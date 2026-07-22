@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <title id="title">SmartCook</title>
+  <path fill="currentColor" d="M10 7.3A6.3 6.3 0 0 1 22 9a5 5 0 0 1 1 9.9V23H9v-4.1A5 5 0 0 1 10 9V7.3Zm1 17.2h10V27H11v-2.5Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M13 14.5v5m3-6v6m3-5v5"/>
+  <path fill="currentColor" d="M24.5 4.5c-3.2.2-5 1.8-5.4 4.8 3.1.1 5-1.5 5.4-4.8Z"/>
+</svg>

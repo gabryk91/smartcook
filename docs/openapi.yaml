@@ -1,0 +1,677 @@
+openapi: 3.1.0
+info:
+  title: SmartCook API
+  version: 1.0.0
+  description: HTTP API exposed by the SmartCook Nextcloud application.
+servers:
+  - url: /apps/smartcook
+security:
+  - nextcloudSession: []
+tags:
+  - { name: Recipes }
+  - { name: Import }
+  - { name: Planner }
+  - { name: Shopping }
+  - { name: Sharing }
+  - { name: Media }
+  - { name: Settings }
+paths:
+  /recipes:
+    get:
+      tags: [Recipes]
+      summary: List recipes accessible to the current user
+      parameters:
+        - { in: query, name: search, schema: { type: string } }
+        - { in: query, name: favorite, schema: { type: boolean } }
+        - { in: query, name: status, schema: { type: string } }
+        - { in: query, name: difficulty, schema: { type: string } }
+        - { in: query, name: maxTime, schema: { type: integer, minimum: 0 } }
+        - { in: query, name: maxCalories, schema: { type: integer, minimum: 0 } }
+        - { in: query, name: tags, schema: { type: string } }
+        - { in: query, name: categories, schema: { type: string } }
+        - { in: query, name: tools, schema: { type: string } }
+        - { in: query, name: ingredients, schema: { type: string } }
+        - { in: query, name: excludeAllergens, schema: { type: string } }
+        - { in: query, name: sort, schema: { type: string } }
+        - { in: query, name: direction, schema: { enum: [asc, desc] } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 200 } }
+      responses:
+        '200':
+          description: Recipe summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [recipes]
+                properties:
+                  recipes: { type: array, items: { $ref: '#/components/schemas/Recipe' } }
+    post:
+      tags: [Recipes]
+      summary: Create a recipe
+      requestBody: { $ref: '#/components/requestBodies/RecipeBody' }
+      responses:
+        '201': { $ref: '#/components/responses/RecipeResponse' }
+        '422': { $ref: '#/components/responses/ErrorResponse' }
+  /recipes/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    get:
+      tags: [Recipes]
+      summary: Get a detailed recipe
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+        '404': { $ref: '#/components/responses/ErrorResponse' }
+    put:
+      tags: [Recipes]
+      summary: Update a recipe
+      requestBody: { $ref: '#/components/requestBodies/RecipeBody' }
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+        '403': { $ref: '#/components/responses/ErrorResponse' }
+        '422': { $ref: '#/components/responses/ErrorResponse' }
+    delete:
+      tags: [Recipes]
+      summary: Delete an owned recipe
+      responses:
+        '200': { $ref: '#/components/responses/DeletedResponse' }
+  /recipes/{id}/favorite:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Recipes]
+      summary: Set favorite state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [favorite]
+              properties: { favorite: { type: boolean } }
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+  /recipes/{id}/cooked:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Recipes]
+      summary: Increment the cooked counter
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+  /recipes/{id}/versions:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Recipes]
+      summary: List revision snapshots
+      responses:
+        '200':
+          description: Revisions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions: { type: array, items: { $ref: '#/components/schemas/RecipeVersion' } }
+  /recipes/{id}/restore/{revision}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+      - { in: path, name: revision, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      tags: [Recipes]
+      summary: Restore a prior revision as the newest revision
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+  /duplicates/check:
+    post:
+      tags: [Recipes]
+      summary: Find likely duplicate recipes
+      requestBody: { $ref: '#/components/requestBodies/RecipeBody' }
+      responses:
+        '200':
+          description: Similarity-ranked matches
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matches: { type: array, items: { $ref: '#/components/schemas/DuplicateMatch' } }
+  /recipes/{id}/merge:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Recipes]
+      summary: Merge another recipe or inline data into a recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                incomingRecipeId: { type: integer, minimum: 1 }
+                recipe: { $ref: '#/components/schemas/RecipeInput' }
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+  /taxonomy:
+    get:
+      tags: [Recipes]
+      summary: List tags, categories, tools and normalized ingredients
+      responses:
+        '200': { description: Taxonomy collections }
+  /stats:
+    get:
+      tags: [Recipes]
+      summary: Get dashboard statistics
+      responses:
+        '200': { description: Dashboard metrics and recent recipes }
+
+  /import/preview:
+    post:
+      tags: [Import]
+      summary: Extract an editable recipe preview
+      requestBody: { $ref: '#/components/requestBodies/ImportBody' }
+      responses:
+        '200':
+          description: Parsed preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportPreview' }
+        '422': { $ref: '#/components/responses/ErrorResponse' }
+  /import/file:
+    post:
+      tags: [Import]
+      summary: Extract a recipe from an uploaded text, JSON, HTML, Markdown, image or PDF file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                language: { type: string }
+                useAi: { type: boolean, default: false }
+                provider: { type: [string, 'null'] }
+      responses:
+        '200': { description: Parsed preview, content: { application/json: { schema: { $ref: '#/components/schemas/ImportPreview' } } } }
+  /import/queue:
+    post:
+      tags: [Import]
+      summary: Queue an import as a Nextcloud background job
+      requestBody: { $ref: '#/components/requestBodies/ImportBody' }
+      responses:
+        '202':
+          description: Queued import
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { job: { $ref: '#/components/schemas/ImportJob' } }
+  /import/jobs:
+    get:
+      tags: [Import]
+      summary: List the current user's import jobs
+      responses:
+        '200':
+          description: Import jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { jobs: { type: array, items: { $ref: '#/components/schemas/ImportJob' } } }
+  /import/jobs/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Import]
+      summary: Get one import job
+      responses:
+        '200': { description: Import job, content: { application/json: { schema: { $ref: '#/components/schemas/ImportJob' } } } }
+
+  /planner:
+    get:
+      tags: [Planner]
+      summary: List planned meals in a date range
+      parameters:
+        - { in: query, name: from, schema: { type: string, format: date } }
+        - { in: query, name: to, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Planned meals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { meals: { type: array, items: { $ref: '#/components/schemas/Meal' } } }
+    post:
+      tags: [Planner]
+      summary: Add a planned meal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [meal]
+              properties: { meal: { $ref: '#/components/schemas/MealInput' } }
+      responses:
+        '201': { description: Created meal, content: { application/json: { schema: { $ref: '#/components/schemas/Meal' } } } }
+  /planner/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    put:
+      tags: [Planner]
+      summary: Update a planned meal
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { meal: { $ref: '#/components/schemas/MealInput' } } } } }
+      responses: { '200': { description: Updated meal } }
+    delete:
+      tags: [Planner]
+      summary: Delete a planned meal
+      responses: { '200': { $ref: '#/components/responses/DeletedResponse' } }
+
+  /shopping:
+    get:
+      tags: [Shopping]
+      summary: List shopping lists
+      responses:
+        '200': { description: Shopping-list summaries }
+    post:
+      tags: [Shopping]
+      summary: Generate a shopping list from recipes and serving counts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, recipes]
+              properties:
+                name: { type: string }
+                recipes:
+                  type: array
+                  items:
+                    type: object
+                    required: [recipeId]
+                    properties:
+                      recipeId: { type: integer, minimum: 1 }
+                      servings: { type: integer, minimum: 1 }
+      responses:
+        '201': { description: Created shopping list, content: { application/json: { schema: { $ref: '#/components/schemas/ShoppingList' } } } }
+  /shopping/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Shopping]
+      summary: Get a shopping list and its items
+      responses:
+        '200': { description: Shopping list, content: { application/json: { schema: { $ref: '#/components/schemas/ShoppingList' } } } }
+    delete:
+      tags: [Shopping]
+      summary: Delete a shopping list
+      responses: { '200': { $ref: '#/components/responses/DeletedResponse' } }
+  /shopping/{id}/items:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Shopping]
+      summary: Add a manual item
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { item: { $ref: '#/components/schemas/ShoppingItemInput' } } } } }
+      responses: { '201': { description: Created item } }
+  /shopping/{listId}/items/{itemId}:
+    parameters:
+      - { in: path, name: listId, required: true, schema: { type: integer, minimum: 1 } }
+      - { in: path, name: itemId, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      tags: [Shopping]
+      summary: Update or check a shopping item
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { item: { $ref: '#/components/schemas/ShoppingItemInput' } } } } }
+      responses: { '200': { description: Updated item } }
+
+  /recipes/{recipeId}/shares:
+    parameters:
+      - { in: path, name: recipeId, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      tags: [Sharing]
+      summary: List shares for an owned recipe
+      responses:
+        '200': { description: Recipe shares }
+    post:
+      tags: [Sharing]
+      summary: Create a user, group or public-link share
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [share]
+              properties: { share: { $ref: '#/components/schemas/ShareInput' } }
+      responses:
+        '201': { description: Created share, content: { application/json: { schema: { $ref: '#/components/schemas/Share' } } } }
+  /recipes/{recipeId}/shares/{shareId}:
+    parameters:
+      - { in: path, name: recipeId, required: true, schema: { type: integer, minimum: 1 } }
+      - { in: path, name: shareId, required: true, schema: { type: integer, minimum: 1 } }
+    delete:
+      tags: [Sharing]
+      summary: Delete a recipe share
+      responses: { '200': { $ref: '#/components/responses/DeletedResponse' } }
+  /public/{token}:
+    get:
+      tags: [Sharing]
+      summary: Render the public recipe page
+      security: []
+      parameters: [{ in: path, name: token, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Public HTML shell, content: { text/html: { schema: { type: string } } } }
+  /public/{token}/data:
+    post:
+      tags: [Sharing]
+      summary: Read the sanitized public recipe after token/password validation
+      security: []
+      parameters: [{ in: path, name: token, required: true, schema: { type: string } }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { password: { type: string, format: password } }
+      responses:
+        '200': { $ref: '#/components/responses/RecipeResponse' }
+        '401': { $ref: '#/components/responses/ErrorResponse' }
+        '404': { $ref: '#/components/responses/ErrorResponse' }
+
+  /recipes/{recipeId}/media:
+    parameters: [{ in: path, name: recipeId, required: true, schema: { type: integer, minimum: 1 } }]
+    post:
+      tags: [Media]
+      summary: Upload a recipe attachment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                kind: { type: string }
+                altText: { type: string }
+      responses:
+        '201': { description: Saved media metadata, content: { application/json: { schema: { $ref: '#/components/schemas/Media' } } } }
+  /media/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Media]
+      summary: Stream or download an authorized attachment
+      responses:
+        '200': { description: Attachment bytes }
+  /recipes/{id}/export/{format}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+      - { in: path, name: format, required: true, schema: { enum: [json, markdown, html] } }
+    get:
+      tags: [Media]
+      summary: Export a recipe
+      responses:
+        '200': { description: Downloadable export }
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Read non-secret user settings and secret-presence flags
+      responses:
+        '200': { description: User settings }
+    put:
+      tags: [Settings]
+      summary: Save user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [settings]
+              properties: { settings: { type: object, additionalProperties: true } }
+      responses:
+        '200': { description: Saved settings without secret values }
+
+components:
+  securitySchemes:
+    nextcloudSession:
+      type: apiKey
+      in: cookie
+      name: nc_session_id
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema: { type: integer, minimum: 1 }
+  requestBodies:
+    RecipeBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [recipe]
+            properties: { recipe: { $ref: '#/components/schemas/RecipeInput' } }
+    ImportBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [kind, payload]
+            properties:
+              kind: { enum: [url, text, html, markdown, json] }
+              payload: { type: object, additionalProperties: true }
+              useAi: { type: boolean, default: false }
+              provider: { type: [string, 'null'] }
+  responses:
+    RecipeResponse:
+      description: Recipe envelope
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [recipe]
+            properties:
+              recipe: { $ref: '#/components/schemas/Recipe' }
+              share: { type: object, additionalProperties: true }
+    DeletedResponse:
+      description: Deleted
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: { ok: { type: boolean } }
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties:
+              error: { type: string }
+              errors: { type: object, additionalProperties: { type: string } }
+  schemas:
+    NamedEntity:
+      type: object
+      required: [name]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        color: { type: [string, 'null'] }
+    Ingredient:
+      type: object
+      required: [name]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        normalizedName: { type: [string, 'null'] }
+        originalText: { type: [string, 'null'] }
+        quantity: { type: [string, 'null'] }
+        amount: { type: [number, 'null'] }
+        unit: { type: [string, 'null'] }
+        notes: { type: [string, 'null'] }
+        optional: { type: boolean }
+        group: { type: [string, 'null'] }
+        category: { type: [string, 'null'] }
+        allergens: { type: array, items: { type: string } }
+        substitutes: { type: array, items: { type: string } }
+        sortOrder: { type: integer }
+    RecipeStep:
+      type: object
+      required: [text]
+      properties:
+        id: { type: integer }
+        text: { type: string }
+        timerSeconds: { type: [integer, 'null'] }
+        temperature: { type: [number, 'null'] }
+        temperatureUnit: { type: [string, 'null'] }
+        notes: { type: [string, 'null'] }
+        imagePath: { type: [string, 'null'] }
+        sortOrder: { type: integer }
+    Media:
+      type: object
+      properties:
+        id: { type: integer }
+        kind: { type: string }
+        path: { type: string }
+        mime: { type: [string, 'null'] }
+        altText: { type: [string, 'null'] }
+    RecipeInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        subtitle: { type: [string, 'null'] }
+        description: { type: [string, 'null'] }
+        language: { type: string, default: en }
+        author: { type: [string, 'null'] }
+        sourceName: { type: [string, 'null'] }
+        sourceUrl: { type: [string, 'null'], format: uri }
+        license: { type: [string, 'null'] }
+        status: { enum: [draft, published, archived] }
+        visibility: { enum: [private, shared, public] }
+        favorite: { type: boolean }
+        servings: { type: integer, minimum: 1 }
+        yieldText: { type: [string, 'null'] }
+        prepTime: { type: integer, minimum: 0 }
+        restTime: { type: integer, minimum: 0 }
+        cookTime: { type: integer, minimum: 0 }
+        totalTime: { type: integer, minimum: 0 }
+        difficulty: { type: [string, 'null'] }
+        costCents: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: [string, 'null'] }
+        cuisine: { type: [string, 'null'] }
+        course: { type: [string, 'null'] }
+        mealType: { type: [string, 'null'] }
+        cookingMethod: { type: [string, 'null'] }
+        season: { type: [string, 'null'] }
+        origin: { type: [string, 'null'] }
+        calories: { type: [integer, 'null'], minimum: 0 }
+        nutrition: { type: object, additionalProperties: true }
+        notes: { type: [string, 'null'] }
+        imagePath: { type: [string, 'null'] }
+        ingredients: { type: array, items: { $ref: '#/components/schemas/Ingredient' } }
+        steps: { type: array, items: { $ref: '#/components/schemas/RecipeStep' } }
+        tags: { type: array, items: { $ref: '#/components/schemas/NamedEntity' } }
+        categories: { type: array, items: { $ref: '#/components/schemas/NamedEntity' } }
+        tools: { type: array, items: { $ref: '#/components/schemas/NamedEntity' } }
+        media: { type: array, items: { $ref: '#/components/schemas/Media' } }
+    Recipe:
+      allOf:
+        - { $ref: '#/components/schemas/RecipeInput' }
+        - type: object
+          properties:
+            id: { type: integer }
+            uuid: { type: string, format: uuid }
+            ownerId: { type: string }
+            revision: { type: integer }
+            cookCount: { type: integer }
+            createdAt: { type: integer }
+            updatedAt: { type: integer }
+    RecipeVersion:
+      type: object
+      properties:
+        revision: { type: integer }
+        snapshot: { $ref: '#/components/schemas/RecipeInput' }
+        createdAt: { type: integer }
+    DuplicateMatch:
+      type: object
+      properties:
+        score: { type: number, minimum: 0, maximum: 1 }
+        recipe: { $ref: '#/components/schemas/Recipe' }
+    ImportPreview:
+      type: object
+      required: [recipe, strategy, warnings, duplicates]
+      properties:
+        recipe: { $ref: '#/components/schemas/RecipeInput' }
+        strategy: { type: string }
+        warnings: { type: array, items: { type: string } }
+        duplicates: { type: array, items: { $ref: '#/components/schemas/DuplicateMatch' } }
+    ImportJob:
+      type: object
+      properties:
+        id: { type: integer }
+        kind: { type: string }
+        status: { enum: [queued, running, complete, failed] }
+        result: { type: [object, 'null'], additionalProperties: true }
+        error: { type: [string, 'null'] }
+        createdAt: { type: integer }
+        updatedAt: { type: integer }
+    MealInput:
+      type: object
+      required: [recipeId, date, slot]
+      properties:
+        recipeId: { type: integer, minimum: 1 }
+        date: { type: string, format: date }
+        slot: { enum: [breakfast, lunch, dinner, snack] }
+        servings: { type: integer, minimum: 1 }
+        notes: { type: [string, 'null'] }
+    Meal:
+      allOf:
+        - { $ref: '#/components/schemas/MealInput' }
+        - type: object
+          properties:
+            id: { type: integer }
+            recipeTitle: { type: string }
+    ShoppingItemInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        quantity: { type: [string, 'null'] }
+        amount: { type: [number, 'null'] }
+        unit: { type: [string, 'null'] }
+        category: { type: [string, 'null'] }
+        checked: { type: boolean }
+        notes: { type: [string, 'null'] }
+    ShoppingList:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        status: { type: string }
+        items: { type: array, items: { $ref: '#/components/schemas/ShoppingItemInput' } }
+        createdAt: { type: integer }
+        updatedAt: { type: integer }
+    ShareInput:
+      type: object
+      required: [type]
+      properties:
+        type: { enum: [user, group, link] }
+        shareWith: { type: [string, 'null'] }
+        permission: { type: integer, enum: [1, 3] }
+        password: { type: [string, 'null'], format: password }
+        expiresAt: { type: [integer, 'null'] }
+    Share:
+      allOf:
+        - { $ref: '#/components/schemas/ShareInput' }
+        - type: object
+          properties:
+            id: { type: integer }
+            token: { type: [string, 'null'] }
+            url: { type: [string, 'null'] }

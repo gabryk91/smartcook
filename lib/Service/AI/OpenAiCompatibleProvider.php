@@ -1,0 +1,73 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OCA\SmartCook\Service\AI;
+
+use OCA\SmartCook\Exception\ImportException;
+use OCP\Http\Client\IClientService;
+
+final class OpenAiCompatibleProvider implements AiProviderInterface {
+    private const PROVIDERS = ['openai', 'openrouter', 'ollama', 'localai', 'mistral', 'custom'];
+
+    public function __construct(
+        private IClientService $clients,
+        private AiPromptFactory $prompts,
+        private AiJsonParser $json,
+        private HttpResponseDecoder $responses,
+    ) {
+    }
+
+    public function supports(string $provider): bool {
+        return in_array($provider, self::PROVIDERS, true);
+    }
+
+    public function extractRecipe(string $text, string $language, array $config): array {
+        $provider = (string)($config['provider'] ?? 'openai');
+        $endpoint = rtrim((string)($config['endpoint'] ?? ''), '/');
+        if ($endpoint === '') {
+            $endpoint = match ($provider) {
+                'openai' => 'https://api.openai.com/v1',
+                'openrouter' => 'https://openrouter.ai/api/v1',
+                'ollama' => 'http://127.0.0.1:11434/v1',
+                'localai' => 'http://127.0.0.1:8080/v1',
+                'mistral' => 'https://api.mistral.ai/v1',
+                default => throw new ImportException('An AI endpoint is required'),
+            };
+        }
+        $model = trim((string)($config['model'] ?? ''));
+        if ($model === '') {
+            throw new ImportException('An AI model is required');
+        }
+        $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];
+        $key = trim((string)($config['apiKey'] ?? ''));
+        if ($key !== '') {
+            $headers['Authorization'] = 'Bearer ' . $key;
+        }
+        if ($provider === 'openrouter') {
+            $headers['X-Title'] = 'SmartCook for Nextcloud';
+        }
+        $payload = [
+            'model' => $model,
+            'temperature' => (float)($config['temperature'] ?? 0.1),
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are a precise culinary data extraction engine.'],
+                ['role' => 'user', 'content' => $this->prompts->recipe($text, $language)],
+            ],
+        ];
+        if (in_array($provider, ['openai', 'openrouter', 'mistral'], true)) {
+            $payload['response_format'] = ['type' => 'json_object'];
+        }
+        $response = $this->clients->newClient()->post($endpoint . '/chat/completions', [
+            'headers' => $headers,
+            'body' => json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
+            'timeout' => (int)($config['timeout'] ?? 90),
+        ]);
+        $body = $this->responses->json($response, 'The AI endpoint');
+        $content = $body['choices'][0]['message']['content'] ?? null;
+        if (!is_string($content)) {
+            throw new ImportException('The AI endpoint returned an unexpected response');
+        }
+        return $this->json->parse($content);
+    }
+}

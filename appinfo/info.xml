@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>smartcook</id>
+    <name>SmartCook</name>
+    <summary>Intelligent, multilingual recipe management for Nextcloud</summary>
+    <description><![CDATA[
+SmartCook is a self-hosted recipe manager with structured ingredients, tags, automatic import from URLs or text, optional AI extraction, OCR adapters, meal planning, shopping lists, sharing, history and exports.
+    ]]></description>
+    <version>1.0.1</version>
+    <licence>AGPL-3.0-or-later</licence>
+    <author>SmartCook contributors</author>
+    <namespace>SmartCook</namespace>
+    <category>multimedia</category>
+    <category>organization</category>
+    <dependencies>
+        <php min-version="8.1"/>
+        <nextcloud min-version="31" max-version="34"/>
+        <database>mysql</database>
+        <database>pgsql</database>
+        <database>sqlite</database>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <id>smartcook</id>
+            <name>SmartCook</name>
+            <route>smartcook.page.index</route>
+            <icon>app.svg</icon>
+            <type>link</type>
+        </navigation>
+    </navigations>
+</info>
