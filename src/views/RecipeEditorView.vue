@@ -15,6 +15,7 @@ const shareWith = ref('')
 const sharePassword = ref('')
 const shareEdit = ref(false)
 const attachment = ref<File | null>(null)
+const coverAttachment = ref<File | null>(null)
 
 const tagsText = computed({
 	get: () => recipe.value.tags.map(item => item.name).join(', '),
@@ -34,6 +35,34 @@ function splitNames(value: string) {
 	return [...new Set(value.split(/[,;]+/).map(name => name.trim()).filter(Boolean))].map(name => ({ name }))
 }
 
+function timerParts(seconds?: number | null) {
+	const value = Math.max(0, Number(seconds || 0))
+	if (value >= 3600 && value % 3600 === 0) return { value: value / 3600, unit: 'hours' as const }
+	if (value >= 60 && value % 60 === 0) return { value: value / 60, unit: 'minutes' as const }
+	return { value: value || null, unit: 'seconds' as const }
+}
+
+function hydrateTimers(steps: Recipe['steps']) {
+	return steps.map(step => ({ ...step, ...timerParts(step.timerSeconds) }))
+}
+
+function timerSeconds(value: number | null | undefined, unit: string | null | undefined) {
+	if (value === null || value === undefined) return null
+	const amount = Math.max(0, Number(value || 0))
+	return unit === 'hours' ? Math.round(amount * 3600) : unit === 'minutes' ? Math.round(amount * 60) : Math.round(amount)
+}
+
+function formatBytes(value?: number | null) {
+	if (!value || value < 0) return '—'
+	if (value < 1024) return `${value} B`
+	if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+	return `${(value / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function formatMediaDate(value?: number) {
+	return value ? new Date(value * 1000).toLocaleString() : '—'
+}
+
 const load = async () => {
 	if (!props.recipeId) {
 		recipe.value = emptyRecipe()
@@ -43,6 +72,7 @@ const load = async () => {
 	}
 	await runBusy(async () => {
 		recipe.value = await api.recipe(props.recipeId!)
+		recipe.value.steps = hydrateTimers(recipe.value.steps)
 		shares.value = await api.shares(props.recipeId!)
 		versions.value = await api.versions(props.recipeId!)
 	})
@@ -54,11 +84,21 @@ const save = async () => {
 	await runBusy(async () => {
 		recipe.value.totalTime = totalTime.value
 		recipe.value.ingredients = recipe.value.ingredients.filter(item => item.name.trim() || item.originalText?.trim())
-		recipe.value.steps = recipe.value.steps.filter(step => step.text.trim())
+		recipe.value.steps = recipe.value.steps.filter(step => step.text.trim()).map(step => ({
+			...step,
+			timerSeconds: timerSeconds(step.timerValue, step.timerUnit),
+		}))
 		const saved = recipe.value.id
 			? await api.updateRecipe(recipe.value.id, recipe.value)
 			: await api.createRecipe(recipe.value)
 		recipe.value = saved
+		recipe.value.steps = hydrateTimers(recipe.value.steps)
+		if (coverAttachment.value && saved.id) {
+			await api.uploadMedia(saved.id, coverAttachment.value, 'image', t('smartcook', 'Cover image'))
+			recipe.value = await api.recipe(saved.id)
+			recipe.value.steps = hydrateTimers(recipe.value.steps)
+			coverAttachment.value = null
+		}
 		notify(t('smartcook', 'Recipe saved'))
 		if (!props.recipeId && saved.id) location.hash = `#/recipes/${saved.id}`
 	})
@@ -74,7 +114,7 @@ const deleteRecipe = async () => {
 }
 
 const addIngredient = () => recipe.value.ingredients.push({ name: '', quantity: null, unit: null })
-const addStep = () => recipe.value.steps.push({ text: '' })
+const addStep = () => recipe.value.steps.push({ text: '', timerValue: null, timerUnit: 'seconds' })
 
 const createShare = async () => {
 	if (!recipe.value.id) return
@@ -148,7 +188,8 @@ const copy = async (value: unknown) => {
 					<label>{{ t('smartcook', 'Status') }}<select v-model="recipe.status"><option value="draft">{{ t('smartcook', 'Draft') }}</option><option value="published">{{ t('smartcook', 'Published') }}</option></select></label>
 					<label>{{ t('smartcook', 'Visibility') }}<select v-model="recipe.visibility"><option value="private">{{ t('smartcook', 'Private') }}</option><option value="shared">{{ t('smartcook', 'Shared') }}</option><option value="public">{{ t('smartcook', 'Public') }}</option></select></label>
 					<label class="span-2">{{ t('smartcook', 'Source URL') }}<input v-model="recipe.sourceUrl" type="url" placeholder="https://…"></label>
-					<label class="span-2">{{ t('smartcook', 'Image URL') }}<input v-model="recipe.imagePath" type="url" placeholder="https://…"></label>
+					<label class="span-2">{{ t('smartcook', 'Image URL') }}<input v-model="recipe.imagePath" type="url" placeholder="https://…"><small>{{ t('smartcook', 'Or upload a cover image below') }}</small></label>
+					<label class="span-2 cover-upload">{{ t('smartcook', 'Cover image') }}<input type="file" accept="image/*" @change="coverAttachment = ($event.target as HTMLInputElement).files?.[0] || null"><small>{{ t('smartcook', 'The uploaded image becomes the recipe cover after saving.') }}</small></label>
 				</div>
 			</section>
 
@@ -185,7 +226,7 @@ const copy = async (value: unknown) => {
 				<div class="step-list">
 					<div v-for="(step, index) in recipe.steps" :key="index" class="step-editor">
 						<span>{{ index + 1 }}</span>
-						<div><textarea v-model="step.text" rows="3" :placeholder="t('smartcook', 'Describe this step…')"></textarea><div class="inline-fields"><label>{{ t('smartcook', 'Timer') }}<input v-model.number="step.timerSeconds" type="number" min="0" placeholder="sec"></label><label>{{ t('smartcook', 'Temperature') }}<input v-model.number="step.temperature" type="number"><select v-model="step.temperatureUnit"><option value="°C">°C</option><option value="°F">°F</option></select></label></div></div>
+						<div><textarea v-model="step.text" rows="3" :placeholder="t('smartcook', 'Describe this step…')"></textarea><div class="inline-fields"><label>{{ t('smartcook', 'Timer quantity') }}<input v-model.number="step.timerValue" type="number" min="0" step="any"></label><label>{{ t('smartcook', 'Timer unit') }}<select v-model="step.timerUnit"><option value="seconds">{{ t('smartcook', 'seconds') }}</option><option value="minutes">{{ t('smartcook', 'minutes') }}</option><option value="hours">{{ t('smartcook', 'hours') }}</option></select></label><label class="temperature-field">{{ t('smartcook', 'Temperature') }}<span><input v-model.number="step.temperature" type="number"><select v-model="step.temperatureUnit"><option value="°C">°C</option><option value="°F">°F</option></select></span></label></div></div>
 						<button class="icon-button danger" @click="recipe.steps.splice(index, 1)">×</button>
 					</div>
 				</div>
@@ -204,7 +245,7 @@ const copy = async (value: unknown) => {
 			<section v-if="recipe.id" class="panel form-section">
 				<div class="section-heading"><div><p class="eyebrow">{{ t('smartcook', 'Nextcloud Files') }}</p><h2>{{ t('smartcook', 'Attachments') }}</h2></div></div>
 				<div class="upload-row"><input type="file" @change="attachment = ($event.target as HTMLInputElement).files?.[0] || null"><button class="secondary" :disabled="!attachment" @click="uploadAttachment">{{ t('smartcook', 'Upload') }}</button></div>
-				<div class="attachment-list"><a v-for="item in recipe.media" :key="item.id || item.path" :href="item.id ? mediaUrl(item.id) : '#'" target="_blank" rel="noopener"><span>{{ item.kind === 'image' ? '▧' : item.kind === 'pdf' ? 'PDF' : '↗' }}</span><div><strong>{{ item.path.split('/').pop() }}</strong><small>{{ item.mime }}</small></div></a></div>
+				<ul class="attachment-list"><li v-for="item in recipe.media" :key="item.id || item.path"><a :href="item.id ? mediaUrl(item.id) : '#'" target="_blank" rel="noopener"><span>{{ item.kind === 'image' ? '▧' : item.kind === 'pdf' ? 'PDF' : '↗' }}</span><div><strong>{{ item.altText || item.path.split('/').pop() }}</strong><small>{{ item.mime || item.kind }} · {{ formatBytes(item.fileSize) }} · {{ formatMediaDate(item.createdAt) }}</small></div></a></li></ul>
 			</section>
 		</template>
 

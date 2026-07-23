@@ -30,7 +30,7 @@ final class HtmlImporter implements ImporterInterface {
         if ($structured !== null) {
             $recipe = $this->normalizer->normalize($structured, $sourceUrl);
             if (($recipe['imagePath'] ?? null) === null && $text['image'] !== null) {
-                $recipe['imagePath'] = $text['image'];
+                $recipe['imagePath'] = $this->normalizer->imageUrl($text['image'], $sourceUrl);
             }
             return new ImportResult($recipe, $text['text'], 'schema-org-jsonld');
         }

@@ -39,8 +39,8 @@ onMounted(() => runBusy(async () => { stats.value = await api.stats() }).catch((
 				<div v-else class="empty-state"><h3>{{ t('smartcook', 'Your cookbook is ready') }}</h3><p>{{ t('smartcook', 'Create a recipe or import one from a webpage or text.') }}</p><a class="primary" href="#/import">{{ t('smartcook', 'Import a recipe') }}</a></div>
 			</article>
 			<div class="view-stack">
-				<article class="panel"><p class="eyebrow">{{ t('smartcook', 'Most used') }}</p><h2>{{ t('smartcook', 'Ingredients') }}</h2><div class="tag-cloud"><span v-for="item in stats.topIngredients" :key="item.name">{{ item.name }} <b>{{ item.count }}</b></span><small v-if="!stats.topIngredients.length">{{ t('smartcook', 'No data yet') }}</small></div></article>
-				<article class="panel"><p class="eyebrow">{{ t('smartcook', 'Organization') }}</p><h2>{{ t('smartcook', 'Top tags') }}</h2><div class="tag-cloud"><span v-for="item in stats.topTags" :key="item.name">#{{ item.name }} <b>{{ item.count }}</b></span><small v-if="!stats.topTags.length">{{ t('smartcook', 'No tags yet') }}</small></div></article>
+				<article class="panel dashboard-stat-panel"><p class="eyebrow">{{ t('smartcook', 'Most used') }}</p><h2>{{ t('smartcook', 'Ingredients') }}</h2><div class="tag-cloud"><span v-for="item in stats.topIngredients" :key="item.name">{{ item.name }} <b>{{ item.count }}</b></span><small v-if="!stats.topIngredients.length">{{ t('smartcook', 'No data yet') }}</small></div></article>
+				<article class="panel dashboard-stat-panel"><p class="eyebrow">{{ t('smartcook', 'Organization') }}</p><h2>{{ t('smartcook', 'Top tags') }}</h2><div class="tag-cloud"><span v-for="item in stats.topTags" :key="item.name">#{{ item.name }} <b>{{ item.count }}</b></span><small v-if="!stats.topTags.length">{{ t('smartcook', 'No tags yet') }}</small></div></article>
 			</div>
 		</section>
 	</div>

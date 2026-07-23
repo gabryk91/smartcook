@@ -20,13 +20,7 @@ final class RecipeNormalizer {
                 $author = $author['name'] ?? null;
             }
         }
-        $image = $data['image'] ?? $data['imagePath'] ?? null;
-        if (is_array($image)) {
-            $image = array_is_list($image) ? ($image[0] ?? null) : ($image['url'] ?? $image['contentUrl'] ?? null);
-        }
-        if (is_string($image) && $sourceUrl !== null) {
-            $image = $this->absoluteUrl($image, $sourceUrl);
-        }
+        $image = $this->imageUrl($data['image'] ?? $data['imagePath'] ?? null, $sourceUrl);
         $yield = $data['recipeYield'] ?? $data['yieldText'] ?? null;
         if (is_array($yield)) {
             $yield = implode(', ', array_map('strval', $yield));
@@ -99,6 +93,20 @@ final class RecipeNormalizer {
             $recipe['totalTime'] = $recipe['prepTime'] + $recipe['restTime'] + $recipe['cookTime'];
         }
         return $recipe;
+    }
+
+    public function imageUrl(mixed $image, ?string $sourceUrl = null): ?string {
+        if (is_array($image)) {
+            $image = array_is_list($image) ? ($image[0] ?? null) : ($image['url'] ?? $image['contentUrl'] ?? null);
+        }
+        if (!is_string($image)) {
+            return null;
+        }
+        $image = trim($image);
+        if ($image === '' || str_starts_with(strtolower($image), 'data:')) {
+            return null;
+        }
+        return $sourceUrl !== null ? $this->absoluteUrl($image, $sourceUrl) : $image;
     }
 
     /** @return list<array<string, mixed>> */

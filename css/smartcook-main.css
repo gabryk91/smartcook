@@ -27,7 +27,10 @@ a {
 }
 
 .smartcook-shell {
-	min-height: calc(100vh - var(--header-height, 50px));
+	display: flex;
+	height: calc(100vh - var(--header-height, 50px));
+	min-height: 0;
+	overflow: hidden;
 	background: var(--smartcook-surface-soft);
 	color: var(--smartcook-text);
 }
@@ -115,11 +118,14 @@ a {
 }
 
 .smartcook-content {
+	flex: 1 1 auto;
 	min-width: 0;
+	min-height: 0;
 	margin-inline-start: 250px;
 	padding: 28px clamp(18px, 3vw, 48px) 60px;
 	background: var(--smartcook-surface-soft);
-	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .page-header {
@@ -274,6 +280,56 @@ button:disabled,
 	cursor: pointer;
 }
 
+.blocking-modal {
+	position: fixed;
+	z-index: 1000;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: rgb(10 20 30 / 58%);
+	cursor: wait;
+}
+
+.blocking-modal[hidden] {
+	display: none !important;
+}
+
+.blocking-modal-card {
+	display: grid;
+	justify-items: center;
+	gap: 12px;
+	width: min(440px, 100%);
+	padding: 32px;
+	border: 2px solid var(--smartcook-accent);
+	border-radius: 18px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 18px 60px rgb(0 0 0 / 28%);
+	text-align: center;
+}
+
+.blocking-modal-card h2,
+.blocking-modal-card p {
+	margin: 0;
+}
+
+.blocking-modal-card p {
+	color: var(--smartcook-muted);
+}
+
+.loading-spinner {
+	width: 42px;
+	height: 42px;
+	border: 4px solid color-mix(in srgb, var(--smartcook-accent) 22%, transparent);
+	border-block-start-color: var(--smartcook-accent);
+	border-radius: 50%;
+	animation: smartcook-spin .8s linear infinite;
+}
+
+@keyframes smartcook-spin {
+	to { transform: rotate(360deg); }
+}
+
 .metric-grid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -417,6 +473,21 @@ button:disabled,
 	color: var(--smartcook-muted);
 }
 
+.dashboard-stat-panel,
+.dashboard-cloud {
+	padding: 18px 22px 22px;
+}
+
+.dashboard-stat-panel h2,
+.dashboard-cloud h2 {
+	margin: 4px 0 18px;
+}
+
+.dashboard-stat-panel .tag-cloud,
+.dashboard-cloud .tag-cloud {
+	padding: 0;
+}
+
 .empty-state,
 .empty-preview {
 	display: grid;
@@ -495,6 +566,18 @@ select:focus {
 	outline: 2px solid color-mix(in srgb, var(--smartcook-accent) 45%, transparent);
 	outline-offset: 1px;
 	border-color: var(--smartcook-accent);
+}
+
+.form-grid input[type='number'] {
+	width: 12ch;
+}
+
+.form-grid input[type='date'] {
+	width: 16ch;
+}
+
+.form-grid select {
+	max-width: 18rem;
 }
 
 .check-inline {
@@ -614,6 +697,26 @@ select:focus {
 	color: var(--smartcook-muted);
 }
 
+.card-footer {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.cuisine-label {
+	flex: 0 1 auto;
+	font-size: 12px;
+	color: var(--smartcook-muted);
+	text-align: end;
+}
+
+.editor-top {
+	display: grid;
+	gap: 20px;
+	padding: 24px;
+}
+
 .editor-actions {
 	position: sticky;
 	z-index: 8;
@@ -663,6 +766,11 @@ select:focus {
 	padding: 24px;
 }
 
+.form-section > .section-heading {
+	padding-block-end: 12px;
+	border-block-end: 1px solid color-mix(in srgb, var(--smartcook-accent) 25%, var(--smartcook-border));
+}
+
 .form-grid {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -685,7 +793,7 @@ select:focus {
 .ingredient-head,
 .ingredient-row {
 	display: grid;
-	grid-template-columns: 110px 110px minmax(180px, 1.2fr) minmax(150px, 1fr) 38px;
+	grid-template-columns: 110px 110px minmax(180px, 1.2fr) minmax(150px, 1fr) minmax(100px, auto) 38px;
 	gap: 8px;
 	align-items: center;
 }
@@ -695,6 +803,30 @@ select:focus {
 	font-size: 12px;
 	font-weight: 650;
 	color: var(--smartcook-muted);
+}
+
+.ingredient-row .tiny-check {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 6px;
+	min-width: 0;
+	white-space: nowrap;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.ingredient-row .tiny-check input {
+	width: 18px;
+	min-width: 18px;
+	height: 18px;
+	min-height: 18px;
+	margin: 0;
+}
+
+.ingredient-row > .icon-button {
+	grid-column: 6;
+	justify-self: center;
 }
 
 .step-list {
@@ -723,6 +855,65 @@ select:focus {
 	font-weight: 700;
 }
 
+.step-row {
+	display: grid;
+	grid-template-columns: 34px minmax(0, 1fr) 38px;
+	gap: 10px 12px;
+	align-items: start;
+	padding: 14px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 12px;
+}
+
+.step-number {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: var(--smartcook-accent);
+	color: var(--color-primary-element-text, #fff);
+	font-weight: 700;
+}
+
+.step-row > textarea {
+	grid-column: 2;
+	min-width: 0;
+}
+
+.step-extras {
+	display: grid;
+	grid-template-columns: minmax(120px, 14ch) minmax(125px, 15ch) minmax(90px, 12ch) 64px;
+	gap: 8px;
+	grid-column: 2;
+}
+
+.step-extras .compact-field {
+	display: grid;
+	gap: 4px;
+	font-size: 11px;
+	font-weight: 650;
+	color: var(--smartcook-muted);
+}
+
+.step-extras input,
+.step-extras select {
+	width: 100%;
+	min-width: 0;
+}
+
+.step-extras .temperature-field > span {
+	display: grid;
+	grid-template-columns: minmax(70px, 1fr) 64px;
+	gap: 6px;
+}
+
+.step-row > .icon-button {
+	grid-column: 3;
+	grid-row: 1 / span 2;
+	justify-self: center;
+}
+
 .inline-fields,
 .upload-row,
 .add-item {
@@ -744,12 +935,81 @@ select:focus {
 	width: 65px;
 }
 
+.cover-upload {
+	padding: 12px;
+	border: 1px dashed color-mix(in srgb, var(--smartcook-accent) 45%, var(--smartcook-border));
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--smartcook-accent) 5%, var(--smartcook-surface));
+}
+
+.danger-zone {
+	border: 2px solid #e00000;
+	background: #fff4f4;
+}
+
+.danger-zone h2 {
+	color: #e00000 !important;
+	font-weight: 800;
+}
+
+.danger-zone .full {
+	width: fit-content;
+}
+
+.danger-zone .danger.secondary {
+	border: 2px solid #e00000;
+	background: #e00000;
+	color: #fff !important;
+	font-weight: 800;
+}
+
+.danger-zone .danger.secondary:hover {
+	border-color: #b00000;
+	background: #b00000;
+	color: #fff !important;
+}
+
 .attachment-list,
 .share-list,
 .version-list,
 .shopping-items {
 	display: grid;
 	gap: 8px;
+}
+
+.attachment-list {
+	margin: 14px 0 0;
+	padding-inline-start: 22px;
+}
+
+.attachment-list li::marker {
+	color: var(--smartcook-accent);
+}
+
+.media-list {
+	margin: 14px 0 0;
+	padding-inline-start: 22px;
+	display: grid;
+	gap: 8px;
+}
+
+.media-list li::marker {
+	color: var(--smartcook-accent);
+}
+
+.media-list a {
+	display: grid;
+	gap: 3px;
+	color: var(--smartcook-text);
+	text-decoration: none;
+}
+
+.media-list a:hover strong {
+	text-decoration: underline;
+}
+
+.media-list small {
+	color: var(--smartcook-muted);
 }
 
 .attachment-list a,
@@ -772,6 +1032,13 @@ select:focus {
 	flex: 1;
 	gap: 3px;
 	min-width: 0;
+}
+
+.version-list > div > div {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 6px 8px;
 }
 
 .attachment-list small,
@@ -855,6 +1122,15 @@ select:focus {
 .preview-panel {
 	min-height: 600px;
 	padding: 24px;
+}
+
+.import-cover-preview {
+	display: block;
+	width: 100%;
+	max-height: 240px;
+	object-fit: cover;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 12px;
 }
 
 .preview-panel label {
@@ -1357,8 +1633,12 @@ select:focus {
 	}
 
 	.smartcook-content {
+		height: auto;
+		min-height: calc(100vh - var(--header-height, 50px));
+		flex: none;
 		margin-inline-start: 0;
 		padding: 18px 12px 45px;
+		overflow: visible;
 	}
 
 	.two-column,
@@ -1378,7 +1658,7 @@ select:focus {
 	}
 
 	.ingredient-row {
-		grid-template-columns: 1fr 1fr 38px;
+		grid-template-columns: 1fr 1fr;
 		padding: 10px;
 		border: 1px solid var(--smartcook-border);
 		border-radius: 10px;
@@ -1386,12 +1666,18 @@ select:focus {
 
 	.ingredient-row input:nth-child(3),
 	.ingredient-row input:nth-child(4) {
-		grid-column: span 2;
+		grid-column: 1 / -1;
+	}
+
+	.ingredient-row .tiny-check {
+		grid-column: 1;
+		grid-row: 3;
 	}
 
 	.ingredient-row .icon-button {
-		grid-column: 3;
-		grid-row: 1;
+		grid-column: 2;
+		grid-row: 3;
+		justify-self: end;
 	}
 
 	.editor-actions {
@@ -1406,6 +1692,14 @@ select:focus {
 	.pipeline {
 		max-width: 100%;
 		overflow-x: auto;
+	}
+
+	.step-row {
+		grid-template-columns: 34px minmax(0, 1fr) 34px;
+	}
+
+	.step-extras {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
@@ -1424,6 +1718,7 @@ select:focus {
 	}
 
 	.form-section,
+	.editor-top,
 	.preview-panel,
 	.shopping-sheet {
 		padding: 17px;

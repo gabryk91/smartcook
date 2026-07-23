@@ -25,7 +25,14 @@ final class HtmlTextExtractor {
             $node->appendChild($dom->createTextNode("\n"));
         }
         $title = $this->meta($xpath, 'property', 'og:title') ?? trim((string)($xpath->query('//title')->item(0)?->textContent ?? ''));
-        $image = $this->meta($xpath, 'property', 'og:image');
+        $image = $this->meta($xpath, 'property', 'og:image')
+            ?? $this->meta($xpath, 'property', 'og:image:url')
+            ?? $this->meta($xpath, 'name', 'twitter:image');
+        if ($image === null) {
+            $imageNode = $xpath->query('//main//img[@src] | //article//img[@src] | //img[@src]')->item(0);
+            $candidate = trim((string)($imageNode?->getAttribute('src') ?? ''));
+            $image = $candidate !== '' ? $candidate : null;
+        }
         $description = $this->meta($xpath, 'name', 'description') ?? $this->meta($xpath, 'property', 'og:description');
         $body = $xpath->query('//body')->item(0);
         $text = $body?->textContent ?? $dom->textContent;

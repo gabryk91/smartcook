@@ -43,13 +43,18 @@ final class IngredientParser {
         } elseif (preg_match('/^(' . $unitPattern . ')\.?\s+(?:di\s+|of\s+)?(.+)$/iu', $line, $m) === 1) {
             $unit = $this->normalizer->normalizeUnit($m[1]);
             $name = trim($m[2]);
+        } elseif (preg_match('/^(.+?)\s+(' . $quantityPattern . ')\s+(' . $unitPattern . ')\.?\b(?:\s+(.+))?$/iu', $line, $m) === 1) {
+            $name = trim($m[1]);
+            $quantity = trim($m[2]);
+            $unit = $this->normalizer->normalizeUnit($m[3]);
+            $notes = isset($m[4]) && trim($m[4]) !== '' ? trim($m[4]) : null;
         }
 
-        $notes = null;
-        if (preg_match('/^(.+?)\s*\(([^)]+)\)\s*$/u', $name, $m) === 1) {
+        $notes ??= null;
+        if ($notes === null && preg_match('/^(.+?)\s*\(([^)]+)\)\s*$/u', $name, $m) === 1) {
             $name = trim($m[1]);
             $notes = trim($m[2]);
-        } elseif (preg_match('/^(.+?),\s*(.+)$/u', $name, $m) === 1 && mb_strlen($m[2]) < 100) {
+        } elseif ($notes === null && preg_match('/^(.+?),\s*(.+)$/u', $name, $m) === 1 && mb_strlen($m[2]) < 100) {
             $name = trim($m[1]);
             $notes = trim($m[2]);
         }

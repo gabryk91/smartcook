@@ -12,6 +12,7 @@ const publicRoot = document.getElementById('smartcook-public');
 let busyCount = 0;
 let messageTimer = 0;
 const tr = (text) => smartWindow.t ? smartWindow.t(appId, text) : text;
+const mealLabel = (slot) => tr({ breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }[slot] || 'Meal');
 const esc = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
@@ -36,6 +37,16 @@ const appUrl = (path) => smartWindow.OC?.generateUrl
     ? smartWindow.OC.generateUrl(`/apps/${appId}${path}`)
     : `/index.php/apps/${appId}${path}`;
 const mediaUrl = (id) => appUrl(`/media/${id}`);
+const formatBytes = (value) => {
+    if (!value || value < 0)
+        return '—';
+    if (value < 1024)
+        return `${value} B`;
+    if (value < 1024 * 1024)
+        return `${(value / 1024).toFixed(1)} KB`;
+    return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+};
+const formatMediaDate = (value) => value ? new Date(value * 1000).toLocaleString() : '—';
 const recipeImageUrl = (value) => {
     const text = String(value ?? '');
     const stored = /^media:(\d+)$/.exec(text);
@@ -294,9 +305,9 @@ function editorForm(recipe) {
 		</main>
 		<aside class="view-stack editor-aside">
 			${recipe.id ? `<section class="panel form-section"><p class="eyebrow">${esc(tr('Exports'))}</p><h2>${esc(tr('Download'))}</h2><div class="export-buttons"><a class="secondary" href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></section>
-			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2><input data-media-file type="file"><button class="secondary full" data-upload-media type="button">${esc(tr('Upload attachment'))}</button><div class="media-list">${recipe.media.map(item => item.id ? `<a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener">${esc(item.altText || item.path.split('/').pop() || item.kind)}</a>` : '').join('')}</div></section>
+			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2><label>${esc(tr('Cover image'))}<input data-cover-file type="file" accept="image/*"><small>${esc(tr('The uploaded image becomes the recipe cover after saving.'))}</small></label><input data-media-file type="file"><button class="secondary full" data-upload-media type="button">${esc(tr('Upload attachment'))}</button><ul class="media-list">${recipe.media.map(item => item.id ? `<li><a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener"><strong>${esc(item.altText || item.path.split('/').pop() || item.kind)}</strong><small>${esc(item.mime || item.kind)} · ${formatBytes(item.fileSize)} · ${formatMediaDate(item.createdAt)}</small></a></li>` : '').join('')}</ul></section>
 			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with placeholder="${attr(tr('User or group ID'))}"><input data-share-password type="password" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary full" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
-			<section class="panel form-section" data-history-section><p class="eyebrow">${esc(tr('Audit trail'))}</p><h2>${esc(tr('Version history'))}</h2><div data-version-list></div></section>
+			<section class="panel form-section" data-history-section><p class="eyebrow">${esc(tr('Audit trail'))}</p><h2>${esc(tr('Version history'))}</h2><div class="version-list" data-version-list></div></section>
 			<section class="panel form-section danger-zone"><h2>${esc(tr('Danger zone'))}</h2><button class="danger secondary full" data-delete-recipe type="button">${esc(tr('Delete recipe'))}</button></section>` : `<section class="panel empty-state"><h2>${esc(tr('Save first'))}</h2><p>${esc(tr('Attachments, sharing, exports and version history become available after the first save.'))}</p></section>`}
 		</aside>
 	</div>`;
@@ -318,10 +329,19 @@ async function renderEditor(view, id) {
         });
         view.querySelector('[data-save-recipe]')?.addEventListener('click', async () => {
             const payload = collectRecipe(view, recipe);
+            const cover = view.querySelector('[data-cover-file]')?.files?.[0];
             const response = recipe.id
                 ? await working(() => request(`/recipes/${recipe.id}`, { method: 'PUT', json: { recipe: payload } }))
                 : await working(() => request('/recipes', { method: 'POST', json: { recipe: payload } }));
             recipe = response.recipe;
+            if (cover && recipe.id) {
+                const form = new FormData();
+                form.append('file', cover);
+                form.append('kind', 'image');
+                form.append('altText', tr('Cover image'));
+                await working(() => request(`/recipes/${recipe.id}/media`, { method: 'POST', body: form }));
+                recipe = (await request(`/recipes/${recipe.id}`)).recipe;
+            }
             showNotice(tr('Recipe saved'));
             if (!id && recipe.id)
                 location.hash = `#/recipes/${recipe.id}`;
@@ -503,7 +523,7 @@ async function renderPlanner(view) {
     };
     const paint = (days) => {
         view.innerHTML = `<section class="toolbar panel planner-toolbar"><button class="secondary" data-week-back type="button">&larr;</button><div><p class="eyebrow">${esc(tr('Week'))}</p><h2>${esc(days[0].toLocaleDateString())} - ${esc(days[6].toLocaleDateString())}</h2></div><button class="secondary" data-week-forward type="button">&rarr;</button><button class="ghost" data-week-today type="button">${esc(tr('Today'))}</button></section>
-		<section class="planner-grid">${days.map(day => `<article class="day-column panel ${dateIso(day) === dateIso(new Date()) ? 'today' : ''}"><header><span>${esc(day.toLocaleDateString(undefined, { weekday: 'short' }))}</span><strong>${day.getDate()}</strong></header>${meals.filter(meal => meal.date === dateIso(day)).map(meal => `<div class="meal-card"><small>${esc(meal.slot)}</small><a href="#/recipes/${meal.recipeId}">${esc(meal.recipeTitle)}</a><span>${meal.servings} ${esc(tr('servings'))}</span><button data-delete-meal="${meal.id}" type="button">x</button></div>`).join('')}<button class="add-meal" data-select-date="${dateIso(day)}" type="button">+</button></article>`).join('')}</section>
+		<section class="planner-grid">${days.map(day => `<article class="day-column panel ${dateIso(day) === dateIso(new Date()) ? 'today' : ''}"><header><span>${esc(day.toLocaleDateString(undefined, { weekday: 'short' }))}</span><strong>${day.getDate()}</strong></header>${meals.filter(meal => meal.date === dateIso(day)).map(meal => `<div class="meal-card"><small>${esc(mealLabel(meal.slot))}</small><a href="#/recipes/${meal.recipeId}">${esc(meal.recipeTitle)}</a><span>${meal.servings} ${esc(tr('servings'))}</span><button data-delete-meal="${meal.id}" type="button">x</button></div>`).join('')}<button class="add-meal" data-select-date="${dateIso(day)}" type="button">+</button></article>`).join('')}</section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Plan'))}</p><h2>${esc(tr('Add a meal'))}</h2></div></div><div class="form-grid four"><label>${esc(tr('Date'))}<input data-meal-date type="date" value="${dateIso(new Date())}"></label><label>${esc(tr('Recipe'))}<select data-meal-recipe>${recipes.map(recipe => `<option value="${recipe.id}">${esc(recipe.title)}</option>`).join('')}</select></label><label>${esc(tr('Meal'))}<select data-meal-slot><option value="breakfast">${esc(tr('Breakfast'))}</option><option value="lunch">${esc(tr('Lunch'))}</option><option value="dinner" selected>${esc(tr('Dinner'))}</option><option value="snack">${esc(tr('Snack'))}</option></select></label><label>${esc(tr('Servings'))}<input data-meal-servings type="number" min="1" value="2"></label></div><button class="primary" data-add-meal type="button">${esc(tr('Add to plan'))}</button></section>`;
         view.querySelector('[data-week-back]')?.addEventListener('click', () => { weekStart.setDate(weekStart.getDate() - 7); void load(); });
         view.querySelector('[data-week-forward]')?.addEventListener('click', () => { weekStart.setDate(weekStart.getDate() + 7); void load(); });

@@ -11,6 +11,7 @@ const text = ref('')
 const file = ref<File | null>(null)
 const language = ref(document.documentElement.lang || 'it')
 const useAi = ref(false)
+const extracting = ref(false)
 const provider = ref('')
 const preview = ref<ImportPreview | null>(null)
 const sourceKinds: Array<{ id: typeof kind.value; label: string }> = [
@@ -22,14 +23,30 @@ const sourceKinds: Array<{ id: typeof kind.value; label: string }> = [
 ]
 
 const canImport = computed(() => kind.value === 'file' ? file.value !== null : kind.value === 'url' ? url.value.trim() !== '' : text.value.trim() !== '')
+const modalText = (key: string) => {
+	if ((document.documentElement.lang || '').toLowerCase().startsWith('it')) {
+		return {
+			'AI extraction in progress': 'Estrazione AI in corso',
+			'The AI is refining the recipe. This may take a little longer.': 'L’AI sta perfezionando la ricetta. Potrebbe richiedere qualche secondo in più.',
+			'Extracting recipe data': 'Estrazione dei dati della ricetta',
+			'Please wait while the recipe is being analyzed.': 'Attendi mentre la ricetta viene analizzata.',
+		}[key] || key
+	}
+	return t('smartcook', key)
+}
 
 const extract = async () => {
-	await runBusy(async () => {
-		preview.value = kind.value === 'file'
-			? await api.previewFile(file.value!, language.value, useAi.value, provider.value || undefined)
-			: await api.previewImport(kind.value, kind.value === 'url' ? { url: url.value, language: language.value } : { text: text.value, language: language.value }, useAi.value, provider.value || undefined)
-		notify(t('smartcook', 'Recipe data extracted. Review it before saving.'))
-	})
+	extracting.value = true
+	try {
+		await runBusy(async () => {
+			preview.value = kind.value === 'file'
+				? await api.previewFile(file.value!, language.value, useAi.value, provider.value || undefined)
+				: await api.previewImport(kind.value, kind.value === 'url' ? { url: url.value, language: language.value } : { text: text.value, language: language.value }, useAi.value, provider.value || undefined)
+			notify(t('smartcook', 'Recipe data extracted. Review it before saving.'))
+		})
+	} finally {
+		extracting.value = false
+	}
 }
 
 const save = async () => {
@@ -66,6 +83,7 @@ const save = async () => {
 				<template v-if="preview">
 					<div class="section-heading"><div><p class="eyebrow">{{ preview.strategy }}</p><h2>{{ t('smartcook', 'Import preview') }}</h2></div><button class="primary" @click="save">{{ t('smartcook', 'Save recipe') }}</button></div>
 					<div v-if="preview.warnings.length" class="warning-list"><p v-for="warning in preview.warnings" :key="warning">⚠ {{ warning }}</p></div>
+					<img v-if="preview.recipe.imagePath && /^https?:\/\//i.test(preview.recipe.imagePath)" class="import-cover-preview" :src="preview.recipe.imagePath" :alt="preview.recipe.title">
 					<label>{{ t('smartcook', 'Title') }}<input v-model="preview.recipe.title"></label>
 					<label>{{ t('smartcook', 'Description') }}<textarea v-model="preview.recipe.description" rows="3"></textarea></label>
 					<div class="preview-metrics"><span>{{ preview.recipe.servings }} {{ t('smartcook', 'servings') }}</span><span>{{ preview.recipe.prepTime }} min {{ t('smartcook', 'prep') }}</span><span>{{ preview.recipe.cookTime }} min {{ t('smartcook', 'cook') }}</span><span>{{ preview.recipe.totalTime }} min {{ t('smartcook', 'total') }}</span></div>
@@ -75,5 +93,12 @@ const save = async () => {
 				<div v-else class="empty-preview"><div>⌁</div><h2>{{ t('smartcook', 'Preview appears here') }}</h2><p>{{ t('smartcook', 'The source is never saved as a recipe until you review and confirm the extracted fields.') }}</p></div>
 			</article>
 		</section>
+		<div v-if="extracting" class="blocking-modal" role="dialog" aria-modal="true" aria-live="polite">
+			<div class="blocking-modal-card">
+				<span class="loading-spinner" aria-hidden="true"></span>
+				<h2>{{ useAi ? modalText('AI extraction in progress') : modalText('Extracting recipe data') }}</h2>
+				<p>{{ useAi ? modalText('The AI is refining the recipe. This may take a little longer.') : modalText('Please wait while the recipe is being analyzed.') }}</p>
+			</div>
+		</div>
 	</div>
 </template>

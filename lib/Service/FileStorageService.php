@@ -55,11 +55,17 @@ final class FileStorageService {
         $mime = method_exists($file, 'getMimeType') ? $file->getMimeType() : (string)($upload['type'] ?? 'application/octet-stream');
         $mediaKind = $kind ?? $this->kind((string)$mime);
         $media = (array)($recipe['media'] ?? []);
+        if ($mediaKind === 'image' && $kind === 'image') {
+            $media = array_values(array_filter($media, static function (mixed $item): bool {
+                return !is_array($item) || (string)($item['altText'] ?? '') === '';
+            }));
+        }
         $media[] = [
             'kind' => $mediaKind,
             'path' => $path,
             'mime' => $mime,
             'altText' => $altText,
+            'fileSize' => $size,
             'sortOrder' => count($media),
         ];
         $updated = $this->recipeService->update($recipeId, ['media' => $media]);
@@ -69,7 +75,10 @@ final class FileStorageService {
             throw new ValidationException('The uploaded attachment could not be persisted');
         }
         $stored = $updatedMedia[$lastKey];
-        if ($mediaKind === 'image' && empty($recipe['imagePath']) && isset($stored['id'])) {
+        // An explicit image upload is a cover upload. This also replaces an
+        // existing remote/stored cover instead of leaving the new file unused
+        // as the visible cover.
+        if ($mediaKind === 'image' && ($kind === 'image' || empty($recipe['imagePath'])) && isset($stored['id'])) {
             $updated = $this->recipeService->update($recipeId, ['imagePath' => 'media:' . (int)$stored['id']]);
             foreach ((array)($updated['media'] ?? []) as $candidate) {
                 if (is_array($candidate) && (int)($candidate['id'] ?? 0) === (int)$stored['id']) {

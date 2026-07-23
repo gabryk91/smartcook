@@ -26,6 +26,8 @@ export interface RecipeStep {
 	id?: number
 	text: string
 	timerSeconds?: number | null
+	timerValue?: number | null
+	timerUnit?: 'seconds' | 'minutes' | 'hours' | null
 	temperature?: number | null
 	temperatureUnit?: string | null
 	notes?: string | null
@@ -38,6 +40,8 @@ export interface RecipeMedia {
 	path: string
 	mime?: string | null
 	altText?: string | null
+	fileSize?: number | null
+	createdAt?: number
 	sortOrder?: number
 }
 

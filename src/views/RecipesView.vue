@@ -47,9 +47,9 @@ const toggleFavorite = async (recipe: Recipe) => {
 					<span class="time-pill">{{ recipe.totalTime || recipe.prepTime + recipe.cookTime }} min</span>
 				</a>
 				<div class="recipe-card-body">
-					<div class="card-title"><div><p>{{ recipe.cuisine || recipe.course || t('smartcook', 'Recipe') }}</p><a :href="`#/recipes/${recipe.id}`"><h2>{{ recipe.title }}</h2></a></div><button class="icon-button" :aria-label="t('smartcook', 'Toggle favorite')" @click="toggleFavorite(recipe)">{{ recipe.favorite ? '★' : '☆' }}</button></div>
+					<div class="card-title"><div><p>{{ recipe.categories[0]?.name || recipe.course || t('smartcook', 'Recipe') }}</p><a :href="`#/recipes/${recipe.id}`"><h2>{{ recipe.title }}</h2></a></div><button class="icon-button" :aria-label="t('smartcook', 'Toggle favorite')" @click="toggleFavorite(recipe)">{{ recipe.favorite ? '★' : '☆' }}</button></div>
 					<p>{{ recipe.description || t('smartcook', 'No description') }}</p>
-					<div class="card-meta"><span>◷ {{ recipe.prepTime }} + {{ recipe.cookTime }} min</span><span>◉ {{ recipe.servings }}</span><span v-if="recipe.difficulty">{{ recipe.difficulty }}</span></div>
+					<div class="card-footer"><div class="card-meta"><span>◷ {{ recipe.prepTime }} + {{ recipe.cookTime }} min</span><span>{{ recipe.servings }} {{ t('smartcook', 'servings') }}</span><span v-if="recipe.difficulty">{{ recipe.difficulty }}</span><span v-if="recipe.cuisine" class="cuisine-label">{{ t('smartcook', 'Cuisine') }}: {{ recipe.cuisine }}</span></div></div>
 				</div>
 			</article>
 		</section>

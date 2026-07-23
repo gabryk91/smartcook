@@ -16,4 +16,12 @@ final class IngredientParserTest extends TestCase {
         self::assertEqualsWithDelta(2.5, $ingredient['amount'], 0.0001);
         self::assertSame('setacciata', $ingredient['notes']);
     }
+
+    public function testIngredientWithQuantityAfterName(): void {
+        $ingredient = (new IngredientParser(new TextNormalizer()))->parse('baccalà 600 g ammollato e dissalato');
+        self::assertSame('baccalà', $ingredient['name']);
+        self::assertSame('600', $ingredient['quantity']);
+        self::assertSame('g', $ingredient['unit']);
+        self::assertSame('ammollato e dissalato', $ingredient['notes']);
+    }
 }

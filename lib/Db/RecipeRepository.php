@@ -391,6 +391,7 @@ final class RecipeRepository extends AbstractRepository {
                 'path' => $path,
                 'mime' => $this->nullString($item['mime'] ?? null),
                 'alt_text' => $this->nullString($item['altText'] ?? null),
+                'file_size' => $this->nullableInt($item['fileSize'] ?? null),
                 'sort_order' => (int)($item['sortOrder'] ?? $index),
             ];
             $mediaId = (int)($item['id'] ?? 0);
@@ -424,6 +425,8 @@ final class RecipeRepository extends AbstractRepository {
             'path' => (string)$row['path'],
             'mime' => $row['mime'],
             'altText' => $row['alt_text'],
+            'fileSize' => $row['file_size'] !== null ? (int)$row['file_size'] : null,
+            'createdAt' => (int)$row['created_at'],
             'sortOrder' => (int)$row['sort_order'],
         ], $this->fetchAll($qb));
     }

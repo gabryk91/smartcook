@@ -35,6 +35,11 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
                 default => throw new ImportException('An AI endpoint is required'),
             };
         }
+        $nativeOllama = $provider === 'ollama' && preg_match('~/api/generate$~i', $endpoint) === 1;
+        if ($provider === 'ollama' && preg_match('~^https?://ollama\.com$~i', $endpoint) === 1) {
+            $endpoint .= '/api/generate';
+            $nativeOllama = true;
+        }
         $model = trim((string)($config['model'] ?? ''));
         if ($model === '') {
             throw new ImportException('An AI model is required');
@@ -47,24 +52,35 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
         if ($provider === 'openrouter') {
             $headers['X-Title'] = 'SmartCook for Nextcloud';
         }
-        $payload = [
-            'model' => $model,
-            'temperature' => (float)($config['temperature'] ?? 0.1),
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are a precise culinary data extraction engine.'],
-                ['role' => 'user', 'content' => $this->prompts->recipe($text, $language)],
-            ],
-        ];
-        if (in_array($provider, ['openai', 'openrouter', 'mistral'], true)) {
+        $temperature = (float)str_replace(',', '.', (string)($config['temperature'] ?? 0.1));
+        $prompt = $this->prompts->recipe($text, $language);
+        $payload = $nativeOllama
+            ? [
+                'model' => $model,
+                'prompt' => "You are a precise culinary data extraction engine.\n\n" . $prompt,
+                'stream' => false,
+                'options' => ['temperature' => $temperature],
+            ]
+            : [
+                'model' => $model,
+                'temperature' => $temperature,
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a precise culinary data extraction engine.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+            ];
+        if (!$nativeOllama && in_array($provider, ['openai', 'openrouter', 'mistral'], true)) {
             $payload['response_format'] = ['type' => 'json_object'];
         }
-        $response = $this->clients->newClient()->post($endpoint . '/chat/completions', [
+        $response = $this->clients->newClient()->post($nativeOllama ? $endpoint : $endpoint . '/chat/completions', [
             'headers' => $headers,
             'body' => json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             'timeout' => (int)($config['timeout'] ?? 90),
         ]);
         $body = $this->responses->json($response, 'The AI endpoint');
-        $content = $body['choices'][0]['message']['content'] ?? null;
+        $content = $nativeOllama
+            ? ($body['response'] ?? null)
+            : ($body['choices'][0]['message']['content'] ?? null);
         if (!is_string($content)) {
             throw new ImportException('The AI endpoint returned an unexpected response');
         }
