@@ -40,4 +40,13 @@ final class AiPromptFactory {
 JSON;
         return "Extract one cooking recipe from the source below. Return only one valid JSON object, with no Markdown and no commentary. Preserve facts; never invent missing quantities, times, nutrition or tools. Times are integer minutes, timerSeconds are seconds. Split ingredients and procedure into ordered arrays. Normalize units while retaining originalText. Output language should be {$language}. Use this exact shape:\n{$schema}\n\nSOURCE:\n{$text}";
     }
+
+    /** @param list<array<string, mixed>> $recipes @param array<string, mixed> $preferences */
+    public function mealPlan(array $recipes, string $from, string $to, array $preferences): string {
+        $schema = '{"meals":[{"date":"YYYY-MM-DD","slot":"breakfast|lunch|dinner|snack","recipeId":1,"servings":2,"notes":"string|null"}]}';
+        $catalog = json_encode($recipes, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $custom = trim((string)($preferences['prompt'] ?? ''));
+        $instruction = $custom !== '' ? $custom : 'Organizza una settimana varia e realistica usando esclusivamente le ricette disponibili.';
+        return "{$instruction}\nCrea un piano pasti dal {$from} al {$to}. Usa esclusivamente recipeId presenti nel catalogo. Rispetta preferenze alimentari, allergie, tempo massimo e porzioni indicati. Inserisci colazione, pranzo, cena o snack quando appropriato; non aggiungere pasti se non esiste una ricetta adatta. Evita ripetizioni ravvicinate quando possibile. Restituisci solo JSON valido senza Markdown con questa forma: {$schema}\n\nPREFERENZE:\n" . (string)($preferences['dietary'] ?? '') . "\nTEMPO MASSIMO DI CUCINA (MINUTI): " . (int)($preferences['cookingTime'] ?? 60) . "\nPORZIONI: " . (int)($preferences['servings'] ?? 2) . "\nISTRUZIONI SETTIMANALI:\n" . (string)($preferences['instruction'] ?? '') . "\n\nCATALOGO RICETTE:\n{$catalog}";
+    }
 }

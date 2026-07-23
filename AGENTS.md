@@ -8,8 +8,9 @@
 - Prima di modificare file, controlla lo stato Git e preserva le modifiche già presenti che non appartengono al task.
 - Per le modifiche ai file usa `apply_patch`.
 - Verifica le modifiche con controlli mirati e test proporzionati al rischio.
+- Il frontend operativo del progetto è esclusivamente il bundle JavaScript pubblicabile (`js/smartcook-main.js`). Non ricreare né rigenerare il bundle tramite tool di build: le modifiche applicative vanno apportate direttamente al bundle e verificate con controlli mirati.
 - Non dichiarare una funzionalità completa senza test reali sull'istanza/container Nextcloud quando il task riguarda l'integrazione runtime.
-- Non usare o aggiornare il frontend Vue (`src/`, `package.json`, `vite.config.*` e relativi asset) se non è necessario per generare o correggere il pacchetto pubblicabile su Unraid/Nextcloud. In caso contrario, consideralo fuori scope.
+- Il frontend Vue e il relativo tooling sono stati rimossi: non reintrodurli nel progetto.
 
 ## Pubblicazione
 

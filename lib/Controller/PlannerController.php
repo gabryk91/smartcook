@@ -37,6 +37,12 @@ final class PlannerController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/planner/ai')]
+    public function generate(): JSONResponse {
+        return $this->respond(fn (): array => $this->planner->generate($this->payload('plan')));
+    }
+
+    #[NoAdminRequired]
     #[FrontpageRoute(verb: 'PUT', url: '/planner/{id}')]
     public function update(int $id): JSONResponse {
         return $this->respond(fn (): array => ['meal' => $this->planner->update($id, $this->payload('meal'))]);

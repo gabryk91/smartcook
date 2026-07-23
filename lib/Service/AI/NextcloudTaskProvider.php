@@ -26,7 +26,8 @@ final class NextcloudTaskProvider implements AiProviderInterface {
         if (!$this->manager->hasProviders() || !array_key_exists(TextToText::ID, $this->manager->getAvailableTaskTypes())) {
             throw new ImportException('No compatible Nextcloud Assistant provider is available');
         }
-        $task = new Task(TextToText::ID, ['input' => $this->prompts->recipe($text, $language)], Application::APP_ID, (string)($config['userId'] ?? ''));
+        $prompt = isset($config['planner']) && is_array($config['planner']) ? $this->prompts->mealPlan($config['planner']['recipes'] ?? [], (string)($config['planner']['from'] ?? ''), (string)($config['planner']['to'] ?? ''), (array)($config['planner']['preferences'] ?? [])) : $this->prompts->recipe($text, $language);
+        $task = new Task(TextToText::ID, ['input' => $prompt], Application::APP_ID, (string)($config['userId'] ?? ''));
         $result = $this->manager->runTask($task)->getOutput();
         $output = is_array($result) ? ($result['output'] ?? null) : null;
         if (!is_string($output) || trim($output) === '') {

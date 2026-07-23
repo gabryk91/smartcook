@@ -13,8 +13,7 @@ SmartCook is a Nextcloud App Framework application using attribute routes, depen
 - `Search`: unified Nextcloud search provider.
 - `Notification`: import completion/failure notifications.
 - `BackgroundJob`: queued imports and retention cleanup.
-- `src`: Vue 3 and TypeScript development interface.
-- `src-standalone`: dependency-free TypeScript compatibility interface compiled into the supplied release.
+- `js/smartcook-main.js`: the sole frontend implementation shipped and executed by Nextcloud.
 
 The production templates load only `js/smartcook-main.js` and `css/smartcook-main.css`. No Node.js process runs on the Nextcloud server.
 

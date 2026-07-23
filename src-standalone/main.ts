@@ -33,6 +33,8 @@ interface RecipeStep {
 	id?: number
 	text: string
 	timerSeconds?: number | null
+	timerValue?: number | null
+	timerUnit?: 'minutes' | 'hours' | null
 	temperature?: number | null
 	temperatureUnit?: string | null
 	notes?: string | null
@@ -118,6 +120,7 @@ const dateIso = (value: Date): string => {
 const appUrl = (path: string): string => smartWindow.OC?.generateUrl
 	? smartWindow.OC.generateUrl(`/apps/${appId}${path}`)
 	: `/index.php/apps/${appId}${path}`
+const appIconUrl = '/custom_apps/smartcook/img/app.svg'
 const mediaUrl = (id: number): string => appUrl(`/media/${id}`)
 const formatBytes = (value?: number | null): string => {
 	if (!value || value < 0) return '—'
@@ -238,7 +241,7 @@ function renderShell(section: string, id?: number): HTMLElement {
 	]
 	root.innerHTML = `<div class="smartcook-shell">
 		<aside class="smartcook-sidebar" aria-label="SmartCook">
-			<div class="brand"><img src="${attr(appUrl('/img/app.svg'))}" alt=""><div><strong>SmartCook</strong><span>${esc(tr('Recipe intelligence'))}</span></div></div>
+			<div class="brand"><img src="${attr(appIconUrl)}" alt=""><div><strong>SmartCook</strong><span>${esc(tr('Recipe intelligence'))}</span></div></div>
 			<nav>${nav.map(([route, label]) => `<a class="${section === route || (route === 'recipes' && section === 'editor') ? 'active' : ''}" href="#/${route}">${esc(label)}</a>`).join('')}</nav>
 			<a class="primary full" href="#/new">+ ${esc(tr('New recipe'))}</a>
 		</aside>
@@ -342,8 +345,21 @@ function ingredientRow(item: Ingredient = { name: '' }): string {
 	</div>`
 }
 
+function timerParts(seconds?: number | null): { value: number | null; unit: 'minutes' | 'hours' } {
+	const value = Math.max(0, Number(seconds || 0))
+	if (value >= 3600 && value % 3600 === 0) return { value: value / 3600, unit: 'hours' }
+	return { value: value ? value / 60 : null, unit: 'minutes' }
+}
+
+function timerSeconds(value: number | null | undefined, unit: string | null | undefined): number | null {
+	if (value === null || value === undefined || value === 0) return null
+	const amount = Math.max(0, Number(value || 0))
+	return unit === 'hours' ? Math.round(amount * 3600) : Math.round(amount * 60)
+}
+
 function stepRow(item: RecipeStep = { text: '' }, index = 0): string {
-	return `<div class="step-row" data-step-row><span class="step-number">${index + 1}</span><textarea data-step-text rows="3" placeholder="${attr(tr('Describe this step...'))}">${esc(item.text)}</textarea><div class="step-extras"><input data-step-timer type="number" min="0" value="${attr(item.timerSeconds)}" placeholder="${attr(tr('Timer seconds'))}"><input data-step-temp type="number" value="${attr(item.temperature)}" placeholder="${attr(tr('Temperature'))}"><select data-step-temp-unit><option value="C"${item.temperatureUnit === 'C' ? ' selected' : ''}>C</option><option value="F"${item.temperatureUnit === 'F' ? ' selected' : ''}>F</option></select></div><button class="icon-button danger" data-remove-row type="button" aria-label="${attr(tr('Remove'))}">x</button></div>`
+	const timer = timerParts(item.timerSeconds)
+	return `<div class="step-row" data-step-row><span class="step-number">${index + 1}</span><textarea data-step-text rows="3" placeholder="${attr(tr('Describe this step...'))}">${esc(item.text)}</textarea><div class="step-extras"><input data-step-timer type="number" min="0" step="any" value="${attr(timer.value)}" placeholder="${attr(tr('Timer quantity'))}"><select data-step-timer-unit aria-label="${attr(tr('Timer unit'))}"><option value="minutes"${timer.unit === 'minutes' ? ' selected' : ''}>${esc(tr('minutes'))}</option><option value="hours"${timer.unit === 'hours' ? ' selected' : ''}>${esc(tr('hours'))}</option></select><input data-step-temp type="number" value="${attr(item.temperature)}" placeholder="${attr(tr('Temperature'))}"><select data-step-temp-unit><option value="C"${item.temperatureUnit === 'C' ? ' selected' : ''}>C</option><option value="F"${item.temperatureUnit === 'F' ? ' selected' : ''}>F</option></select></div><button class="icon-button danger" data-remove-row type="button" aria-label="${attr(tr('Remove'))}">x</button></div>`
 }
 
 function bindRowRemoval(container: HTMLElement): void {
@@ -362,7 +378,7 @@ function collectRecipe(view: HTMLElement, existing: Recipe): Recipe {
 	})).filter(item => item.name)
 	const steps = [...view.querySelectorAll<HTMLElement>('[data-step-row]')].map(row => ({
 		text: row.querySelector<HTMLTextAreaElement>('[data-step-text]')?.value.trim() || '',
-		timerSeconds: asNumber(row.querySelector<HTMLInputElement>('[data-step-timer]')?.value) || null,
+		timerSeconds: timerSeconds(asNumber(row.querySelector<HTMLInputElement>('[data-step-timer]')?.value) || null, row.querySelector<HTMLSelectElement>('[data-step-timer-unit]')?.value),
 		temperature: asNumber(row.querySelector<HTMLInputElement>('[data-step-temp]')?.value) || null,
 		temperatureUnit: row.querySelector<HTMLSelectElement>('[data-step-temp-unit]')?.value || null,
 	})).filter(item => item.text)
@@ -711,15 +727,15 @@ async function renderSettings(view: HTMLElement): Promise<void> {
 async function renderPublic(rootNode: HTMLElement): Promise<void> {
 	const token = rootNode.dataset.token || ''
 	const load = async (password = ''): Promise<void> => {
-		rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appUrl('/img/app.svg'))}" alt=""><strong>SmartCook</strong></div><p>${esc(tr('Loading...'))}</p></main>`
+	rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appIconUrl)}" alt=""><strong>SmartCook</strong></div><p>${esc(tr('Loading...'))}</p></main>`
 		try {
 			const payload = await request<{ recipe: Recipe }>(`/public/${encodeURIComponent(token)}/data`, { method: 'POST', json: { password } })
 			const recipe = payload.recipe
 			const image = recipeImageUrl(recipe.imagePath)
-			rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appUrl('/img/app.svg'))}" alt=""><strong>SmartCook</strong></div><article class="public-recipe">${image ? `<img class="hero" src="${attr(image)}" alt="">` : ''}<p class="eyebrow">${esc(recipe.cuisine)}${recipe.course ? ` - ${esc(recipe.course)}` : ''}</p><h1>${esc(recipe.title)}</h1><p class="lead">${esc(recipe.description)}</p><div class="metrics"><div><strong>${recipe.servings}</strong><span>${esc(tr('Servings'))}</span></div><div><strong>${recipe.prepTime} min</strong><span>${esc(tr('Preparation'))}</span></div><div><strong>${recipe.cookTime} min</strong><span>${esc(tr('Cooking'))}</span></div><div><strong>${recipe.totalTime} min</strong><span>${esc(tr('Total'))}</span></div></div><div class="public-grid"><section><h2>${esc(tr('Ingredients'))}</h2><ul>${recipe.ingredients.map(item => `<li><b>${esc(item.quantity)} ${esc(item.unit)}</b> ${esc(item.name)} <small>${esc(item.notes)}</small></li>`).join('')}</ul></section><section><h2>${esc(tr('Method'))}</h2><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></section></div></article></main>`
+		rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appIconUrl)}" alt=""><strong>SmartCook</strong></div><article class="public-recipe">${image ? `<img class="hero" src="${attr(image)}" alt="">` : ''}<p class="eyebrow">${esc(recipe.cuisine)}${recipe.course ? ` - ${esc(recipe.course)}` : ''}</p><h1>${esc(recipe.title)}</h1><p class="lead">${esc(recipe.description)}</p><div class="metrics"><div><strong>${recipe.servings}</strong><span>${esc(tr('Servings'))}</span></div><div><strong>${recipe.prepTime} min</strong><span>${esc(tr('Preparation'))}</span></div><div><strong>${recipe.cookTime} min</strong><span>${esc(tr('Cooking'))}</span></div><div><strong>${recipe.totalTime} min</strong><span>${esc(tr('Total'))}</span></div></div><div class="public-grid"><section><h2>${esc(tr('Ingredients'))}</h2><ul>${recipe.ingredients.map(item => `<li><b>${esc(item.quantity)} ${esc(item.unit)}</b> ${esc(item.name)} <small>${esc(item.notes)}</small></li>`).join('')}</ul></section><section><h2>${esc(tr('Method'))}</h2><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></section></div></article></main>`
 		} catch (error) {
 			const message = error instanceof Error ? error.message : tr('Could not load the shared recipe')
-			rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appUrl('/img/app.svg'))}" alt=""><strong>SmartCook</strong></div><form class="password-card"><h1>${esc(tr('Shared recipe'))}</h1><p>${esc(message)}</p><label>${esc(tr('Password'))}<input data-public-password type="password" autocomplete="current-password"></label><button class="primary" type="submit">${esc(tr('Open recipe'))}</button></form></main>`
+		rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appIconUrl)}" alt=""><strong>SmartCook</strong></div><form class="password-card"><h1>${esc(tr('Shared recipe'))}</h1><p>${esc(message)}</p><label>${esc(tr('Password'))}<input data-public-password type="password" autocomplete="current-password"></label><button class="primary" type="submit">${esc(tr('Open recipe'))}</button></form></main>`
 			rootNode.querySelector('form')?.addEventListener('submit', event => { event.preventDefault(); void load(rootNode.querySelector<HTMLInputElement>('[data-public-password]')?.value || '') })
 		}
 	}

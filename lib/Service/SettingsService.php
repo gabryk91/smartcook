@@ -18,6 +18,10 @@ final class SettingsService {
         'aiModel' => '',
         'aiTemperature' => '0.1',
         'aiTimeout' => '90',
+        'aiPlannerPrompt' => 'Organizza una settimana varia e realistica usando esclusivamente le ricette disponibili.',
+        'plannerPreferences' => '',
+        'plannerCookingTime' => '60',
+        'plannerServings' => '2',
         'ocrProvider' => 'disabled',
         'ocrEndpoint' => '',
         'ocrLanguage' => 'ita+eng',
@@ -37,6 +41,8 @@ final class SettingsService {
         }
         $result['aiTemperature'] = (float)$result['aiTemperature'];
         $result['aiTimeout'] = (int)$result['aiTimeout'];
+        $result['plannerCookingTime'] = (int)$result['plannerCookingTime'];
+        $result['plannerServings'] = (int)$result['plannerServings'];
         $result['maxImportBytes'] = (int)$result['maxImportBytes'];
         $result['hasAiApiKey'] = $this->secret($userId, 'aiApiKey') !== '';
         $result['hasOcrApiKey'] = $this->secret($userId, 'ocrApiKey') !== '';
@@ -69,6 +75,10 @@ final class SettingsService {
                 $value = (string)max(10, min(300, (int)$value));
             } elseif ($key === 'maxImportBytes') {
                 $value = (string)max(100000, min(20000000, (int)$value));
+            } elseif ($key === 'plannerCookingTime') {
+                $value = (string)max(5, min(600, (int)$value));
+            } elseif ($key === 'plannerServings') {
+                $value = (string)max(1, min(30, (int)$value));
             } else {
                 $value = trim((string)$value);
             }
@@ -102,6 +112,10 @@ final class SettingsService {
             'apiKey' => $settings['aiApiKey'],
             'temperature' => $settings['aiTemperature'],
             'timeout' => $settings['aiTimeout'],
+            'plannerPrompt' => $settings['aiPlannerPrompt'],
+            'plannerPreferences' => $settings['plannerPreferences'],
+            'plannerCookingTime' => $settings['plannerCookingTime'],
+            'plannerServings' => $settings['plannerServings'],
         ];
     }
 

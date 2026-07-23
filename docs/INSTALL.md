@@ -84,20 +84,6 @@ SmartCook does not hard-code external model names because provider catalogues ch
 
 Queued imports and cleanup rely on the normal Nextcloud background-job system. For reliable processing, configure the instance to run `cron.php` using system cron rather than AJAX mode.
 
-## Source build
+## Frontend maintenance
 
-The source archive contains the Vue/Vite interface and a dependency-free TypeScript compatibility interface.
-
-```bash
-composer install
-composer test:smoke
-composer test:unit
-npm install
-npm run typecheck
-npm run lint
-npm run stylelint
-npm run build
-npm run build:compat
-```
-
-For development, place the source directory at `custom_apps/smartcook`, enable Nextcloud debug mode and run `npm run watch`.
+The frontend is maintained directly in `js/smartcook-main.js`. Packaging uses the checked-in JavaScript and does not run npm, Vite or another frontend build step.

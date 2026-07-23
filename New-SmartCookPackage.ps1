@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$OutputDirectory = (Join-Path $PSScriptRoot 'build'),
-    [switch]$Build
+    [string]$OutputDirectory = (Join-Path $PSScriptRoot 'build')
 )
 
 Set-StrictMode -Version Latest
@@ -29,19 +28,6 @@ catch {
 }
 
 $nextVersion = '{0}.{1}.{2}' -f $parsedVersion.Major, $parsedVersion.Minor, ($parsedVersion.Build + 1)
-
-if ($Build) {
-    Push-Location -LiteralPath $projectRoot
-    try {
-        & npm run build:all
-        if ($LASTEXITCODE -ne 0) {
-            throw "La compilazione degli asset è terminata con codice $LASTEXITCODE."
-        }
-    }
-    finally {
-        Pop-Location
-    }
-}
 
 # Questa whitelist deve rimanere allineata a krankerl.toml.
 $packageEntries = @(

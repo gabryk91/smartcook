@@ -92,6 +92,7 @@ The response contains `recipe`, `strategy`, `warnings` and `duplicates`. SmartCo
 |---|---|---|
 | `GET` | `/planner?from=YYYY-MM-DD&to=YYYY-MM-DD` | List meals in a date range. |
 | `POST` | `/planner` | Create from `{ "meal": { "recipeId", "date", "slot", "servings", "notes" } }`. |
+| `POST` | `/planner/ai` | Generate and insert meals from existing recipes using `{ "plan": { "from", "to", "instruction" } }`. The configured user preferences and AI prompt are applied. |
 | `PUT` | `/planner/{id}` | Update one meal. |
 | `DELETE` | `/planner/{id}` | Delete one meal. |
 
@@ -126,7 +127,7 @@ Permissions are a bit mask: `1` is read, `3` is read and update. Only the owner 
 | `GET` | `/media/{id}` | Stream an authorized attachment. |
 | `GET` | `/recipes/{id}/export/{format}` | Export `json`, `markdown` or `html`. |
 | `GET` | `/settings` | Read non-secret user settings and secret-presence flags. |
-| `PUT` | `/settings` | Save `{ "settings": ... }`; blank API-key fields preserve stored keys. |
+| `PUT` | `/settings` | Save `{ "settings": ... }`; blank API-key fields preserve stored keys. Planner settings include `aiPlannerPrompt`, `plannerPreferences`, `plannerCookingTime` and `plannerServings`. |
 
 Set `clearAiApiKey` or `clearOcrApiKey` to `true` to delete an encrypted credential.
 

@@ -1,5 +1,3 @@
 [package]
-before_cmds = ["npm ci", "npm run build"]
-
 [package.include]
 assets = ["appinfo", "css", "img", "js", "l10n", "lib", "templates", "LICENSE", "README.md"]
