@@ -1,0 +1,62 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Biscotti pan di zenzero",
+    "inLanguage": "it",
+    "description": "IngredientiPer circa 35-40 biscotti:300 g di farina 00130 g di burro freddo80 g di zucchero a velo80 g di melassa (o miele scuro)1 tuorlo2 g di bicarbonato2 g di zenzero in polvere2 g di cannella in polvere1,5 g di chiodi di garofano in polvere1 g di noce moscata in polvere1 pizzico di salePer la ghiaccia reale:1 albume150 g di zucchero a veloQualche goccia di succo di limonePreparazioneRaccogliete nella ciotola della planetaria la farina e il burro tagliato a cubetti. Lavorateli a bassa velocità fino ad ottenere un composto sabbiato. Unite la melassa, il tuorlo, lo zucchero, le spezie, il bicarbonato e il pizzico di sale.Impastate il tutto fino a ottenere una pasta omogenea. Avvolgetela nella pellicola alimentare e fate riposare 1 ora in frigorifero.Stendetelo con il mattarello su una spianatoia infarinata portandolo ad uno spessore di 4 mm. Con i tagliabiscotti ricavate le sagome desiderate.Disponetele su teglie rivestite di carta forno e cuocete a 180° per circa 12-13 minuti. Fate raffreddare e decorate con la ghiaccia reale.",
+    "notes": "Nota originale 4833F95C-2C96-40CE-AC7A-3CA7FE016E46\n\nIngredientiPer circa 35-40 biscotti:300 g di farina 00130 g di burro freddo80 g di zucchero a velo80 g di melassa (o miele scuro)1 tuorlo2 g di bicarbonato2 g di zenzero in polvere2 g di cannella in polvere1,5 g di chiodi di garofano in polvere1 g di noce moscata in polvere1 pizzico di salePer la ghiaccia reale:1 albume150 g di zucchero a veloQualche goccia di succo di limonePreparazioneRaccogliete nella ciotola della planetaria la farina e il burro tagliato a cubetti. Lavorateli a bassa velocità fino ad ottenere un composto sabbiato. Unite la melassa, il tuorlo, lo zucchero, le spezie, il bicarbonato e il pizzico di sale.Impastate il tutto fino a ottenere una pasta omogenea. Avvolgetela nella pellicola alimentare e fate riposare 1 ora in frigorifero.Stendetelo con il mattarello su una spianatoia infarinata portandolo ad uno spessore di 4 mm. Con i tagliabiscotti ricavate le sagome desiderate.Disponetele su teglie rivestite di carta forno e cuocete a 180° per circa 12-13 minuti. Fate raffreddare e decorate con la ghiaccia reale.",
+    "recipeIngredient": [
+        "300 g di farina 00",
+        "130 g di burro freddo",
+        "80 g di zucchero a velo",
+        "80 g di melassa (o miele scuro)",
+        "1 tuorlo",
+        "2 g di bicarbonato",
+        "2 g di zenzero in polvere",
+        "2 g di cannella in polvere",
+        "1,5 g di chiodi di garofano in polvere",
+        "1 g di noce moscata in polvere",
+        "1 pizzico di sale",
+        "1 albume",
+        "150 g di zucchero a velo",
+        "Qualche goccia di succo di limone"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Per circa 35-40 biscotti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Per la ghiaccia reale:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Raccogliete nella ciotola della planetaria la farina e il burro tagliato a cubetti. Lavorateli a bassa velocità fino ad ottenere un composto sabbiato. Unite la melassa, il tuorlo, lo zucchero, le spezie, il bicarbonato e il pizzico di sale."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Impastate il tutto fino a ottenere una pasta omogenea. Avvolgetela nella pellicola alimentare e fate riposare 1 ora in frigorifero."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Stendetelo con il mattarello su una spianatoia infarinata portandolo ad uno spessore di 4 mm. Con i tagliabiscotti ricavate le sagome desiderate."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Disponetele su teglie rivestite di carta forno e cuocete a 180° per circa 12-13 minuti. Fate raffreddare e decorate con la ghiaccia reale."
+        }
+    ],
+    "keywords": [
+        "Dolci",
+        "Snack"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

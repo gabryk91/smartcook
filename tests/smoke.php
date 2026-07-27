@@ -73,6 +73,7 @@ $expectSame(4, $recipe['servings'], 'Recipe servings');
 $expectSame(20, $recipe['prepTime'], 'Recipe preparation time');
 $expectSame(45, $recipe['cookTime'], 'Recipe cooking time');
 $expectSame(65, $recipe['totalTime'], 'Recipe total time fallback');
+$expectSame(null, $recipe['description'], 'Recipe description is empty without a specific field');
 $expectSame(3, count($recipe['ingredients']), 'Recipe ingredient count');
 $expectSame(2, count($recipe['steps']), 'Recipe step count');
 $expectSame(2, count($recipe['tools']), 'Recipe tool count');

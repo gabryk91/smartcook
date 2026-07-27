@@ -1,0 +1,30 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pane veloce",
+    "inLanguage": "it",
+    "description": "Ingredienti500gr farina, 370ml acqua, 12gr lievito birra, 1cucchiaino miele, 2 cucchiaini sale finoPreparazioneSciogliere lievito in 50ml acqua tolta dal totale, mettere farina in 1 ciotola, fare un buco al centro e buttarvi acqua con lievito e miele. Aggiungere poco a poco restante acqua mescolando e aggiungere anche sale. Mescolare bene, l impasto deve restare appiccicoso e molle. Spolverare la superficie con farina e lasciare lievitare coperto x 1h e mezzo. Sollevare poi l impasto con aiuto di paletta e trasferirlo su leccarda forno. Tagliare in filoncini e cuocere a 230gr x 1/2 ora.",
+    "notes": "Nota originale 31846E47-C56B-4A7E-A33E-185EB980B240\n\nIngredienti500gr farina, 370ml acqua, 12gr lievito birra, 1cucchiaino miele, 2 cucchiaini sale finoPreparazioneSciogliere lievito in 50ml acqua tolta dal totale, mettere farina in 1 ciotola, fare un buco al centro e buttarvi acqua con lievito e miele. Aggiungere poco a poco restante acqua mescolando e aggiungere anche sale. Mescolare bene, l impasto deve restare appiccicoso e molle. Spolverare la superficie con farina e lasciare lievitare coperto x 1h e mezzo. Sollevare poi l impasto con aiuto di paletta e trasferirlo su leccarda forno. Tagliare in filoncini e cuocere a 230gr x 1/2 ora.",
+    "recipeIngredient": [
+        "500gr farina,",
+        "370ml acqua,",
+        "12gr lievito birra,",
+        "1cucchiaino miele,",
+        "2 cucchiaini sale fino"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Sciogliere lievito in 50ml acqua tolta dal totale, mettere farina in 1 ciotola, fare un buco al centro e buttarvi acqua con lievito e miele. Aggiungere poco a poco restante acqua mescolando e aggiungere anche sale. Mescolare bene, l impasto deve restare appiccicoso e molle. Spolverare la superficie con farina e lasciare lievitare coperto x 1h e mezzo. Sollevare poi l impasto con aiuto di paletta e trasferirlo su leccarda forno. Tagliare in filoncini e cuocere a 230gr x 1/2 ora."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

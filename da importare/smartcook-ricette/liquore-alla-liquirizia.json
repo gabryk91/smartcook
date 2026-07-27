@@ -1,0 +1,99 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Liquore alla Liquirizia",
+    "inLanguage": "it",
+    "description": "INGREDIENTI:\n500 gr liquirizia in polvere o radice tritata\n900 gr alcol 95/96°\n350 gr acqua\n300 gr zucchero\nPROCEDIMENTO:\n1. Tritare finemente la liquirizia\n2. Aggiungere lo zucchero\n3. Versare l'acqua e far bollire per circa 30 minuti\n4. Far raffreddare completamente\n5. Aggiungere l'alcol poco alla volta mescolando bene\n6. Mescolare accuratamente fino a omogeneità\n7. Imbottigliare in bottiglie di vetro scuro\n8. Conservare in luogo fresco e asciutto\n9. Lasciare riposare almeno una settimana prima di consumare per permettere ai sapori di svilupparsi\nNOTE:\nLiquore aromatico a base di liquirizia, dolce e digestivo. La liquirizia dona un sapore particolare e caratteristico. Servire freddo come digestivo dopo i pasti. Può essere conservato per anni in bottiglie ben chiuse.",
+    "notes": "Nota originale 6DC76556-19A1-473A-BEA1-31ABBDBAB31E\n\nINGREDIENTI:\n500 gr liquirizia in polvere o radice tritata\n900 gr alcol 95/96°\n350 gr acqua\n300 gr zucchero\nPROCEDIMENTO:\n1. Tritare finemente la liquirizia\n2. Aggiungere lo zucchero\n3. Versare l'acqua e far bollire per circa 30 minuti\n4. Far raffreddare completamente\n5. Aggiungere l'alcol poco alla volta mescolando bene\n6. Mescolare accuratamente fino a omogeneità\n7. Imbottigliare in bottiglie di vetro scuro\n8. Conservare in luogo fresco e asciutto\n9. Lasciare riposare almeno una settimana prima di consumare per permettere ai sapori di svilupparsi\nNOTE:\nLiquore aromatico a base di liquirizia, dolce e digestivo. La liquirizia dona un sapore particolare e caratteristico. Servire freddo come digestivo dopo i pasti. Può essere conservato per anni in bottiglie ben chiuse.",
+    "recipeIngredient": [
+        "500 gr liquirizia in polvere o radice tritata",
+        "900 gr alcol 95/96°",
+        "350 gr acqua",
+        "300 gr zucchero",
+        "1. Tritare finemente la liquirizia",
+        "2. Aggiungere lo zucchero",
+        "3. Versare l'acqua e far bollire per circa 30 minuti",
+        "4. Far raffreddare completamente",
+        "5. Aggiungere l'alcol poco alla volta mescolando bene",
+        "6. Mescolare accuratamente fino a omogeneità",
+        "7. Imbottigliare in bottiglie di vetro scuro",
+        "8. Conservare in luogo fresco e asciutto",
+        "9. Lasciare riposare almeno una settimana prima di consumare per permettere ai sapori di svilupparsi",
+        "Liquore aromatico a base di liquirizia, dolce e digestivo. La liquirizia dona un sapore particolare e caratteristico. Servire freddo come digestivo dopo i pasti. Può essere conservato per anni in bottiglie ben chiuse."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "INGREDIENTI:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "500 gr liquirizia in polvere o radice tritata"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "900 gr alcol 95/96°"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "350 gr acqua"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "300 gr zucchero"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "PROCEDIMENTO:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Tritare finemente la liquirizia"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Aggiungere lo zucchero"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Versare l'acqua e far bollire per circa 30 minuti"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Far raffreddare completamente"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Aggiungere l'alcol poco alla volta mescolando bene"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "6. Mescolare accuratamente fino a omogeneità"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "7. Imbottigliare in bottiglie di vetro scuro"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "8. Conservare in luogo fresco e asciutto"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "9. Lasciare riposare almeno una settimana prima di consumare per permettere ai sapori di svilupparsi"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "NOTE:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Liquore aromatico a base di liquirizia, dolce e digestivo. La liquirizia dona un sapore particolare e caratteristico. Servire freddo come digestivo dopo i pasti. Può essere conservato per anni in bottiglie ben chiuse."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

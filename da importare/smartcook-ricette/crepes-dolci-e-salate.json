@@ -1,0 +1,45 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Crepes dolci e salate",
+    "inLanguage": "it",
+    "description": "Ingredienti200 g di farina2 uova500 ml di latte50 g di burro fusoUn pizzico di salePreparazioneSetacciate la farina in una ciotola. Fate un buco al centro e aggiungete le uova. Mescolate gradualmente aggiungendo il latte.Aggiungete il burro fuso e il sale. Lasciate riposare l'impasto per 30 minuti.Versate un mestolo d'impasto in una padella antiaderente precedentemente unta. Cuocete fino a doratura e girate.Potete farcire le crepes dolci con marmellata, crema, frutta fresca o dolci vari. Per quelle salate usate formaggi, affettati, verdure.",
+    "notes": "Nota originale E67420CF-3365-44F6-8EE0-F5945261BA49\n\nIngredienti200 g di farina2 uova500 ml di latte50 g di burro fusoUn pizzico di salePreparazioneSetacciate la farina in una ciotola. Fate un buco al centro e aggiungete le uova. Mescolate gradualmente aggiungendo il latte.Aggiungete il burro fuso e il sale. Lasciate riposare l'impasto per 30 minuti.Versate un mestolo d'impasto in una padella antiaderente precedentemente unta. Cuocete fino a doratura e girate.Potete farcire le crepes dolci con marmellata, crema, frutta fresca o dolci vari. Per quelle salate usate formaggi, affettati, verdure.",
+    "recipeIngredient": [
+        "200 g di farina",
+        "2 uova",
+        "500 ml di latte",
+        "50 g di burro fuso",
+        "Un pizzico di sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Setacciate la farina in una ciotola. Fate un buco al centro e aggiungete le uova. Mescolate gradualmente aggiungendo il latte."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Aggiungete il burro fuso e il sale. Lasciate riposare l'impasto per 30 minuti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate un mestolo d'impasto in una padella antiaderente precedentemente unta. Cuocete fino a doratura e girate."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Potete farcire le crepes dolci con marmellata, crema, frutta fresca o dolci vari. Per quelle salate usate formaggi, affettati, verdure."
+        }
+    ],
+    "keywords": [
+        "Dolci",
+        "Piatti unici"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

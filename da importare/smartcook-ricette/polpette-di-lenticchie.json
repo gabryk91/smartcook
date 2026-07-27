@@ -1,0 +1,60 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Polpette di lenticchie",
+    "inLanguage": "it",
+    "description": "@Ingredienti x 24 polpette (fare metà dosi, meglio)Tritare insieme200g. Lenticchie rosse (solo ammollate 30 min)un pezzetto di zenzero tritato2 spicchi di aglio tritato100g. Farina di mandorle2 cucchiai olio evosale e pepe q.b1 cucchiaino curry1 cucchiaino cuminosucco di mezzo limone Aggiungere:1 cipolla grattugiata1 carota grattugiatauna punta di bicarbonato Fare la forma a crocchetta e friggere in olio di semi Per la salsa di yogurt alla soia:1 yogurt alla soia da 125g.mezzo limone spremuto1 spicchio di aglio tritatofoglie di sedano o prezzemolosale q.b",
+    "notes": "Nota originale 71215777-6D95-4A73-B5DC-6ED610AE279D\n\n@Ingredienti x 24 polpette (fare metà dosi, meglio)Tritare insieme200g. Lenticchie rosse (solo ammollate 30 min)un pezzetto di zenzero tritato2 spicchi di aglio tritato100g. Farina di mandorle2 cucchiai olio evosale e pepe q.b1 cucchiaino curry1 cucchiaino cuminosucco di mezzo limone Aggiungere:1 cipolla grattugiata1 carota grattugiatauna punta di bicarbonato Fare la forma a crocchetta e friggere in olio di semi Per la salsa di yogurt alla soia:1 yogurt alla soia da 125g.mezzo limone spremuto1 spicchio di aglio tritatofoglie di sedano o prezzemolosale q.b",
+    "recipeIngredient": [
+        "200g. Lenticchie rosse (solo ammollate 30 min)",
+        "un pezzetto di zenzero tritato",
+        "2 spicchi di aglio tritato",
+        "100g. Farina di mandorle",
+        "2 cucchiai olio evo",
+        "sale e pepe q.b",
+        "1 cucchiaino curry",
+        "1 cucchiaino cumino",
+        "succo di mezzo limone",
+        "1 cipolla grattugiata",
+        "1 carota grattugiata",
+        "una punta di bicarbonato",
+        "1 yogurt alla soia da 125g.",
+        "mezzo limone spremuto",
+        "1 spicchio di aglio tritato",
+        "foglie di sedano o prezzemolo",
+        "sale q.b"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "@Ingredienti x 24 polpette (fare metà dosi, meglio)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tritare insieme"
+        },
+        {
+            "@type": "HowToStep",
+            "text": " "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Aggiungere:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fare la forma a crocchetta e friggere in olio di semi"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Per la salsa di yogurt alla soia:"
+        }
+    ],
+    "keywords": [
+        "Secondi"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

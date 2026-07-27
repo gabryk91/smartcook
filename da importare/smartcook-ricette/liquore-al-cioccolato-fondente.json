@@ -1,0 +1,34 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "LIQUORE AL CIOCCOLATO FONDENTE",
+    "inLanguage": "it",
+    "description": "IngredientiIngredienti per 800 ml: 125 gr di cioccolato fondente, 125 gr di zucchero, 250 ml di panna fresca, 250 ml di latte (fresco, intero), 75 ml di alcool (a 95%)PreparazionePer preparare il liquore al cioccolato fondente iniziate a tritare grossolanamente il cioccolato fondente. Riscaldate il latte in un pentolino, poi aggiungete il cioccolato tritato e fatelo sciogliere a fuoco dolce, mescolando. Quando il cioccolato si sarà sciolto aggiungete lo zucchero e successivamente la panna, mescolando dopo ogni aggiunta per incorporare gli ingredienti. Portate a bollore e fate sobbollire per pochi minuti. Spegnete il fuoco e trasferite il liquore in un'altra ciotola, filtrandolo, poi lasciatelo raffreddare completamente. Solo quando si sarà raffreddato aggiungete l'alcool e mescolate bene. Trasferite il liquore al cioccolato in una bottiglia, chiudete e fatelo riposare in un luogo fresco e asciutto, al buio, per una settimana, prima di consumarlo.",
+    "notes": "Nota originale 6C6D4A08-A516-4779-910F-6210815CC4AF\n\nIngredientiIngredienti per 800 ml: 125 gr di cioccolato fondente, 125 gr di zucchero, 250 ml di panna fresca, 250 ml di latte (fresco, intero), 75 ml di alcool (a 95%)PreparazionePer preparare il liquore al cioccolato fondente iniziate a tritare grossolanamente il cioccolato fondente. Riscaldate il latte in un pentolino, poi aggiungete il cioccolato tritato e fatelo sciogliere a fuoco dolce, mescolando. Quando il cioccolato si sarà sciolto aggiungete lo zucchero e successivamente la panna, mescolando dopo ogni aggiunta per incorporare gli ingredienti. Portate a bollore e fate sobbollire per pochi minuti. Spegnete il fuoco e trasferite il liquore in un'altra ciotola, filtrandolo, poi lasciatelo raffreddare completamente. Solo quando si sarà raffreddato aggiungete l'alcool e mescolate bene. Trasferite il liquore al cioccolato in una bottiglia, chiudete e fatelo riposare in un luogo fresco e asciutto, al buio, per una settimana, prima di consumarlo.",
+    "recipeIngredient": [
+        "125 gr di cioccolato fondente,",
+        "125 gr di zucchero,",
+        "250 ml di panna fresca,",
+        "250 ml di latte (fresco, intero),",
+        "75 ml di alcool (a 95%)"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti per 800 ml:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Per preparare il liquore al cioccolato fondente iniziate a tritare grossolanamente il cioccolato fondente. Riscaldate il latte in un pentolino, poi aggiungete il cioccolato tritato e fatelo sciogliere a fuoco dolce, mescolando. Quando il cioccolato si sarà sciolto aggiungete lo zucchero e successivamente la panna, mescolando dopo ogni aggiunta per incorporare gli ingredienti. Portate a bollore e fate sobbollire per pochi minuti. Spegnete il fuoco e trasferite il liquore in un'altra ciotola, filtrandolo, poi lasciatelo raffreddare completamente. Solo quando si sarà raffreddato aggiungete l'alcool e mescolate bene. Trasferite il liquore al cioccolato in una bottiglia, chiudete e fatelo riposare in un luogo fresco e asciutto, al buio, per una settimana, prima di consumarlo."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

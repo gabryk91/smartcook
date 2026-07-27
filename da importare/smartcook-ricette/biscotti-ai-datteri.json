@@ -1,0 +1,39 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Biscotti ai datteri",
+    "inLanguage": "it",
+    "description": "Ingredienti70 gr datteri (al naturale )120 gr farina di avena70 gr farina di farro (o farina integrale o tipo 1 )70 ml latte scremato (o di riso)40 ml olio di semi di girasoleMezza scorza d’arancia (grattugiata )8 gr lievito in polvere per dolci1 pizzico cannella in polvere\nProcedimentoInnanzitutto denoccioliamo i datteri, tagliamoli a pezzetti e frulliamoli con un tritatutto.Trasferiamo i datteri in una ciotola, aggiungiamo il latte, l’olio di semi e mescoliamo.Uniamo le farine, la scorza d’arancia grattugiata, il lievito per dolci ed un pizzico di cannella (facoltativo).Impastiamo bene il tutto, l’impasto deve essere morbido e un po’ appiccicoso. Se necessario aggiungiamo un cucchiaio di latte.Formiamo un filoncino o un cilindro, avvolgiamolo con la pellicola trasparente per alimenti e mettiamolo in frigo per un’ora circa.Trascorso questo tempo, con un coltello ben affilato, tagliamo dei dischi da mezzo centimetro di spessore oppure se preferite, stendiamo la pasta e ritagliamo i nostri biscotti con le formine.Sistemiamo i biscotti su una teglia rivestita con carta forno ed inforniamo in forno preriscaldato a 180° per 15 minuti circa.Controlliamo i biscotti affinché non si colorino troppo. Lasciamoli qualche minuto nel forno spento con lo sportello semi aperto, quindi sforniamoli.",
+    "notes": "Nota originale 543E246B-DEC6-44D5-9DA4-F84B47B43509\n\nIngredienti70 gr datteri (al naturale )120 gr farina di avena70 gr farina di farro (o farina integrale o tipo 1 )70 ml latte scremato (o di riso)40 ml olio di semi di girasoleMezza scorza d’arancia (grattugiata )8 gr lievito in polvere per dolci1 pizzico cannella in polvere\nProcedimentoInnanzitutto denoccioliamo i datteri, tagliamoli a pezzetti e frulliamoli con un tritatutto.Trasferiamo i datteri in una ciotola, aggiungiamo il latte, l’olio di semi e mescoliamo.Uniamo le farine, la scorza d’arancia grattugiata, il lievito per dolci ed un pizzico di cannella (facoltativo).Impastiamo bene il tutto, l’impasto deve essere morbido e un po’ appiccicoso. Se necessario aggiungiamo un cucchiaio di latte.Formiamo un filoncino o un cilindro, avvolgiamolo con la pellicola trasparente per alimenti e mettiamolo in frigo per un’ora circa.Trascorso questo tempo, con un coltello ben affilato, tagliamo dei dischi da mezzo centimetro di spessore oppure se preferite, stendiamo la pasta e ritagliamo i nostri biscotti con le formine.Sistemiamo i biscotti su una teglia rivestita con carta forno ed inforniamo in forno preriscaldato a 180° per 15 minuti circa.Controlliamo i biscotti affinché non si colorino troppo. Lasciamoli qualche minuto nel forno spento con lo sportello semi aperto, quindi sforniamoli.",
+    "recipeIngredient": [
+        "70 gr datteri (al naturale )",
+        "120 gr farina di avena",
+        "70 gr farina di farro (o farina integrale o tipo 1 )",
+        "70 ml latte scremato (o di riso)",
+        "40 ml olio di semi di girasole",
+        "Mezza scorza d’arancia (grattugiata )",
+        "8 gr lievito in polvere per dolci",
+        "1 pizzico cannella in polvere",
+        "Innanzitutto denoccioliamo i datteri, tagliamoli a pezzetti e frulliamoli con un tritatutto.",
+        "Trasferiamo i datteri in una ciotola, aggiungiamo il latte, l’olio di semi e mescoliamo.",
+        "Uniamo le farine, la scorza d’arancia grattugiata, il lievito per dolci ed un pizzico di cannella (facoltativo).",
+        "Impastiamo bene il tutto, l’impasto deve essere morbido e un po’ appiccicoso. Se necessario aggiungiamo un cucchiaio di latte.",
+        "Formiamo un filoncino o un cilindro, avvolgiamolo con la pellicola trasparente per alimenti e mettiamolo in frigo per un’ora circa.",
+        "Trascorso questo tempo, con un coltello ben affilato, tagliamo dei dischi da mezzo centimetro di spessore oppure se preferite, stendiamo la pasta e ritagliamo i nostri biscotti con le formine.",
+        "Sistemiamo i biscotti su una teglia rivestita con carta forno ed inforniamo in forno preriscaldato a 180° per 15 minuti circa.",
+        "Controlliamo i biscotti affinché non si colorino troppo. Lasciamoli qualche minuto nel forno spento con lo sportello semi aperto, quindi sforniamoli."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,45 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Tagliolini al Limone",
+    "inLanguage": "it",
+    "description": "Tagliolini al LimoneIngredienti per 4 persone:400gr tagliolini freschi all'uovo4 limoni biologici (succo e scorza)100ml panna fresca50gr burro50gr parmigiano reggiano grattugiatoSale e pepe biancoPreparazione:Grattugiare finemente la scorza di 2 limoni. Spremere tutti i limoni per il succo. Sciogliere il burro a fuoco basso, aggiungere la panna. Unire il succo di limone lentamente (non deve cagliare). Aggiungere la scorza. Cuocere i tagliolini al dente, scolare conservando acqua di cottura. Mantecare con il sugo di limone, aggiungere parmigiano. Servire subito con pepe bianco.Consiglio: Aggiungere l'acqua di cottura se il sugo è troppo denso.",
+    "notes": "Nota originale 7C804693-E70B-45C3-AAB8-1E614497F11E\n\nTagliolini al LimoneIngredienti per 4 persone:400gr tagliolini freschi all'uovo4 limoni biologici (succo e scorza)100ml panna fresca50gr burro50gr parmigiano reggiano grattugiatoSale e pepe biancoPreparazione:Grattugiare finemente la scorza di 2 limoni. Spremere tutti i limoni per il succo. Sciogliere il burro a fuoco basso, aggiungere la panna. Unire il succo di limone lentamente (non deve cagliare). Aggiungere la scorza. Cuocere i tagliolini al dente, scolare conservando acqua di cottura. Mantecare con il sugo di limone, aggiungere parmigiano. Servire subito con pepe bianco.Consiglio: Aggiungere l'acqua di cottura se il sugo è troppo denso.",
+    "recipeIngredient": [
+        "400gr tagliolini freschi all'uovo",
+        "4 limoni biologici (succo e scorza)",
+        "100ml panna fresca",
+        "50gr burro",
+        "50gr parmigiano reggiano grattugiato",
+        "Sale e pepe bianco"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Tagliolini al Limone"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti per 4 persone:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Grattugiare finemente la scorza di 2 limoni. Spremere tutti i limoni per il succo. Sciogliere il burro a fuoco basso, aggiungere la panna. Unire il succo di limone lentamente (non deve cagliare). Aggiungere la scorza. Cuocere i tagliolini al dente, scolare conservando acqua di cottura. Mantecare con il sugo di limone, aggiungere parmigiano. Servire subito con pepe bianco."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Consiglio: Aggiungere l'acqua di cottura se il sugo è troppo denso."
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

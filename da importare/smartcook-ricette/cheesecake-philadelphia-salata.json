@@ -1,0 +1,51 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Cheesecake philadelphia salata",
+    "inLanguage": "it",
+    "description": "IngredientiBase:200 g di biscotti digestive100 g di burro fusoRipieno:500 g di philadelphia300 g di ricotta150 g di parmigiano reggiano grattugiato100 g di pancetta croccante2 uovaSale e pepe qbPreparazioneTritiamo i biscotti e mescoliamo con il burro fuso. Versiamo sul fondo di uno stampo e compattate bene.Mixate philadelphia e ricotta fino a ottenere un composto omogeneo. Unite il parmigiano, le uova, sale e pepe. Aggiungete la pancetta croccante.Versate il ripieno sulla base e cuocete a 160° per 45-50 minuti. Fate raffreddare completamente prima di servire.",
+    "notes": "Nota originale C1391A3B-3F42-4852-8168-F6F0F260EF56\n\nIngredientiBase:200 g di biscotti digestive100 g di burro fusoRipieno:500 g di philadelphia300 g di ricotta150 g di parmigiano reggiano grattugiato100 g di pancetta croccante2 uovaSale e pepe qbPreparazioneTritiamo i biscotti e mescoliamo con il burro fuso. Versiamo sul fondo di uno stampo e compattate bene.Mixate philadelphia e ricotta fino a ottenere un composto omogeneo. Unite il parmigiano, le uova, sale e pepe. Aggiungete la pancetta croccante.Versate il ripieno sulla base e cuocete a 160° per 45-50 minuti. Fate raffreddare completamente prima di servire.",
+    "recipeIngredient": [
+        "200 g di biscotti digestive",
+        "100 g di burro fuso",
+        "500 g di philadelphia",
+        "300 g di ricotta",
+        "150 g di parmigiano reggiano grattugiato",
+        "100 g di pancetta croccante",
+        "2 uova",
+        "Sale e pepe qb"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Base:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ripieno:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tritiamo i biscotti e mescoliamo con il burro fuso. Versiamo sul fondo di uno stampo e compattate bene."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mixate philadelphia e ricotta fino a ottenere un composto omogeneo. Unite il parmigiano, le uova, sale e pepe. Aggiungete la pancetta croccante."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate il ripieno sulla base e cuocete a 160° per 45-50 minuti. Fate raffreddare completamente prima di servire."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

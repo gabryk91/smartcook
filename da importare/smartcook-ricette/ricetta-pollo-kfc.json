@@ -1,0 +1,34 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Ricetta Pollo KFC",
+    "inLanguage": "it",
+    "description": "Miscela Spezie Pollo KFC2/3 di cucchiaio di saleMezzo cucchiaio di timoMezzo cucchiaio di basilico1/3 di cucchiaio di origanoUn cucchiaio di sale con semi di sedanoUn cucchiaio di pepe neroUn cucchiaio di senape essiccata4 cucchiai di paprika2 cucchiai di sale all'aglioUn cucchiaio di zenzero in polvere3 cucchiai di pepe bianco",
+    "notes": "Nota originale F288BD47-9D38-4B74-B478-3C5D07D39148\n\nMiscela Spezie Pollo KFC2/3 di cucchiaio di saleMezzo cucchiaio di timoMezzo cucchiaio di basilico1/3 di cucchiaio di origanoUn cucchiaio di sale con semi di sedanoUn cucchiaio di pepe neroUn cucchiaio di senape essiccata4 cucchiai di paprika2 cucchiai di sale all'aglioUn cucchiaio di zenzero in polvere3 cucchiai di pepe bianco",
+    "recipeIngredient": [
+        "2/3 di cucchiaio di sale",
+        "Mezzo cucchiaio di timo",
+        "Mezzo cucchiaio di basilico",
+        "1/3 di cucchiaio di origano",
+        "Un cucchiaio di sale con semi di sedano",
+        "Un cucchiaio di pepe nero",
+        "Un cucchiaio di senape essiccata",
+        "4 cucchiai di paprika",
+        "2 cucchiai di sale all'aglio",
+        "Un cucchiaio di zenzero in polvere",
+        "3 cucchiai di pepe bianco"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Miscela Spezie Pollo KFC"
+        }
+    ],
+    "keywords": [
+        "Secondi"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

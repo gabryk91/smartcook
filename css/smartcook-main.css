@@ -232,7 +232,7 @@ button:disabled,
 }
 
 .full {
-	width: 100%;
+	width: fit-content;
 }
 
 .icon-button {
@@ -461,11 +461,24 @@ button:disabled,
 	padding: 0 22px 22px;
 }
 
-.tag-cloud span {
+.tag-cloud span,
+.tag-cloud a {
 	padding: 7px 10px;
 	border-radius: 999px;
 	background: var(--smartcook-surface-soft);
 	font-size: 13px;
+}
+
+.tag-cloud a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.tag-cloud a:hover,
+.tag-cloud a:focus-visible {
+	background: color-mix(in srgb, var(--smartcook-accent) 14%, var(--smartcook-surface));
+	outline: 2px solid var(--smartcook-accent);
+	outline-offset: 2px;
 }
 
 .tag-cloud b {
@@ -1781,6 +1794,13 @@ select:focus {
 }
 
 @media (max-width: 800px) {
+	.smartcook-shell {
+		height: auto;
+		min-height: calc(100vh - var(--header-height, 50px));
+		overflow: visible;
+		flex-direction: column;
+	}
+
 	.smartcook-sidebar {
 		position: sticky;
 		inset: 0;

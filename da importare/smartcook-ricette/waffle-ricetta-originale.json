@@ -1,0 +1,24 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Waffle Ricetta Originale",
+    "inLanguage": "it",
+    "description": "Waffle croccanti e leggeri. Ingredienti: 300gr farina, 500ml latte, 100gr burro fuso, 2 uova, 2 cucchiai zucchero, 2 cucchiaini lievito, vaniglia, pizzico sale",
+    "notes": "Nota originale E6E20510-9586-439F-828E-99402D0DB777\n\nWaffle croccanti e leggeri. Ingredienti: 300gr farina, 500ml latte, 100gr burro fuso, 2 uova, 2 cucchiai zucchero, 2 cucchiaini lievito, vaniglia, pizzico sale",
+    "recipeIngredient": [
+        "Waffle croccanti e leggeri. Ingredienti: 300gr farina, 500ml latte, 100gr burro fuso, 2 uova, 2 cucchiai zucchero, 2 cucchiaini lievito, vaniglia, pizzico sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Waffle croccanti e leggeri. Ingredienti: 300gr farina, 500ml latte, 100gr burro fuso, 2 uova, 2 cucchiai zucchero, 2 cucchiaini lievito, vaniglia, pizzico sale"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

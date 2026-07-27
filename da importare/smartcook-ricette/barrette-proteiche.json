@@ -1,0 +1,31 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Barrette proteiche",
+    "inLanguage": "it",
+    "description": "Ingredienti160g di mandorle pelate200g di fiocchi di avena60g di mela tagliata100g di uvetta40g di datteri o fichiUn pizzico di cannellaPreparazioneMescolare tutti gli ingredienti fino ad ottenere un impasto omogeneo. Formare delle barrette e farle riposare in frigorifero.",
+    "notes": "Nota originale 75790E67-65E4-4A4A-89AA-B0E8874E2A3E\n\nIngredienti160g di mandorle pelate200g di fiocchi di avena60g di mela tagliata100g di uvetta40g di datteri o fichiUn pizzico di cannellaPreparazioneMescolare tutti gli ingredienti fino ad ottenere un impasto omogeneo. Formare delle barrette e farle riposare in frigorifero.",
+    "recipeIngredient": [
+        "160g di mandorle pelate",
+        "200g di fiocchi di avena",
+        "60g di mela tagliata",
+        "100g di uvetta",
+        "40g di datteri o fichi",
+        "Un pizzico di cannella"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mescolare tutti gli ingredienti fino ad ottenere un impasto omogeneo. Formare delle barrette e farle riposare in frigorifero."
+        }
+    ],
+    "keywords": [
+        "Snack"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

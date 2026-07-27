@@ -1,0 +1,35 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Limoncino metodo Bressanini",
+    "inLanguage": "it",
+    "description": "Bottiglietta 500ml (circa 12€ a bottiglia)\n200ml alcool (100)\n240ml acqua (120)\n160gr zucchero (80%)\n4 limoni (riutilizzabili 1 volta) 60gr bucce\nBucce di limone e acqua e zucchero 2 ore a 50°, poi unire.",
+    "notes": "Nota originale 5B7E2CF8-C20A-4813-8B78-562B307DAA60\n\nBottiglietta 500ml (circa 12€ a bottiglia)\n200ml alcool (100)\n240ml acqua (120)\n160gr zucchero (80%)\n4 limoni (riutilizzabili 1 volta) 60gr bucce\nBucce di limone e acqua e zucchero 2 ore a 50°, poi unire.",
+    "recipeIngredient": [
+        "Bottiglietta 500ml (circa 12€ a bottiglia)",
+        "200ml alcool (100)",
+        "240ml acqua (120)",
+        "160gr zucchero (80%)",
+        "4 limoni (riutilizzabili 1 volta) 60gr bucce",
+        "Bucce di limone e acqua e zucchero 2 ore a 50°, poi unire."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Bottiglietta 500ml (circa 12€ a bottiglia) 200ml alcool (100) 240ml acqua (120) 160gr zucchero (80%)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4 limoni (riutilizzabili 1 volta) 60gr bucce"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Bucce di limone e acqua e zucchero 2 ore a 50°, poi unire."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,42 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Spaghetti al Pesto di Limoni",
+    "inLanguage": "it",
+    "description": "Spaghetti al Pesto di LimoniIngredienti:400gr spaghetti4 limoni biologici150gr pinoli tostati100gr basilico fresco150ml olio EVO50gr parmigiano reggianoSale q.b.Preparazione:Lavare bene i limoni, grattugiare la scorza e spremere il succo. Frullare basilico, pinoli, scorza di limone con olio fino a ottenere un pesto cremoso. Aggiungere succo di limone fresco e parmigiano. Cuocere gli spaghetti in acqua salata, scolare conservando acqua di cottura. Condire il pesto dilungandolo con un pò di acqua di cottura. Servire subito.",
+    "notes": "Nota originale 61FF2D40-96A4-4C79-A337-929AAE9F5B28\n\nSpaghetti al Pesto di LimoniIngredienti:400gr spaghetti4 limoni biologici150gr pinoli tostati100gr basilico fresco150ml olio EVO50gr parmigiano reggianoSale q.b.Preparazione:Lavare bene i limoni, grattugiare la scorza e spremere il succo. Frullare basilico, pinoli, scorza di limone con olio fino a ottenere un pesto cremoso. Aggiungere succo di limone fresco e parmigiano. Cuocere gli spaghetti in acqua salata, scolare conservando acqua di cottura. Condire il pesto dilungandolo con un pò di acqua di cottura. Servire subito.",
+    "recipeIngredient": [
+        "400gr spaghetti",
+        "4 limoni biologici",
+        "150gr pinoli tostati",
+        "100gr basilico fresco",
+        "150ml olio EVO",
+        "50gr parmigiano reggiano",
+        "Sale q.b."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Spaghetti al Pesto di Limoni"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Lavare bene i limoni, grattugiare la scorza e spremere il succo. Frullare basilico, pinoli, scorza di limone con olio fino a ottenere un pesto cremoso. Aggiungere succo di limone fresco e parmigiano. Cuocere gli spaghetti in acqua salata, scolare conservando acqua di cottura. Condire il pesto dilungandolo con un pò di acqua di cottura. Servire subito."
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

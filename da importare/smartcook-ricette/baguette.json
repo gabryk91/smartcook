@@ -1,0 +1,46 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Baguette",
+    "inLanguage": "it",
+    "description": "Ingredienti1 bustina lievito di birra secco (o 1 cubetto fresco)75 ml acqua tiepida (30°C)450-500 g farina 015 g sale300 ml acqua tiepida (25°C)IstruzioniMescolate il lievito in 75 ml d'acqua tiepida e lasciate sciogliere completamente. Quando il lievito è sciolto, versatelo nella farina con il sale e il resto dell'acqua.Mescolate e tagliate l'acqua nella farina con una spatola di gomma, premendo con decisione. Fatela riposare per 3 minuti, poi lavorate bene per altri 5-10 minuti. La superficie dovrà essere liscia.Fatela lievitare nella ciotola unta d'olio per circa 3 ore fino a quando non avrà triplicato il volume.Dividete l'impasto in 6 baguette. Dopo aver tagliato i pezzi, sollevate un'estremità e capovolgetela sull'estremità opposta. Fate riposare 5 minuti. Formate ogni baguette piegandola longitudinalmente fino a formare un filoncino.Posate le baguette sul telo di cotone e fate lievitare per 2 ore. Spruzzate con acqua e cuocete per 25 minuti a 250°, poi a 200°-220°C dopo 10 minuti.",
+    "notes": "Nota originale AE961938-72BC-4363-9837-FE0D9A003228\n\nIngredienti1 bustina lievito di birra secco (o 1 cubetto fresco)75 ml acqua tiepida (30°C)450-500 g farina 015 g sale300 ml acqua tiepida (25°C)IstruzioniMescolate il lievito in 75 ml d'acqua tiepida e lasciate sciogliere completamente. Quando il lievito è sciolto, versatelo nella farina con il sale e il resto dell'acqua.Mescolate e tagliate l'acqua nella farina con una spatola di gomma, premendo con decisione. Fatela riposare per 3 minuti, poi lavorate bene per altri 5-10 minuti. La superficie dovrà essere liscia.Fatela lievitare nella ciotola unta d'olio per circa 3 ore fino a quando non avrà triplicato il volume.Dividete l'impasto in 6 baguette. Dopo aver tagliato i pezzi, sollevate un'estremità e capovolgetela sull'estremità opposta. Fate riposare 5 minuti. Formate ogni baguette piegandola longitudinalmente fino a formare un filoncino.Posate le baguette sul telo di cotone e fate lievitare per 2 ore. Spruzzate con acqua e cuocete per 25 minuti a 250°, poi a 200°-220°C dopo 10 minuti.",
+    "recipeIngredient": [
+        "1 bustina lievito di birra secco (o 1 cubetto fresco)",
+        "75 ml acqua tiepida (30°C)",
+        "450-500 g farina 0",
+        "15 g sale",
+        "300 ml acqua tiepida (25°C)"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Istruzioni"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mescolate il lievito in 75 ml d'acqua tiepida e lasciate sciogliere completamente. Quando il lievito è sciolto, versatelo nella farina con il sale e il resto dell'acqua."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mescolate e tagliate l'acqua nella farina con una spatola di gomma, premendo con decisione. Fatela riposare per 3 minuti, poi lavorate bene per altri 5-10 minuti. La superficie dovrà essere liscia."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fatela lievitare nella ciotola unta d'olio per circa 3 ore fino a quando non avrà triplicato il volume."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Dividete l'impasto in 6 baguette. Dopo aver tagliato i pezzi, sollevate un'estremità e capovolgetela sull'estremità opposta. Fate riposare 5 minuti. Formate ogni baguette piegandola longitudinalmente fino a formare un filoncino."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Posate le baguette sul telo di cotone e fate lievitare per 2 ore. Spruzzate con acqua e cuocete per 25 minuti a 250°, poi a 200°-220°C dopo 10 minuti."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

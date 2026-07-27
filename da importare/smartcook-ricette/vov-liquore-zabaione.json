@@ -1,0 +1,44 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Vov - Liquore Zabaione",
+    "inLanguage": "it",
+    "description": "Vov - Liquore Zabaione PiacentinoIngredienti:8 tuorli d'uovo freschissimi200gr zucchero300ml alcol etilico 96°150ml acqua1 stecca di vanigliaNoce moscata grattugiataScorza di 1 limonePreparazione:Montare i tuorli con lo zucchero a bagnomaria fino a ottenere uno zabaione denso e spumoso. Raffreddare completamente. Aggiungere lentamente l'alcol mescolando. Filtrare attraverso tela. Aggiungere vaniglia, noce moscata e scorza di limone. Lasciare riposare in bottiglie di vetro scuro per almeno una settimana prima di servire. Servire freddo come digestivo.Conservazione: In bottiglie scure in luogo fresco, fino a 1 anno.",
+    "notes": "Nota originale 37C267C3-E38A-46DE-A81F-63B5E09B8EF6\n\nVov - Liquore Zabaione PiacentinoIngredienti:8 tuorli d'uovo freschissimi200gr zucchero300ml alcol etilico 96°150ml acqua1 stecca di vanigliaNoce moscata grattugiataScorza di 1 limonePreparazione:Montare i tuorli con lo zucchero a bagnomaria fino a ottenere uno zabaione denso e spumoso. Raffreddare completamente. Aggiungere lentamente l'alcol mescolando. Filtrare attraverso tela. Aggiungere vaniglia, noce moscata e scorza di limone. Lasciare riposare in bottiglie di vetro scuro per almeno una settimana prima di servire. Servire freddo come digestivo.Conservazione: In bottiglie scure in luogo fresco, fino a 1 anno.",
+    "recipeIngredient": [
+        "8 tuorli d'uovo freschissimi",
+        "200gr zucchero",
+        "300ml alcol etilico 96°",
+        "150ml acqua",
+        "1 stecca di vaniglia",
+        "Noce moscata grattugiata",
+        "Scorza di 1 limone"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Vov - Liquore Zabaione Piacentino"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Montare i tuorli con lo zucchero a bagnomaria fino a ottenere uno zabaione denso e spumoso. Raffreddare completamente. Aggiungere lentamente l'alcol mescolando. Filtrare attraverso tela. Aggiungere vaniglia, noce moscata e scorza di limone. Lasciare riposare in bottiglie di vetro scuro per almeno una settimana prima di servire. Servire freddo come digestivo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Conservazione: In bottiglie scure in luogo fresco, fino a 1 anno."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

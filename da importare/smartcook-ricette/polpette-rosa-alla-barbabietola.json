@@ -1,0 +1,42 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Polpette rosa alla barbabietola",
+    "inLanguage": "it",
+    "description": "Ingredienti:​250 gr di fagioli borlotti già cotti​80 g di barbabietola cotta al vapore​1/2 cipolla rossa​4-6 cucchiai di pangrattato (anche senza glutine)​2 cucchiai di salsa di soia (o tamari)​Il succo di 1/2 lime​2 cucchiai di semi di lino macinati​4 cucchiai di olio extravergine di oliva​Pepe​1/2 cucchiaino di sale​Procedimento:​Frullare: Versate in un mixer la barbabietola, i fagioli, la cipolla, la salsa di soia, il succo di lime, i semi di lino macinati, il sale e un pizzico di pepe. Tritate tutto fino a ottenere un composto piuttosto omogeneo.​Addensare: Versate il composto in una ciotola e aggiungete il pangrattato poco alla volta. Mescolate con un cucchiaio e fermatevi quando avrete ottenuto una consistenza malleabile.​Formare: Modellate delle palline dal diametro non superiore ai 4 cm e rivestitele di pangrattato.​Cuocere: Fate scaldare l'olio in una padella dal fondo piatto e adagiatevi le polpette. Giratele delicatamente per consentire una cottura uniforme su tutta la superficie.​Servire: Quando la superficie si sarà dorata leggermente, le polpette saranno pronte. Servitele ancora calde.​Consiglio per la conservazione: Le polpette si conservano per 5 giorni in frigorifero o possono essere congelate. Per scongelarle, mettetele in padella con un filo d'olio oppure in forno statico per 10 minuti a 180°C.",
+    "notes": "Nota originale 47D20ED2-EF95-4F44-BF83-AD2C5E559B2D\n\nIngredienti:​250 gr di fagioli borlotti già cotti​80 g di barbabietola cotta al vapore​1/2 cipolla rossa​4-6 cucchiai di pangrattato (anche senza glutine)​2 cucchiai di salsa di soia (o tamari)​Il succo di 1/2 lime​2 cucchiai di semi di lino macinati​4 cucchiai di olio extravergine di oliva​Pepe​1/2 cucchiaino di sale​Procedimento:​Frullare: Versate in un mixer la barbabietola, i fagioli, la cipolla, la salsa di soia, il succo di lime, i semi di lino macinati, il sale e un pizzico di pepe. Tritate tutto fino a ottenere un composto piuttosto omogeneo.​Addensare: Versate il composto in una ciotola e aggiungete il pangrattato poco alla volta. Mescolate con un cucchiaio e fermatevi quando avrete ottenuto una consistenza malleabile.​Formare: Modellate delle palline dal diametro non superiore ai 4 cm e rivestitele di pangrattato.​Cuocere: Fate scaldare l'olio in una padella dal fondo piatto e adagiatevi le polpette. Giratele delicatamente per consentire una cottura uniforme su tutta la superficie.​Servire: Quando la superficie si sarà dorata leggermente, le polpette saranno pronte. Servitele ancora calde.​Consiglio per la conservazione: Le polpette si conservano per 5 giorni in frigorifero o possono essere congelate. Per scongelarle, mettetele in padella con un filo d'olio oppure in forno statico per 10 minuti a 180°C.",
+    "recipeIngredient": [
+        "​250 gr di fagioli borlotti già cotti",
+        "​80 g di barbabietola cotta al vapore",
+        "​1/2 cipolla rossa",
+        "​4-6 cucchiai di pangrattato (anche senza glutine)",
+        "​2 cucchiai di salsa di soia (o tamari)",
+        "​Il succo di 1/2 lime",
+        "​2 cucchiai di semi di lino macinati",
+        "​4 cucchiai di olio extravergine di oliva",
+        "​Pepe",
+        "​1/2 cucchiaino di sale",
+        "​Frullare: Versate in un mixer la barbabietola, i fagioli, la cipolla, la salsa di soia, il succo di lime, i semi di lino macinati, il sale e un pizzico di pepe. Tritate tutto fino a ottenere un composto piuttosto omogeneo.",
+        "​Addensare: Versate il composto in una ciotola e aggiungete il pangrattato poco alla volta. Mescolate con un cucchiaio e fermatevi quando avrete ottenuto una consistenza malleabile.",
+        "​Formare: Modellate delle palline dal diametro non superiore ai 4 cm e rivestitele di pangrattato.",
+        "​Cuocere: Fate scaldare l'olio in una padella dal fondo piatto e adagiatevi le polpette. Giratele delicatamente per consentire una cottura uniforme su tutta la superficie.",
+        "​Servire: Quando la superficie si sarà dorata leggermente, le polpette saranno pronte. Servitele ancora calde."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "​Procedimento:"
+        }
+    ],
+    "keywords": [
+        "Secondi"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

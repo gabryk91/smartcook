@@ -1,0 +1,46 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Agretti agli agrumi",
+    "inLanguage": "it",
+    "description": "Ingredienti400 gr. di agretti (o fagiolini)50 gr. di olive taggiasche1 cucchiaio di capperi1 limone1 aranciaSaleOlio evoProcedimentoPuliamo e laviamo bene gli agretti togliendo le radici, e li scottiamo in acqua bollente salata per 3 minuti; scoliamo e lasciamo raffreddare.Spremiamo il succo di ½ limone e ½ arancia, uniamo olio e sale, emulsioniamo bene tutti gli ingredienti.Peliamo l'altra mezza arancia togliendo anche la parte bianca e la tagliamo a cubetti.In una terrina mettiamo la verdura, aggiungiamo la polpa di mezza arancia tagliata a cubetti, le olive tagliate a rondelle, capperi tritati e condiamo con l'emulsione lasciamo marinare per 20 minuti. Serviamo.",
+    "notes": "Nota originale C8CD2B1D-F9CB-4AA5-A452-0C23981497E6\n\nIngredienti400 gr. di agretti (o fagiolini)50 gr. di olive taggiasche1 cucchiaio di capperi1 limone1 aranciaSaleOlio evoProcedimentoPuliamo e laviamo bene gli agretti togliendo le radici, e li scottiamo in acqua bollente salata per 3 minuti; scoliamo e lasciamo raffreddare.Spremiamo il succo di ½ limone e ½ arancia, uniamo olio e sale, emulsioniamo bene tutti gli ingredienti.Peliamo l'altra mezza arancia togliendo anche la parte bianca e la tagliamo a cubetti.In una terrina mettiamo la verdura, aggiungiamo la polpa di mezza arancia tagliata a cubetti, le olive tagliate a rondelle, capperi tritati e condiamo con l'emulsione lasciamo marinare per 20 minuti. Serviamo.",
+    "recipeIngredient": [
+        "400 gr. di agretti (o fagiolini)",
+        "50 gr. di olive taggiasche",
+        "1 cucchiaio di capperi",
+        "1 limone",
+        "1 arancia",
+        "Sale",
+        "Olio evo"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Puliamo e laviamo bene gli agretti togliendo le radici, e li scottiamo in acqua bollente salata per 3 minuti; scoliamo e lasciamo raffreddare."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Spremiamo il succo di ½ limone e ½ arancia, uniamo olio e sale, emulsioniamo bene tutti gli ingredienti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Peliamo l'altra mezza arancia togliendo anche la parte bianca e la tagliamo a cubetti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "In una terrina mettiamo la verdura, aggiungiamo la polpa di mezza arancia tagliata a cubetti, le olive tagliate a rondelle, capperi tritati e condiamo con l'emulsione lasciamo marinare per 20 minuti. Serviamo."
+        }
+    ],
+    "keywords": [
+        "Contorni"
+    ],
+    "recipeCategory": [
+        "Contorni"
+    ],
+    "recipeYield": "4 0"
+}

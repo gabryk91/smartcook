@@ -1,0 +1,49 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Torta Frutta Secca e Pere",
+    "inLanguage": "it",
+    "description": "Torta Frutta Secca e PereIngredienti per uno stampo 24cm:300gr farina 00200gr burro morbido150gr zucchero3 uova100gr noci tritate100gr mandorle tritate4 pere medie mature2 cucchiaini lievito per dolciPizzico di saleBuccia di limone grattugiataPreparazione:Cremare burro e zucchero. Aggiungere uova una per volta. Unire farina setacciata con lievito e sale. Incorporare noci, mandorle e scorza di limone. Pelere le pere, tagliarle a spicchi. Versare metà impasto nello stampo burrrato. Disporre gli spicchi di pera. Coprire con il resto dell'impasto. Cuocere a 180°C per 50-60 minuti fino a quando un stecchino inserito esce asciutto. Raffreddare prima di sformare.Tempo: 1.5 ore | Difficoltà: Media",
+    "notes": "Nota originale 5AEB7ED3-3D0D-42BC-84EA-BDD46E3827B9\n\nTorta Frutta Secca e PereIngredienti per uno stampo 24cm:300gr farina 00200gr burro morbido150gr zucchero3 uova100gr noci tritate100gr mandorle tritate4 pere medie mature2 cucchiaini lievito per dolciPizzico di saleBuccia di limone grattugiataPreparazione:Cremare burro e zucchero. Aggiungere uova una per volta. Unire farina setacciata con lievito e sale. Incorporare noci, mandorle e scorza di limone. Pelere le pere, tagliarle a spicchi. Versare metà impasto nello stampo burrrato. Disporre gli spicchi di pera. Coprire con il resto dell'impasto. Cuocere a 180°C per 50-60 minuti fino a quando un stecchino inserito esce asciutto. Raffreddare prima di sformare.Tempo: 1.5 ore | Difficoltà: Media",
+    "recipeIngredient": [
+        "300gr farina 00",
+        "200gr burro morbido",
+        "150gr zucchero",
+        "3 uova",
+        "100gr noci tritate",
+        "100gr mandorle tritate",
+        "4 pere medie mature",
+        "2 cucchiaini lievito per dolci",
+        "Pizzico di sale",
+        "Buccia di limone grattugiata"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Torta Frutta Secca e Pere"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti per uno stampo 24cm:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cremare burro e zucchero. Aggiungere uova una per volta. Unire farina setacciata con lievito e sale. Incorporare noci, mandorle e scorza di limone. Pelere le pere, tagliarle a spicchi. Versare metà impasto nello stampo burrrato. Disporre gli spicchi di pera. Coprire con il resto dell'impasto. Cuocere a 180°C per 50-60 minuti fino a quando un stecchino inserito esce asciutto. Raffreddare prima di sformare."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tempo: 1.5 ore | Difficoltà: Media"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

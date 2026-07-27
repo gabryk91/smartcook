@@ -1,0 +1,44 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Spaghetti Cacio e Pepe",
+    "inLanguage": "it",
+    "description": "Spaghetti Cacio e PepeIngredienti per 4 persone:400gr spaghetti200gr guanciale a cubetti150gr pecorino romano grattugiato2 cucchiai pepe nero macinato frescoSale q.b.Procedimento:Cuocere il guanciale a fuoco medio fino a renderlo croccante. Cuocere gli spaghetti in acqua salata al dente. Mantecare gli spaghetti con il grasso del guanciale e il pepe. Aggiungere il pecorino e l'acqua di cottura per creare una crema. Unire il guanciale croccante. Servire subito.Consiglio: Non usare panna né uova. Solo questi 4 ingredienti!",
+    "notes": "Nota originale 5E1CE82E-D9A5-4455-B40E-790B36E48D8A\n\nSpaghetti Cacio e PepeIngredienti per 4 persone:400gr spaghetti200gr guanciale a cubetti150gr pecorino romano grattugiato2 cucchiai pepe nero macinato frescoSale q.b.Procedimento:Cuocere il guanciale a fuoco medio fino a renderlo croccante. Cuocere gli spaghetti in acqua salata al dente. Mantecare gli spaghetti con il grasso del guanciale e il pepe. Aggiungere il pecorino e l'acqua di cottura per creare una crema. Unire il guanciale croccante. Servire subito.Consiglio: Non usare panna né uova. Solo questi 4 ingredienti!",
+    "recipeIngredient": [
+        "400gr spaghetti",
+        "200gr guanciale a cubetti",
+        "150gr pecorino romano grattugiato",
+        "2 cucchiai pepe nero macinato fresco",
+        "Sale q.b."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Spaghetti Cacio e Pepe"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti per 4 persone:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cuocere il guanciale a fuoco medio fino a renderlo croccante. Cuocere gli spaghetti in acqua salata al dente. Mantecare gli spaghetti con il grasso del guanciale e il pepe. Aggiungere il pecorino e l'acqua di cottura per creare una crema. Unire il guanciale croccante. Servire subito."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Consiglio: Non usare panna né uova. Solo questi 4 ingredienti!"
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

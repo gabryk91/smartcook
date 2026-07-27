@@ -1,0 +1,47 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Tiramisù Classico",
+    "inLanguage": "it",
+    "description": "Tiramisù Classico ItalianoIngredienti:500gr mascarpone a temperatura ambiente6 uova (tuorli e albumi separati)150gr zucchero300ml caffè espresso raffreddato40ml Marsala o Vin Santo200gr biscotti SavoiardiCacao amaro in polvere q.b.Pizzico di salePreparazione:Montare i tuorli con lo zucchero fino a ottenere un composto pallido e spumoso. Aggiungere il mascarpone lentamente, mescolando delicatamente. In una ciotola separate, montare gli albumi a neve ferma. Incorporare la neve agli albumi al composto di mascarpone con delicatezza. Mescolare caffè con Marsala. Immergere i biscotti uno per uno nel caffè, disposrli in uno strato nel piatto da portata. Coprire con metà del mascarpone. Ripetere con un altro strato di biscotti imbevuti e il resto del mascarpone. Cospargere di cacao. Refrigerare 6 ore o una notte.Consiglio: Usare uova fresche per il consumo a crudo.",
+    "notes": "Nota originale A8D0EC3C-D9D9-4751-B2A0-14B2C339B916\n\nTiramisù Classico ItalianoIngredienti:500gr mascarpone a temperatura ambiente6 uova (tuorli e albumi separati)150gr zucchero300ml caffè espresso raffreddato40ml Marsala o Vin Santo200gr biscotti SavoiardiCacao amaro in polvere q.b.Pizzico di salePreparazione:Montare i tuorli con lo zucchero fino a ottenere un composto pallido e spumoso. Aggiungere il mascarpone lentamente, mescolando delicatamente. In una ciotola separate, montare gli albumi a neve ferma. Incorporare la neve agli albumi al composto di mascarpone con delicatezza. Mescolare caffè con Marsala. Immergere i biscotti uno per uno nel caffè, disposrli in uno strato nel piatto da portata. Coprire con metà del mascarpone. Ripetere con un altro strato di biscotti imbevuti e il resto del mascarpone. Cospargere di cacao. Refrigerare 6 ore o una notte.Consiglio: Usare uova fresche per il consumo a crudo.",
+    "recipeIngredient": [
+        "500gr mascarpone a temperatura ambiente",
+        "6 uova (tuorli e albumi separati)",
+        "150gr zucchero",
+        "300ml caffè espresso raffreddato",
+        "40ml Marsala o Vin Santo",
+        "200gr biscotti Savoiardi",
+        "Cacao amaro in polvere q.b.",
+        "Pizzico di sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Tiramisù Classico Italiano"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Montare i tuorli con lo zucchero fino a ottenere un composto pallido e spumoso. Aggiungere il mascarpone lentamente, mescolando delicatamente. In una ciotola separate, montare gli albumi a neve ferma. Incorporare la neve agli albumi al composto di mascarpone con delicatezza. Mescolare caffè con Marsala. Immergere i biscotti uno per uno nel caffè, disposrli in uno strato nel piatto da portata. Coprire con metà del mascarpone. Ripetere con un altro strato di biscotti imbevuti e il resto del mascarpone. Cospargere di cacao. Refrigerare 6 ore o una notte."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Consiglio: Usare uova fresche per il consumo a crudo."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

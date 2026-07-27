@@ -1,0 +1,38 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pancake PAT",
+    "inLanguage": "it",
+    "description": "Ingredienti (x circa 6 pan cake)100 gr di farina di grano tenero o farro20 gr di farina di castagne150 gr circa di succo di mela o bevanda vegetalepizzico di salepizzico di bicarbonatoolio evoPreparazioneIn una terrina uniamo le farine e il bicarbonato e mescoliamo. Aggiungiamo il sale, il succo di mela o altra bevanda e amalgamiamo per bene. In una padella spennellata l’olio e versate il composto con un mestolino formando un pan cake. Dorate da entrambi le parti e farcite con della crema di nocciola, di mandorla, di frutta cotta o di marmellata senza zucchero aggiunto",
+    "notes": "Nota originale 226C1CC4-4950-4868-B7BA-CE39F9DB7834\n\nIngredienti (x circa 6 pan cake)100 gr di farina di grano tenero o farro20 gr di farina di castagne150 gr circa di succo di mela o bevanda vegetalepizzico di salepizzico di bicarbonatoolio evoPreparazioneIn una terrina uniamo le farine e il bicarbonato e mescoliamo. Aggiungiamo il sale, il succo di mela o altra bevanda e amalgamiamo per bene. In una padella spennellata l’olio e versate il composto con un mestolino formando un pan cake. Dorate da entrambi le parti e farcite con della crema di nocciola, di mandorla, di frutta cotta o di marmellata senza zucchero aggiunto",
+    "recipeIngredient": [
+        "100 gr di farina di grano tenero o farro",
+        "20 gr di farina di castagne",
+        "150 gr circa di succo di mela o bevanda vegetale",
+        "pizzico di sale",
+        "pizzico di bicarbonato",
+        "olio evo"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti (x circa 6 pan cake)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "In una terrina uniamo le farine e il bicarbonato e mescoliamo. Aggiungiamo il sale, il succo di mela o altra bevanda e amalgamiamo per bene. In una padella spennellata l’olio e versate il composto con un mestolino formando un pan cake. Dorate da entrambi le parti e farcite con della crema di nocciola, di mandorla, di frutta cotta o di marmellata senza zucchero aggiunto"
+        }
+    ],
+    "keywords": [
+        "Colazione",
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

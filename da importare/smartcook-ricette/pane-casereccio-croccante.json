@@ -1,0 +1,172 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pane Casereccio Croccante",
+    "inLanguage": "it",
+    "description": "INGREDIENTI:\n500gr farina (tipo 0 o 00)250-300ml acqua tiepida7gr lievito di birra secco (o 20gr fresco)10gr saleAcqua bollente per vapore (in forno)\nPROCEDIMENTO:Fase 1 - Impasto e lievitazione temperatura ambiente (2-3 ore):\n1. Mescolare farina, acqua, lievito e sale fino a ottenere un impasto omogeneo2. Impastare a mano per 10-15 minuti (non serve impastatrice)3. Lasciare lievitare a temperatura ambiente per 2-3 ore fino al raddoppio del volume\nFase 2 - Lievitazione in frigorifero (2 ore - diversi giorni):\n4. Trasferire l'impasto in frigorifero per almeno 2 ore (fino a 3-4 giorni per più sapore acido)5. Più tempo in frigo = più sapore acido\nCottura:\n6. Riprendere l'impasto dal frigo, trasferire su carta da forno7. Fare una leggera superficie con acqua se desiderato8. Riscaldare forno a 250°C con pentolino di acqua bollente inside per vapore9. Inserire il pane nel forno10. Mantenere il pentolino di acqua nella prima metà della cottura (per crosta croccante ridurre il tempo dell'acqua)11. Cuocere 30-35 minuti fino a doratura intensa12. Sfornare e raffreddare su griglia\nCARATTERISTICHE:\nCrosta: Molto croccanteInterno: Gommoso con alveoliTempo totale: 4-5 ore (+ 2 giorni opzionali in frigo)Difficoltà: Bassa\nVARIAZIONI:- Aggiungere semi (chia, lino) sulla superficie prima della cottura- Usare farina di grani antichi o semintegrale- Sostituire lievito di birra con lievito madre- Aumentare acqua per impasto più idratato e alveoli più grossi\nFONTE ORIGINALE CON VIDEO:﻿﻿Video Ricetta su Viva La FocacciaBasato su: King Arthur Flour - The Crunchiest Bread Recipe",
+    "notes": "Nota originale E7208DDC-624A-4534-A404-A8BFEDA2884B\n\nINGREDIENTI:\n500gr farina (tipo 0 o 00)250-300ml acqua tiepida7gr lievito di birra secco (o 20gr fresco)10gr saleAcqua bollente per vapore (in forno)\nPROCEDIMENTO:Fase 1 - Impasto e lievitazione temperatura ambiente (2-3 ore):\n1. Mescolare farina, acqua, lievito e sale fino a ottenere un impasto omogeneo2. Impastare a mano per 10-15 minuti (non serve impastatrice)3. Lasciare lievitare a temperatura ambiente per 2-3 ore fino al raddoppio del volume\nFase 2 - Lievitazione in frigorifero (2 ore - diversi giorni):\n4. Trasferire l'impasto in frigorifero per almeno 2 ore (fino a 3-4 giorni per più sapore acido)5. Più tempo in frigo = più sapore acido\nCottura:\n6. Riprendere l'impasto dal frigo, trasferire su carta da forno7. Fare una leggera superficie con acqua se desiderato8. Riscaldare forno a 250°C con pentolino di acqua bollente inside per vapore9. Inserire il pane nel forno10. Mantenere il pentolino di acqua nella prima metà della cottura (per crosta croccante ridurre il tempo dell'acqua)11. Cuocere 30-35 minuti fino a doratura intensa12. Sfornare e raffreddare su griglia\nCARATTERISTICHE:\nCrosta: Molto croccanteInterno: Gommoso con alveoliTempo totale: 4-5 ore (+ 2 giorni opzionali in frigo)Difficoltà: Bassa\nVARIAZIONI:- Aggiungere semi (chia, lino) sulla superficie prima della cottura- Usare farina di grani antichi o semintegrale- Sostituire lievito di birra con lievito madre- Aumentare acqua per impasto più idratato e alveoli più grossi\nFONTE ORIGINALE CON VIDEO:﻿﻿Video Ricetta su Viva La FocacciaBasato su: King Arthur Flour - The Crunchiest Bread Recipe",
+    "recipeIngredient": [
+        "500gr farina (tipo 0 o 00)250-300ml acqua tiepida7gr lievito di birra secco (o 20gr fresco)10gr saleAcqua bollente per vapore (in forno)",
+        "PROCEDIMENTO:Fase 1 - Impasto e lievitazione temperatura ambiente (2-3 ore):",
+        "1. Mescolare farina, acqua, lievito e sale fino a ottenere un impasto omogeneo2. Impastare a mano per 10-15 minuti (non serve impastatrice)3. Lasciare lievitare a temperatura ambiente per 2-3 ore fino al raddoppio del volume",
+        "Fase 2 - Lievitazione in frigorifero (2 ore - diversi giorni):",
+        "4. Trasferire l'impasto in frigorifero per almeno 2 ore (fino a 3-4 giorni per più sapore acido)5. Più tempo in frigo = più sapore acido",
+        "6. Riprendere l'impasto dal frigo, trasferire su carta da forno7. Fare una leggera superficie con acqua se desiderato8. Riscaldare forno a 250°C con pentolino di acqua bollente inside per vapore9. Inserire il pane nel forno10. Mantenere il pentolino di acqua nella prima metà della cottura (per crosta croccante ridurre il tempo dell'acqua)11. Cuocere 30-35 minuti fino a doratura intensa12. Sfornare e raffreddare su griglia",
+        "Crosta: Molto croccanteInterno: Gommoso con alveoliTempo totale: 4-5 ore (+ 2 giorni opzionali in frigo)Difficoltà: Bassa"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "INGREDIENTI:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "500gr farina (tipo 0 o 00)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "250-300ml acqua tiepida"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "7gr lievito di birra secco (o 20gr fresco)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "10gr sale"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Acqua bollente per vapore (in forno)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "PROCEDIMENTO:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 1 - Impasto e lievitazione temperatura ambiente (2-3 ore):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Mescolare farina, acqua, lievito e sale fino a ottenere un impasto omogeneo"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Impastare a mano per 10-15 minuti (non serve impastatrice)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Lasciare lievitare a temperatura ambiente per 2-3 ore fino al raddoppio del volume"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 2 - Lievitazione in frigorifero (2 ore - diversi giorni):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Trasferire l'impasto in frigorifero per almeno 2 ore (fino a 3-4 giorni per più sapore acido)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Più tempo in frigo = più sapore acido"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cottura:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "6. Riprendere l'impasto dal frigo, trasferire su carta da forno"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "7. Fare una leggera superficie con acqua se desiderato"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "8. Riscaldare forno a 250°C con pentolino di acqua bollente inside per vapore"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "9. Inserire il pane nel forno"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "10. Mantenere il pentolino di acqua nella prima metà della cottura (per crosta croccante ridurre il tempo dell'acqua)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "11. Cuocere 30-35 minuti fino a doratura intensa"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "12. Sfornare e raffreddare su griglia"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "CARATTERISTICHE:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Crosta: Molto croccante"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Interno: Gommoso con alveoli"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tempo totale: 4-5 ore (+ 2 giorni opzionali in frigo)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Difficoltà: Bassa"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "VARIAZIONI:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Aggiungere semi (chia, lino) sulla superficie prima della cottura"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Usare farina di grani antichi o semintegrale"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Sostituire lievito di birra con lievito madre"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Aumentare acqua per impasto più idratato e alveoli più grossi"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "FONTE ORIGINALE CON VIDEO:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "﻿﻿"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Video Ricetta su Viva La Focaccia"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Basato su:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "King Arthur Flour - The Crunchiest Bread Recipe"
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

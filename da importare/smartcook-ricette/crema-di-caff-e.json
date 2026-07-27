@@ -1,0 +1,41 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Crema di caffè",
+    "inLanguage": "it",
+    "description": "Ingredienti200 ml di latte intero2 cucchiai di caffè istantaneo3 tuorli d'uovo80 g di zucchero250 ml di panna da montareUn pizzico di salePreparazioneScaldate il latte e sciogliete il caffè istantaneo. Montate i tuorli con lo zucchero fino a ottenere una crema chiara.Aggiungete il latte con il caffè ai tuorli. Fate intiepidire e aggiungete la panna montata delicatamente.Versate in bicchierini e servite ben fredda.",
+    "notes": "Nota originale 0F9FF936-84DD-416E-A023-DA55864617E2\n\nIngredienti200 ml di latte intero2 cucchiai di caffè istantaneo3 tuorli d'uovo80 g di zucchero250 ml di panna da montareUn pizzico di salePreparazioneScaldate il latte e sciogliete il caffè istantaneo. Montate i tuorli con lo zucchero fino a ottenere una crema chiara.Aggiungete il latte con il caffè ai tuorli. Fate intiepidire e aggiungete la panna montata delicatamente.Versate in bicchierini e servite ben fredda.",
+    "recipeIngredient": [
+        "200 ml di latte intero",
+        "2 cucchiai di caffè istantaneo",
+        "3 tuorli d'uovo",
+        "80 g di zucchero",
+        "250 ml di panna da montare",
+        "Un pizzico di sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Scaldate il latte e sciogliete il caffè istantaneo. Montate i tuorli con lo zucchero fino a ottenere una crema chiara."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Aggiungete il latte con il caffè ai tuorli. Fate intiepidire e aggiungete la panna montata delicatamente."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate in bicchierini e servite ben fredda."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

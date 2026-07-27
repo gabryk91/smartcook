@@ -1,0 +1,49 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Sugo di Carne alla Genovese",
+    "inLanguage": "it",
+    "description": "Sugo di Carne alla Genovese (Tocco)Ingredienti (4 persone):500gr carne da sugo1 cipolla media1 carota1 gambo di sedano1/2 bicchiere olio d'oliva extra vergine1 cucchiaio concentrato pomodoro1 bicchiere passata di pomodoroBrodo di carne q.b.10gr funghi secchiMidollo di osso1-2 foglie alloroSale e pepeProcedimento:Mettere funghi in ammollo. Pulire e lavare verdure, tritare finemente. Sudare verdure in olio a fuoco basso. Rosolare la carne. Aggiungere funghi ammollati con acqua filtrata. Aggiungere concentrato e passata pomodoro. Cuocere 2 ore a fuoco basso mescolando spesso. Salare, pepare, aggiungere alloro. Servire la carne come secondo dopo affettamento.Tempo: 3 ore | Difficoltà: Media | Calorie: 243 kcal/100gr",
+    "notes": "Nota originale 92EFF6CC-65A6-4EDD-8A12-3476D5930FBE\n\nSugo di Carne alla Genovese (Tocco)Ingredienti (4 persone):500gr carne da sugo1 cipolla media1 carota1 gambo di sedano1/2 bicchiere olio d'oliva extra vergine1 cucchiaio concentrato pomodoro1 bicchiere passata di pomodoroBrodo di carne q.b.10gr funghi secchiMidollo di osso1-2 foglie alloroSale e pepeProcedimento:Mettere funghi in ammollo. Pulire e lavare verdure, tritare finemente. Sudare verdure in olio a fuoco basso. Rosolare la carne. Aggiungere funghi ammollati con acqua filtrata. Aggiungere concentrato e passata pomodoro. Cuocere 2 ore a fuoco basso mescolando spesso. Salare, pepare, aggiungere alloro. Servire la carne come secondo dopo affettamento.Tempo: 3 ore | Difficoltà: Media | Calorie: 243 kcal/100gr",
+    "recipeIngredient": [
+        "500gr carne da sugo",
+        "1 cipolla media",
+        "1 carota",
+        "1 gambo di sedano",
+        "1/2 bicchiere olio d'oliva extra vergine",
+        "1 cucchiaio concentrato pomodoro",
+        "1 bicchiere passata di pomodoro",
+        "Brodo di carne q.b.",
+        "10gr funghi secchi",
+        "Midollo di osso",
+        "1-2 foglie alloro",
+        "Sale e pepe"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Sugo di Carne alla Genovese (Tocco)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti (4 persone):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mettere funghi in ammollo. Pulire e lavare verdure, tritare finemente. Sudare verdure in olio a fuoco basso. Rosolare la carne. Aggiungere funghi ammollati con acqua filtrata. Aggiungere concentrato e passata pomodoro. Cuocere 2 ore a fuoco basso mescolando spesso. Salare, pepare, aggiungere alloro. Servire la carne come secondo dopo affettamento."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tempo: 3 ore | Difficoltà: Media | Calorie: 243 kcal/100gr"
+        }
+    ],
+    "keywords": [
+        "Condimenti"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

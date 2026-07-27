@@ -1,0 +1,50 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Farinata",
+    "inLanguage": "it",
+    "description": "Ingredienti200 g di farina di ceci600 ml di acqua100 ml di olio di olivaSale qbPepe nero qbRosmarino frescoPreparazioneSciogliete la farina di ceci in acqua fredda, mescolando bene per evitare grumi.Lasciate riposare per almeno 3-4 ore (meglio una notte).Versate 50 ml d'olio in una teglia e fatela riscaldare in forno a 200° per 10 minuti.Versate l'impasto nella teglia calda, aggiungete il resto dell'olio, sale, pepe e rosmarino.Cuocete a 200° per 20-25 minuti fino a doratura. Tagliate a pezzi e servite calda.",
+    "notes": "Nota originale 5C3C723D-7C18-44FC-B39E-6B6489AF8172\n\nIngredienti200 g di farina di ceci600 ml di acqua100 ml di olio di olivaSale qbPepe nero qbRosmarino frescoPreparazioneSciogliete la farina di ceci in acqua fredda, mescolando bene per evitare grumi.Lasciate riposare per almeno 3-4 ore (meglio una notte).Versate 50 ml d'olio in una teglia e fatela riscaldare in forno a 200° per 10 minuti.Versate l'impasto nella teglia calda, aggiungete il resto dell'olio, sale, pepe e rosmarino.Cuocete a 200° per 20-25 minuti fino a doratura. Tagliate a pezzi e servite calda.",
+    "recipeIngredient": [
+        "200 g di farina di ceci",
+        "600 ml di acqua",
+        "100 ml di olio di oliva",
+        "Sale qb",
+        "Pepe nero qb",
+        "Rosmarino fresco"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Sciogliete la farina di ceci in acqua fredda, mescolando bene per evitare grumi."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Lasciate riposare per almeno 3-4 ore (meglio una notte)."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate 50 ml d'olio in una teglia e fatela riscaldare in forno a 200° per 10 minuti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate l'impasto nella teglia calda, aggiungete il resto dell'olio, sale, pepe e rosmarino."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cuocete a 200° per 20-25 minuti fino a doratura. Tagliate a pezzi e servite calda."
+        }
+    ],
+    "keywords": [
+        "Secondi",
+        "Snack"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,79 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pasta butada",
+    "inLanguage": "it",
+    "description": "Ingredienti per 2 personeBrodo di carne2 uova bio3 cucchiai di farina3 cucchiai di parmigianosale\nProcedimentoFate sobollire il brodo di carne (per la ricetta clicca qui). A parte sbattete le uova con sale, farina di semola e parmigiano reggiano grattugiato. Versare il composto nel brodo “spaccando” il liquido con una forchetta. Cuocere per qualche minuto e servire caldo.\nAlternativa125 gr di farina;100 gr di formaggio grattugiato;1 uovo;sale q.b.\nSu una spianatoia preparate una fontanella di farina, dentro rompete l'uovo e aggiungete un pizzico di sale e un cucchiaio di acqua. Incorporate anche il formaggio grattugiato e continuate ad impastare fino a quando non otterrete una consistenza morbida ed elastica. Una volta pronta, grattugiate la pasta e gettatela nel brodo in bollore. Cucinate per qualche minuto e servite ben calda",
+    "notes": "Nota originale 565D3D18-90A0-4FA1-8666-C6A55FEDB396\n\nIngredienti per 2 personeBrodo di carne2 uova bio3 cucchiai di farina3 cucchiai di parmigianosale\nProcedimentoFate sobollire il brodo di carne (per la ricetta clicca qui). A parte sbattete le uova con sale, farina di semola e parmigiano reggiano grattugiato. Versare il composto nel brodo “spaccando” il liquido con una forchetta. Cuocere per qualche minuto e servire caldo.\nAlternativa125 gr di farina;100 gr di formaggio grattugiato;1 uovo;sale q.b.\nSu una spianatoia preparate una fontanella di farina, dentro rompete l'uovo e aggiungete un pizzico di sale e un cucchiaio di acqua. Incorporate anche il formaggio grattugiato e continuate ad impastare fino a quando non otterrete una consistenza morbida ed elastica. Una volta pronta, grattugiate la pasta e gettatela nel brodo in bollore. Cucinate per qualche minuto e servite ben calda",
+    "recipeIngredient": [
+        "Ingredienti per 2 personeBrodo di carne2 uova bio3 cucchiai di farina3 cucchiai di parmigianosale",
+        "ProcedimentoFate sobollire il brodo di carne (per la ricetta clicca qui). A parte sbattete le uova con sale, farina di semola e parmigiano reggiano grattugiato. Versare il composto nel brodo “spaccando” il liquido con una forchetta. Cuocere per qualche minuto e servire caldo.",
+        "Alternativa125 gr di farina;100 gr di formaggio grattugiato;1 uovo;sale q.b.",
+        "Su una spianatoia preparate una fontanella di farina, dentro rompete l'uovo e aggiungete un pizzico di sale e un cucchiaio di acqua. Incorporate anche il formaggio grattugiato e continuate ad impastare fino a quando non otterrete una consistenza morbida ed elastica. Una volta pronta, grattugiate la pasta e gettatela nel brodo in bollore. Cucinate per qualche minuto e servite ben calda"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti per 2 persone"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Brodo di carne"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2 uova bio"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3 cucchiai di farina"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3 cucchiai di parmigiano"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "sale"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fate sobollire il brodo di carne (per la ricetta clicca qui). A parte sbattete le uova con sale, farina di semola e parmigiano reggiano grattugiato. Versare il composto nel brodo “spaccando” il liquido con una forchetta. Cuocere per qualche minuto e servire caldo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Alternativa"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "125 gr di farina;"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "100 gr di formaggio grattugiato;"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1 uovo;"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "sale q.b."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Su una spianatoia preparate una fontanella di farina, dentro rompete l'uovo e aggiungete un pizzico di sale e un cucchiaio di acqua. Incorporate anche il formaggio grattugiato e continuate ad impastare fino a quando non otterrete una consistenza morbida ed elastica. Una volta pronta, grattugiate la pasta e gettatela nel brodo in bollore. Cucinate per qualche minuto e servite ben calda"
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,26 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pasta all'avocado e pesto di rucola",
+    "inLanguage": "it",
+    "description": "PreparazioneAvocado + sale + limone = crema. Rucola + aglio + limone + sale = pesto. Pomodori secchi + noci = trito. Assemblare con la pasta.",
+    "notes": "Nota originale D85D1274-0535-4358-B3DD-B8D5EA59F6A1\n\nPreparazioneAvocado + sale + limone = crema. Rucola + aglio + limone + sale = pesto. Pomodori secchi + noci = trito. Assemblare con la pasta.",
+    "recipeIngredient": [],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Avocado + sale + limone = crema. Rucola + aglio + limone + sale = pesto. Pomodori secchi + noci = trito. Assemblare con la pasta."
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

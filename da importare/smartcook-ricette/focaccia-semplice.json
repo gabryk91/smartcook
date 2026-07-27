@@ -1,0 +1,51 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Focaccia semplice",
+    "inLanguage": "it",
+    "description": "http://vivalafocaccia.com/2012/04/16/ricetta-focaccia-ingredienti-impasto-casa/\nIngredienti190 g acqua300-310 g farina tipo 0 (W260-280)20 g olio extravergine di oliva7 g sale3 g malto17 g lievito di birraProcedimentoSciogliere acqua, sale, malto e olioAggiungere metà della farina fino ad ottenere una pasta densa, ma ancora liquida.Aggiungere il lievito ben sbriciolato (se usate lievito secco, scioglietelo in un po’ di acqua tiepida).Lavorare la pasta aggiungendo la restante farina fino ad ottenere un impasto compatto ma non duro.Coprire bene e lasciare riposare la pasta per 10-15 minuti su un asse o tegame, coperta con telo (in modo che non formi crosta).Dopo il riposo, se necessario piegare la pasta in 2 o 4 (a seconda della forza della farina) per darle forza. Dare all’impasto una forma che corrisponda alla teglia dove verrà cotta (nel caso indicato ~ 25×40 cm).Versare un po’ d’olio nel centro della teglia, deporre l’impasto e cospargere la superficie con olio (con pennello o dita). Mettere a lievitare in luogo riparato da correnti (es. forno spento con luce accesa per ~30 °C).Dopo circa 40-60 minuti (a seconda delle condizioni e dello stato del lievito), l’impasto raddoppierà volume. Stendere l’impasto nella teglia con le mani, senza tirare o maltrattare, fino a che occupi tutta la teglia.Cospargere la superficie con abbondante sale (serve anche per evitare crosta durante la lievitazione).Lasciare riposare circa 30 minuti. Versare un po’ d’acqua tiepida (≈ 30 °C) sulla superficie, poi un po’ d’olio extravergine. Fare con le dita i caratteristici “buchi” uniformi sulla superficie della focaccia. (Facoltativo) Se si desidera, aggiungere in superficie cipolla tagliata a fettine, oppure pomodorini, origano, olive. Lasciare lievitare ancora almeno 60-75 minuti (i tempi variano in base al clima).Cottura: Infornare nel forno già caldo a 220-240 °C per 15-20 minuti.Una volta cotta, sfornare e rovesciare la focaccia su una griglia per far passare l’aria anche sotto (in modo che non diventi molle). Dare una pennellata di olio sulla superficie e servire calda.",
+    "notes": "Nota originale 7288BB5E-4564-4C4D-A0CE-123156D074B6\n\nhttp://vivalafocaccia.com/2012/04/16/ricetta-focaccia-ingredienti-impasto-casa/\nIngredienti190 g acqua300-310 g farina tipo 0 (W260-280)20 g olio extravergine di oliva7 g sale3 g malto17 g lievito di birraProcedimentoSciogliere acqua, sale, malto e olioAggiungere metà della farina fino ad ottenere una pasta densa, ma ancora liquida.Aggiungere il lievito ben sbriciolato (se usate lievito secco, scioglietelo in un po’ di acqua tiepida).Lavorare la pasta aggiungendo la restante farina fino ad ottenere un impasto compatto ma non duro.Coprire bene e lasciare riposare la pasta per 10-15 minuti su un asse o tegame, coperta con telo (in modo che non formi crosta).Dopo il riposo, se necessario piegare la pasta in 2 o 4 (a seconda della forza della farina) per darle forza. Dare all’impasto una forma che corrisponda alla teglia dove verrà cotta (nel caso indicato ~ 25×40 cm).Versare un po’ d’olio nel centro della teglia, deporre l’impasto e cospargere la superficie con olio (con pennello o dita). Mettere a lievitare in luogo riparato da correnti (es. forno spento con luce accesa per ~30 °C).Dopo circa 40-60 minuti (a seconda delle condizioni e dello stato del lievito), l’impasto raddoppierà volume. Stendere l’impasto nella teglia con le mani, senza tirare o maltrattare, fino a che occupi tutta la teglia.Cospargere la superficie con abbondante sale (serve anche per evitare crosta durante la lievitazione).Lasciare riposare circa 30 minuti. Versare un po’ d’acqua tiepida (≈ 30 °C) sulla superficie, poi un po’ d’olio extravergine. Fare con le dita i caratteristici “buchi” uniformi sulla superficie della focaccia. (Facoltativo) Se si desidera, aggiungere in superficie cipolla tagliata a fettine, oppure pomodorini, origano, olive. Lasciare lievitare ancora almeno 60-75 minuti (i tempi variano in base al clima).Cottura: Infornare nel forno già caldo a 220-240 °C per 15-20 minuti.Una volta cotta, sfornare e rovesciare la focaccia su una griglia per far passare l’aria anche sotto (in modo che non diventi molle). Dare una pennellata di olio sulla superficie e servire calda.",
+    "recipeIngredient": [
+        "190 g acqua",
+        "300-310 g farina tipo 0 (W260-280)",
+        "20 g olio extravergine di oliva",
+        "7 g sale",
+        "3 g malto",
+        "17 g lievito di birra",
+        "Sciogliere acqua, sale, malto e olio",
+        "Aggiungere metà della farina fino ad ottenere una pasta densa, ma ancora liquida.",
+        "Aggiungere il lievito ben sbriciolato (se usate lievito secco, scioglietelo in un po’ di acqua tiepida).",
+        "Lavorare la pasta aggiungendo la restante farina fino ad ottenere un impasto compatto ma non duro.",
+        "Coprire bene e lasciare riposare la pasta per 10-15 minuti su un asse o tegame, coperta con telo (in modo che non formi crosta).",
+        "Dopo il riposo, se necessario piegare la pasta in 2 o 4 (a seconda della forza della farina) per darle forza.",
+        "Dare all’impasto una forma che corrisponda alla teglia dove verrà cotta (nel caso indicato ~ 25×40 cm).",
+        "Versare un po’ d’olio nel centro della teglia, deporre l’impasto e cospargere la superficie con olio (con pennello o dita).",
+        "Mettere a lievitare in luogo riparato da correnti (es. forno spento con luce accesa per ~30 °C).",
+        "Dopo circa 40-60 minuti (a seconda delle condizioni e dello stato del lievito), l’impasto raddoppierà volume.",
+        "Stendere l’impasto nella teglia con le mani, senza tirare o maltrattare, fino a che occupi tutta la teglia.",
+        "Cospargere la superficie con abbondante sale (serve anche per evitare crosta durante la lievitazione).",
+        "Lasciare riposare circa 30 minuti.",
+        "Versare un po’ d’acqua tiepida (≈ 30 °C) sulla superficie, poi un po’ d’olio extravergine.",
+        "Fare con le dita i caratteristici “buchi” uniformi sulla superficie della focaccia.",
+        "(Facoltativo) Se si desidera, aggiungere in superficie cipolla tagliata a fettine, oppure pomodorini, origano, olive.",
+        "Lasciare lievitare ancora almeno 60-75 minuti (i tempi variano in base al clima).",
+        "Cottura: Infornare nel forno già caldo a 220-240 °C per 15-20 minuti.",
+        "Una volta cotta, sfornare e rovesciare la focaccia su una griglia per far passare l’aria anche sotto (in modo che non diventi molle).",
+        "Dare una pennellata di olio sulla superficie e servire calda."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "http://vivalafocaccia.com/2012/04/16/ricetta-focaccia-ingredienti-impasto-casa/"
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

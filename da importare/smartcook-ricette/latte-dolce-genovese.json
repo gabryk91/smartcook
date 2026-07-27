@@ -1,0 +1,36 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "LATTE DOLCE GENOVESE",
+    "inLanguage": "it",
+    "description": "Ingredienti1 litro di latte intero150 gr farina100 gr zucchero4 uova2 tuorli1 limone non trattatopangrattatoolio di semizucchero a veloPreparazioneMontate le 4 uova e i 2 tuorli insieme allo zucchero finchè non otterrete un composto spumoso. Aggiungete il latte, la farina setacciata e la scorza del limone grattata. Mettete sul fuoco molto basso e fate cuocere mescolando continuamente fino a che non otterrete una consistenza molto densa. Versate la crema ottenuta su un tegame unto di olio (dovete ottenere uno strato di 1.5 cm circa) e fate raffreddare a temperatura ambiente poi passatelo in frigo. Il giorno dopo tagliate a rombi la crema, passatela nell'albume leggermente sbattuto e poi nel pangrattato. Fate scaldare abbondante olio e quando sarà bel caldo friggete i pezzi di latte dolce 5 o 6 alla volta. Spolverizzate di zucchero a velo e servite tiepidi.",
+    "notes": "Nota originale 4AA03C45-C60A-4A55-98D0-1F45B71405FA\n\nIngredienti1 litro di latte intero150 gr farina100 gr zucchero4 uova2 tuorli1 limone non trattatopangrattatoolio di semizucchero a veloPreparazioneMontate le 4 uova e i 2 tuorli insieme allo zucchero finchè non otterrete un composto spumoso. Aggiungete il latte, la farina setacciata e la scorza del limone grattata. Mettete sul fuoco molto basso e fate cuocere mescolando continuamente fino a che non otterrete una consistenza molto densa. Versate la crema ottenuta su un tegame unto di olio (dovete ottenere uno strato di 1.5 cm circa) e fate raffreddare a temperatura ambiente poi passatelo in frigo. Il giorno dopo tagliate a rombi la crema, passatela nell'albume leggermente sbattuto e poi nel pangrattato. Fate scaldare abbondante olio e quando sarà bel caldo friggete i pezzi di latte dolce 5 o 6 alla volta. Spolverizzate di zucchero a velo e servite tiepidi.",
+    "recipeIngredient": [
+        "1 litro di latte intero",
+        "150 gr farina",
+        "100 gr zucchero",
+        "4 uova",
+        "2 tuorli",
+        "1 limone non trattato",
+        "pangrattato",
+        "olio di semi",
+        "zucchero a velo"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Montate le 4 uova e i 2 tuorli insieme allo zucchero finchè non otterrete un composto spumoso. Aggiungete il latte, la farina setacciata e la scorza del limone grattata. Mettete sul fuoco molto basso e fate cuocere mescolando continuamente fino a che non otterrete una consistenza molto densa. Versate la crema ottenuta su un tegame unto di olio (dovete ottenere uno strato di 1.5 cm circa) e fate raffreddare a temperatura ambiente poi passatelo in frigo. Il giorno dopo tagliate a rombi la crema, passatela nell'albume leggermente sbattuto e poi nel pangrattato. Fate scaldare abbondante olio e quando sarà bel caldo friggete i pezzi di latte dolce 5 o 6 alla volta. Spolverizzate di zucchero a velo e servite tiepidi."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

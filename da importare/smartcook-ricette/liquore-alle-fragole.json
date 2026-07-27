@@ -1,0 +1,29 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Liquore alle fragole",
+    "inLanguage": "it",
+    "description": "Ingredienti800 g di fragole, 1 lt alcol 96 gradi, 1.200 ml acqua, 600g zuccheroPreparazioneLe fragole lavate e tagliate vanno messe nell'alcol per 8-10 giorni girando tutti giorni 1 volta. Sciroppo fatto a caldo e lasciato raffreddare per bene. Appena raffreddato va unito tutto. Imbottigliato e messo al buio per riposare altri 2 settimane. Va servito bello fresco.",
+    "notes": "Nota originale E22514FA-2C11-4E50-99AD-A8ABBA7B27D7\n\nIngredienti800 g di fragole, 1 lt alcol 96 gradi, 1.200 ml acqua, 600g zuccheroPreparazioneLe fragole lavate e tagliate vanno messe nell'alcol per 8-10 giorni girando tutti giorni 1 volta. Sciroppo fatto a caldo e lasciato raffreddare per bene. Appena raffreddato va unito tutto. Imbottigliato e messo al buio per riposare altri 2 settimane. Va servito bello fresco.",
+    "recipeIngredient": [
+        "800 g di fragole,",
+        "1 lt alcol 96 gradi,",
+        "1.200 ml acqua,",
+        "600g zucchero"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Le fragole lavate e tagliate vanno messe nell'alcol per 8-10 giorni girando tutti giorni 1 volta. Sciroppo fatto a caldo e lasciato raffreddare per bene. Appena raffreddato va unito tutto. Imbottigliato e messo al buio per riposare altri 2 settimane. Va servito bello fresco."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

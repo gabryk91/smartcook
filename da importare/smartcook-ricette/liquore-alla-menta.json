@@ -1,0 +1,34 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Liquore alla menta",
+    "inLanguage": "it",
+    "description": "Per 2lt2 manciate di foglie di menta lavate e asciugate per bene, 1 lt alcol 96 gradi, 550g zucchero, 1.200lt acqua, buccia da 2 limePreparazioneMettere le foglie di menta nell'alcol per 8 giorni al buio girando ogni giorno una volta. Fare lo sciroppo con acqua e zucchero e fare raffreddare bene. Unire alcool e sciroppo. Imbottigliare e lasciare a riposare sempre al buio per 15-20 giorni.",
+    "notes": "Nota originale 59320163-FA68-4A15-9D42-9FA04BC43890\n\nPer 2lt2 manciate di foglie di menta lavate e asciugate per bene, 1 lt alcol 96 gradi, 550g zucchero, 1.200lt acqua, buccia da 2 limePreparazioneMettere le foglie di menta nell'alcol per 8 giorni al buio girando ogni giorno una volta. Fare lo sciroppo con acqua e zucchero e fare raffreddare bene. Unire alcool e sciroppo. Imbottigliare e lasciare a riposare sempre al buio per 15-20 giorni.",
+    "recipeIngredient": [
+        "2 manciate di foglie di menta lavate e asciugate per bene,",
+        "1 lt alcol 96 gradi,",
+        "550g zucchero,",
+        "1.200lt acqua,",
+        "buccia da 2 lime"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Per 2lt"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mettere le foglie di menta nell'alcol per 8 giorni al buio girando ogni giorno una volta. Fare lo sciroppo con acqua e zucchero e fare raffreddare bene. Unire alcool e sciroppo. Imbottigliare e lasciare a riposare sempre al buio per 15-20 giorni."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

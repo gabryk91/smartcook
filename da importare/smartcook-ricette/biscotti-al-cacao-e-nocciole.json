@@ -1,0 +1,43 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "🍪 Biscotti al cacao e nocciole",
+    "inLanguage": "it",
+    "description": "Dosi per circa 8 biscotti:65 g farina di avena integrale15 g cacao amaro in polvere8 g lievito per dolci10 g nocciole tritate finemente (puoi usare anche mandorle tritate o farina di mandorle)20 g crema di nocciole 100%20 g olio extravergine d’oliva (o olio di cocco)70 g banana (oppure mela)1 pizzico di sale🧑‍🍳 Procedimento:Frulla al mixer tutti gli ingredienti fino a ottenere un composto omogeneo e morbido.(Se usi la mela): tagliala a cubetti e cuocila per qualche minuto in padella con un po’ d’acqua o al microonde, facendo evaporare bene l’acqua, poi scolala.Con le mani umide, prendi il composto e forma delle palline.Adagiale su una teglia da forno e schiacciale con le mani per dare forma ai biscotti.Guarnisci la superficie con nocciole tritate e scaglie di cioccolato fondente, pressando leggermente.Cuoci in forno a 180°C per circa 10 minuti. (Per biscotti più morbidi, riduci leggermente il tempo di cottura).",
+    "notes": "Nota originale F19AD412-24FF-4568-9FFD-8A9F82866830\n\nDosi per circa 8 biscotti:65 g farina di avena integrale15 g cacao amaro in polvere8 g lievito per dolci10 g nocciole tritate finemente (puoi usare anche mandorle tritate o farina di mandorle)20 g crema di nocciole 100%20 g olio extravergine d’oliva (o olio di cocco)70 g banana (oppure mela)1 pizzico di sale🧑‍🍳 Procedimento:Frulla al mixer tutti gli ingredienti fino a ottenere un composto omogeneo e morbido.(Se usi la mela): tagliala a cubetti e cuocila per qualche minuto in padella con un po’ d’acqua o al microonde, facendo evaporare bene l’acqua, poi scolala.Con le mani umide, prendi il composto e forma delle palline.Adagiale su una teglia da forno e schiacciale con le mani per dare forma ai biscotti.Guarnisci la superficie con nocciole tritate e scaglie di cioccolato fondente, pressando leggermente.Cuoci in forno a 180°C per circa 10 minuti. (Per biscotti più morbidi, riduci leggermente il tempo di cottura).",
+    "recipeIngredient": [
+        "65 g farina di avena integrale",
+        "15 g cacao amaro in polvere",
+        "8 g lievito per dolci",
+        "10 g nocciole tritate finemente",
+        "(puoi usare anche mandorle tritate o farina di mandorle)",
+        "20 g crema di nocciole 100%",
+        "20 g olio extravergine d’oliva (o olio di cocco)",
+        "70 g banana (oppure mela)",
+        "1 pizzico di sale",
+        "Frulla al mixer tutti gli ingredienti fino a ottenere un composto omogeneo e morbido.",
+        "(Se usi la mela): tagliala a cubetti e cuocila per qualche minuto in padella con un po’ d’acqua o al microonde, facendo evaporare bene l’acqua, poi scolala.",
+        "Con le mani umide, prendi il composto e forma delle palline.",
+        "Adagiale su una teglia da forno e schiacciale con le mani per dare forma ai biscotti.",
+        "Guarnisci la superficie con nocciole tritate e scaglie di cioccolato fondente, pressando leggermente.",
+        "Cuoci in forno a 180°C per circa 10 minuti.",
+        "(Per biscotti più morbidi, riduci leggermente il tempo di cottura)."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Dosi per circa 8 biscotti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "🧑‍🍳 Procedimento:"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,32 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pere al vino rosso",
+    "inLanguage": "it",
+    "description": "Ingredienti2 pere di stagione preferite (kaiser, williams), 500g di vino rosso preferito, 150g di zucchero semolato, 2 stecche di cannella, 100g di acqua naturalePreparazioneIn una pentola, versare il vino rosso, unire lo zucchero, la cannella e l'acqua naturale. Portare a bollore, aggiungere le pere sbucciate. Cuocere per 15 minuti, lasciar raffreddare a temperatura ambiente e poi lasciar riposare in frigorifero per un giorno. Prelevare le pere dal liquido di cottura. Rimettere il liquido sul fuoco e far ridurre più o meno della metà. Togliere infine la stecca di cannella, filtrare e lasciar raffreddare. Versare la salsa sulle pere e servire.",
+    "notes": "Nota originale B5E07F2C-4A57-4BED-93A3-65B1625950B7\n\nIngredienti2 pere di stagione preferite (kaiser, williams), 500g di vino rosso preferito, 150g di zucchero semolato, 2 stecche di cannella, 100g di acqua naturalePreparazioneIn una pentola, versare il vino rosso, unire lo zucchero, la cannella e l'acqua naturale. Portare a bollore, aggiungere le pere sbucciate. Cuocere per 15 minuti, lasciar raffreddare a temperatura ambiente e poi lasciar riposare in frigorifero per un giorno. Prelevare le pere dal liquido di cottura. Rimettere il liquido sul fuoco e far ridurre più o meno della metà. Togliere infine la stecca di cannella, filtrare e lasciar raffreddare. Versare la salsa sulle pere e servire.",
+    "recipeIngredient": [
+        "2 pere di stagione preferite (kaiser, williams),",
+        "500g di vino rosso preferito,",
+        "150g di zucchero semolato,",
+        "2 stecche di cannella,",
+        "100g di acqua naturale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "In una pentola, versare il vino rosso, unire lo zucchero, la cannella e l'acqua naturale. Portare a bollore, aggiungere le pere sbucciate. Cuocere per 15 minuti, lasciar raffreddare a temperatura ambiente e poi lasciar riposare in frigorifero per un giorno. Prelevare le pere dal liquido di cottura. Rimettere il liquido sul fuoco e far ridurre più o meno della metà. Togliere infine la stecca di cannella, filtrare e lasciar raffreddare. Versare la salsa sulle pere e servire."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

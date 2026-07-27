@@ -1,0 +1,50 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Spezzatino",
+    "inLanguage": "it",
+    "description": "Spezzatino ClassicoIngredienti:800gr carne vitello (spalla) a cubetti400gr pomodori pelati2 cipolle medie tagliate2 carote a rondelle2 gambi sedano a pezzetti100ml vino rosso secco150ml olio EVO3 spicchi aglio2 foglie alloroSalvia e rosmarino frescoSale e pepeProcedimento:Rosolare la carne in olio caldo fino a doratura. Aggiungere soffritto di verdure. Sfumare con vino rosso. Aggiungere pomodori pelati, alloro, salvia, rosmarino. Coprire e cuocere 2 ore a fuoco basso. Verificare cottura della carne (deve essere tenerissima). Salare e pepare. Servire con polenta o patate.Tempo: 2.5 ore | Difficoltà: Bassa",
+    "notes": "Nota originale ED859ABC-1EF9-4C4B-9F32-49473C5325F1\n\nSpezzatino ClassicoIngredienti:800gr carne vitello (spalla) a cubetti400gr pomodori pelati2 cipolle medie tagliate2 carote a rondelle2 gambi sedano a pezzetti100ml vino rosso secco150ml olio EVO3 spicchi aglio2 foglie alloroSalvia e rosmarino frescoSale e pepeProcedimento:Rosolare la carne in olio caldo fino a doratura. Aggiungere soffritto di verdure. Sfumare con vino rosso. Aggiungere pomodori pelati, alloro, salvia, rosmarino. Coprire e cuocere 2 ore a fuoco basso. Verificare cottura della carne (deve essere tenerissima). Salare e pepare. Servire con polenta o patate.Tempo: 2.5 ore | Difficoltà: Bassa",
+    "recipeIngredient": [
+        "800gr carne vitello (spalla) a cubetti",
+        "400gr pomodori pelati",
+        "2 cipolle medie tagliate",
+        "2 carote a rondelle",
+        "2 gambi sedano a pezzetti",
+        "100ml vino rosso secco",
+        "150ml olio EVO",
+        "3 spicchi aglio",
+        "2 foglie alloro",
+        "Salvia e rosmarino fresco",
+        "Sale e pepe"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Spezzatino Classico"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Rosolare la carne in olio caldo fino a doratura. Aggiungere soffritto di verdure. Sfumare con vino rosso. Aggiungere pomodori pelati, alloro, salvia, rosmarino. Coprire e cuocere 2 ore a fuoco basso. Verificare cottura della carne (deve essere tenerissima). Salare e pepare. Servire con polenta o patate."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tempo: 2.5 ore | Difficoltà: Bassa"
+        }
+    ],
+    "keywords": [
+        "Secondi"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

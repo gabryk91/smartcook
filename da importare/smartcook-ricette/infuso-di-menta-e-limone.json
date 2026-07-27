@@ -1,0 +1,52 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Infuso di menta e limone",
+    "inLanguage": "it",
+    "description": "Ingredienti600 ml di acqua6 foglie di menta fresca2 fette di limone bio2 cucchiai di succo di limoneZucchero di canna q.b. (o miele / sciroppo d'acero a piacere)Preparazione1. Versa l'acqua in una pentola e portala a ebollizione.2. Nel frattempo, lava le foglie di menta e il limone bio.3. Taglia due fette centrali dal limone e spremi anche una fetta intera per ricavarne il succo.4. Quando l'acqua bolle, spegni il fuoco e unisci le foglie di menta, le fette di limone e il succo.5. Copri la pentola e lascia in infusione per 10–15 minuti.6. Lascia raffreddare, poi dolcifica a piacere con zucchero di canna (o miele / sciroppo d'acero).",
+    "notes": "Nota originale EE4738F6-4049-4E60-8741-CEFAC735DDBA\n\nIngredienti600 ml di acqua6 foglie di menta fresca2 fette di limone bio2 cucchiai di succo di limoneZucchero di canna q.b. (o miele / sciroppo d'acero a piacere)Preparazione1. Versa l'acqua in una pentola e portala a ebollizione.2. Nel frattempo, lava le foglie di menta e il limone bio.3. Taglia due fette centrali dal limone e spremi anche una fetta intera per ricavarne il succo.4. Quando l'acqua bolle, spegni il fuoco e unisci le foglie di menta, le fette di limone e il succo.5. Copri la pentola e lascia in infusione per 10–15 minuti.6. Lascia raffreddare, poi dolcifica a piacere con zucchero di canna (o miele / sciroppo d'acero).",
+    "recipeIngredient": [
+        "600 ml di acqua",
+        "6 foglie di menta fresca",
+        "2 fette di limone bio",
+        "2 cucchiai di succo di limone",
+        "Zucchero di canna q.b. (o miele / sciroppo d'acero a piacere)"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Versa l'acqua in una pentola e portala a ebollizione."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Nel frattempo, lava le foglie di menta e il limone bio."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Taglia due fette centrali dal limone e spremi anche una fetta intera per ricavarne il succo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Quando l'acqua bolle, spegni il fuoco e unisci le foglie di menta, le fette di limone e il succo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Copri la pentola e lascia in infusione per 10–15 minuti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "6. Lascia raffreddare, poi dolcifica a piacere con zucchero di canna (o miele / sciroppo d'acero)."
+        }
+    ],
+    "keywords": [
+        "Bevande"
+    ],
+    "recipeCategory": [
+        "Bevande"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,197 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Grissini Stirati Torinesi",
+    "inLanguage": "it",
+    "description": "SPECIALITÀ PIEMONTESE TRADIZIONALEINGREDIENTI:500 gr farina tipo 0 o 00300 ml acqua tiepida10 gr lievito di birra fresco (o 3-4 gr secco)10 gr sale20 gr malto o miele50 ml olio extravergine di olivaSemola di grano duro (per passare i grissini)Olio per ungerePROCEDIMENTO:Fase 1 - Impasto (Planetaria o a mano):1. Sciogliere il lievito in acqua tiepida2. Versare in planetaria: mezza farina, malto, acqua con lievito3. Iniziare ad impastare a velocità bassa4. Aggiungere il sale e il resto della farina5. Impastare per 10-12 minuti fino ad ottenere maglia glutinica6. Aggiungere l'olio e continuare impastamento altri 5 minuti7. Temperatura finale impasto: 24-25°CFase 2 - Prima Lievitazione (8-12 ore in frigo):8. Formare un filone lungo e stretto9. Ungere bene con olio10. Coprire con cellophane alimentare11. Riporre in frigorifero per 8-12 ore (può arrivare fino a 24h)Fase 3 - Formatura:12. Riprendere l'impasto dal frigo13. Disporre su superficie piana unta di olio14. Stendere leggermente con mattarello15. Tagliare in pezzetti di circa 1-1,5 cm di larghezza16. Passare ogni pezzetto nella semola di grano duro17. Ripasso su semola per entrambi i latiFase 4 - Stiramento a Mano:18. Prendere il pezzetto di impasto19. Stirare dai lembi fino a raggiungere la lunghezza della teglia20. Deporre su teglia rivestita di carta da forno21. Distanziare i grissini tra loroFase 5 - Seconda Lievitazione (1-2 ore):22. Coprire i grissini con cellophane23. Lasciar lievitare 1-2 ore a temperatura ambienteCottura:24. Riscaldare forno a 200-220°C25. Inserire pentolino di acqua sul fondo per vapore26. Infornare i grissini27. Cuocere 15-25 minuti fino a doratura intensa e croccantezza28. Sfornare e raffreddare su grigliaCONSERVAZIONE:- Ripieni in sacchetti di carta per alimenti- Durata: 2-3 settimane mantenendo croccantezza- Se perdono croccantezza: ripassare 30 minuti in forno a 100°C con sportello in fessuraSTORIA:Tradizione narra che il fornaio Antonio Brunero della corte di Torino inventò i grissini nel 1679 per il piccolo Vittorio Amedeo II che non digeriva la mollica del pane comune. Il grissino si differenzia dal pane tradizionale proprio per l'assenza di mollica, garantendo friabilità e croccantezza.",
+    "notes": "Nota originale 393B39BD-275E-474F-B8BA-CD4338790585\n\nSPECIALITÀ PIEMONTESE TRADIZIONALEINGREDIENTI:500 gr farina tipo 0 o 00300 ml acqua tiepida10 gr lievito di birra fresco (o 3-4 gr secco)10 gr sale20 gr malto o miele50 ml olio extravergine di olivaSemola di grano duro (per passare i grissini)Olio per ungerePROCEDIMENTO:Fase 1 - Impasto (Planetaria o a mano):1. Sciogliere il lievito in acqua tiepida2. Versare in planetaria: mezza farina, malto, acqua con lievito3. Iniziare ad impastare a velocità bassa4. Aggiungere il sale e il resto della farina5. Impastare per 10-12 minuti fino ad ottenere maglia glutinica6. Aggiungere l'olio e continuare impastamento altri 5 minuti7. Temperatura finale impasto: 24-25°CFase 2 - Prima Lievitazione (8-12 ore in frigo):8. Formare un filone lungo e stretto9. Ungere bene con olio10. Coprire con cellophane alimentare11. Riporre in frigorifero per 8-12 ore (può arrivare fino a 24h)Fase 3 - Formatura:12. Riprendere l'impasto dal frigo13. Disporre su superficie piana unta di olio14. Stendere leggermente con mattarello15. Tagliare in pezzetti di circa 1-1,5 cm di larghezza16. Passare ogni pezzetto nella semola di grano duro17. Ripasso su semola per entrambi i latiFase 4 - Stiramento a Mano:18. Prendere il pezzetto di impasto19. Stirare dai lembi fino a raggiungere la lunghezza della teglia20. Deporre su teglia rivestita di carta da forno21. Distanziare i grissini tra loroFase 5 - Seconda Lievitazione (1-2 ore):22. Coprire i grissini con cellophane23. Lasciar lievitare 1-2 ore a temperatura ambienteCottura:24. Riscaldare forno a 200-220°C25. Inserire pentolino di acqua sul fondo per vapore26. Infornare i grissini27. Cuocere 15-25 minuti fino a doratura intensa e croccantezza28. Sfornare e raffreddare su grigliaCONSERVAZIONE:- Ripieni in sacchetti di carta per alimenti- Durata: 2-3 settimane mantenendo croccantezza- Se perdono croccantezza: ripassare 30 minuti in forno a 100°C con sportello in fessuraSTORIA:Tradizione narra che il fornaio Antonio Brunero della corte di Torino inventò i grissini nel 1679 per il piccolo Vittorio Amedeo II che non digeriva la mollica del pane comune. Il grissino si differenzia dal pane tradizionale proprio per l'assenza di mollica, garantendo friabilità e croccantezza.",
+    "recipeIngredient": [
+        "500 gr farina tipo 0 o 00",
+        "300 ml acqua tiepida",
+        "10 gr lievito di birra fresco (o 3-4 gr secco)",
+        "10 gr sale",
+        "20 gr malto o miele",
+        "50 ml olio extravergine di oliva",
+        "Semola di grano duro (per passare i grissini)",
+        "Olio per ungere"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "SPECIALITÀ PIEMONTESE TRADIZIONALE"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "INGREDIENTI:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "PROCEDIMENTO:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 1 - Impasto (Planetaria o a mano):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Sciogliere il lievito in acqua tiepida"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Versare in planetaria: mezza farina, malto, acqua con lievito"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Iniziare ad impastare a velocità bassa"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Aggiungere il sale e il resto della farina"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Impastare per 10-12 minuti fino ad ottenere maglia glutinica"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "6. Aggiungere l'olio e continuare impastamento altri 5 minuti"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "7. Temperatura finale impasto: 24-25°C"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 2 - Prima Lievitazione (8-12 ore in frigo):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "8. Formare un filone lungo e stretto"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "9. Ungere bene con olio"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "10. Coprire con cellophane alimentare"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "11. Riporre in frigorifero per 8-12 ore (può arrivare fino a 24h)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 3 - Formatura:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "12. Riprendere l'impasto dal frigo"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "13. Disporre su superficie piana unta di olio"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "14. Stendere leggermente con mattarello"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "15. Tagliare in pezzetti di circa 1-1,5 cm di larghezza"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "16. Passare ogni pezzetto nella semola di grano duro"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "17. Ripasso su semola per entrambi i lati"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 4 - Stiramento a Mano:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "18. Prendere il pezzetto di impasto"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "19. Stirare dai lembi fino a raggiungere la lunghezza della teglia"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "20. Deporre su teglia rivestita di carta da forno"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "21. Distanziare i grissini tra loro"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fase 5 - Seconda Lievitazione (1-2 ore):"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "22. Coprire i grissini con cellophane"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "23. Lasciar lievitare 1-2 ore a temperatura ambiente"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cottura:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "24. Riscaldare forno a 200-220°C"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "25. Inserire pentolino di acqua sul fondo per vapore"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "26. Infornare i grissini"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "27. Cuocere 15-25 minuti fino a doratura intensa e croccantezza"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "28. Sfornare e raffreddare su griglia"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "CONSERVAZIONE:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Ripieni in sacchetti di carta per alimenti"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Durata: 2-3 settimane mantenendo croccantezza"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "- Se perdono croccantezza: ripassare 30 minuti in forno a 100°C con sportello in fessura"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STORIA:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tradizione narra che il fornaio Antonio Brunero della corte di Torino inventò i grissini nel 1679 per il piccolo Vittorio Amedeo II che non digeriva la mollica del pane comune. Il grissino si differenzia dal pane tradizionale proprio per l'assenza di mollica, garantendo friabilità e croccantezza."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

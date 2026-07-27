@@ -1,0 +1,46 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Focaccette morbide in padella",
+    "inLanguage": "it",
+    "description": "Ingredienti500 g di farina300 ml di acqua tiepida7 g di lievito di birra secco10 g di sale40 ml di olio extra verginePreparazioneSciogliete il lievito in acqua tiepida. Unite alla farina con il sale e l'olio. Impastate per 10 minuti.Fate lievitare per 2 ore in una ciotola unta, coperta da un canovaccio.Riprendete l'impasto e dividetelo in 8 porzioni. Formate delle palle e schiacciatele leggermente.Riscaldate un filo d'olio in una padella e cuocete le focaccette a fuoco medio per 2-3 minuti per lato fino a doratura.Servite tiepide con i vostri condimenti preferiti.",
+    "notes": "Nota originale 80C898BD-13EC-461C-8DA7-B7EC763C6AA0\n\nIngredienti500 g di farina300 ml di acqua tiepida7 g di lievito di birra secco10 g di sale40 ml di olio extra verginePreparazioneSciogliete il lievito in acqua tiepida. Unite alla farina con il sale e l'olio. Impastate per 10 minuti.Fate lievitare per 2 ore in una ciotola unta, coperta da un canovaccio.Riprendete l'impasto e dividetelo in 8 porzioni. Formate delle palle e schiacciatele leggermente.Riscaldate un filo d'olio in una padella e cuocete le focaccette a fuoco medio per 2-3 minuti per lato fino a doratura.Servite tiepide con i vostri condimenti preferiti.",
+    "recipeIngredient": [
+        "500 g di farina",
+        "300 ml di acqua tiepida",
+        "7 g di lievito di birra secco",
+        "10 g di sale",
+        "40 ml di olio extra vergine"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Sciogliete il lievito in acqua tiepida. Unite alla farina con il sale e l'olio. Impastate per 10 minuti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Fate lievitare per 2 ore in una ciotola unta, coperta da un canovaccio."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Riprendete l'impasto e dividetelo in 8 porzioni. Formate delle palle e schiacciatele leggermente."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Riscaldate un filo d'olio in una padella e cuocete le focaccette a fuoco medio per 2-3 minuti per lato fino a doratura."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Servite tiepide con i vostri condimenti preferiti."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

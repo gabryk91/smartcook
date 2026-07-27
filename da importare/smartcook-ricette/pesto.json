@@ -1,0 +1,28 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pesto",
+    "inLanguage": "it",
+    "description": "80gr Basilico40g Parmigiano reggiano40g Pecorino40g Pinoli150g Olio extravergine d’oliva1 spicchioAglioq.b.Sale",
+    "notes": "Nota originale 592AD4D5-A953-4825-8E58-2209475A9466\n\n80gr Basilico40g Parmigiano reggiano40g Pecorino40g Pinoli150g Olio extravergine d’oliva1 spicchioAglioq.b.Sale",
+    "recipeIngredient": [
+        "80gr Basilico",
+        "40g Parmigiano reggiano",
+        "40g Pecorino",
+        "40g Pinoli",
+        "150g Olio extravergine d’oliva",
+        "1 spicchioAglio",
+        "q.b.Sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "80gr Basilico40g Parmigiano reggiano40g Pecorino40g Pinoli150g Olio extravergine d’oliva1 spicchioAglioq.b.Sale"
+        }
+    ],
+    "keywords": [
+        "Condimenti"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,39 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Tajine di Pollo con Verdure",
+    "inLanguage": "it",
+    "description": "Tajine di Pollo con VerdureCategoria: Piatti Unici - TradizionalePreparazione: 30 minuti\nCottura: 40 minuti\nDifficoltà: Media\nCosto: Basso\nDosi: per 4 personeUn delizioso piatto magrebino che unisce pollo tenero con verdure fresche e spezie aromatiche. Tradizionalmente cotto in un tajine di terracotta, ma perfetto anche in padella. Un'esperienza culinaria esotica e autentica.",
+    "notes": "Nota originale 72E349F5-75DF-402D-A9C5-BE0C733E3838\n\nTajine di Pollo con VerdureCategoria: Piatti Unici - TradizionalePreparazione: 30 minuti\nCottura: 40 minuti\nDifficoltà: Media\nCosto: Basso\nDosi: per 4 personeUn delizioso piatto magrebino che unisce pollo tenero con verdure fresche e spezie aromatiche. Tradizionalmente cotto in un tajine di terracotta, ma perfetto anche in padella. Un'esperienza culinaria esotica e autentica.",
+    "recipeIngredient": [
+        "Tajine di Pollo con VerdureCategoria: Piatti Unici - TradizionalePreparazione: 30 minuti",
+        "Cottura: 40 minuti",
+        "Dosi: per 4 personeUn delizioso piatto magrebino che unisce pollo tenero con verdure fresche e spezie aromatiche. Tradizionalmente cotto in un tajine di terracotta, ma perfetto anche in padella. Un'esperienza culinaria esotica e autentica."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Tajine di Pollo con Verdure"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Categoria: Piatti Unici - Tradizionale"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione: 30 minutiCottura: 40 minutiDifficoltà: MediaCosto: BassoDosi: per 4 persone"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Un delizioso piatto magrebino che unisce pollo tenero con verdure fresche e spezie aromatiche. Tradizionalmente cotto in un tajine di terracotta, ma perfetto anche in padella. Un'esperienza culinaria esotica e autentica."
+        }
+    ],
+    "keywords": [
+        "Secondi",
+        "Piatti unici"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

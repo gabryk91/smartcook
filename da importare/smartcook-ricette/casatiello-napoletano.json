@@ -1,0 +1,46 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "CASATIELLO NAPOLETANO",
+    "inLanguage": "it",
+    "description": "Ingredienti800 g farina 00450 ml circa acqua tiepida12 g lievito di birra (oppure 1 bustina liofilizzato)3 cucchiai olio extra vergine di oliva200 g di salame napoletano200 g di provolone del monaco6 uovaPepe nero qbSale qbPreparazioneSciogliete il lievito in un po' d'acqua tiepida. In una ciotola unite la farina, il lievito sciolto, il resto dell'acqua e l'olio. Impastate fino ad ottenere un composto morbido e elastico.Tagliate a dadini il salame e il provolone, unite all'impasto. Fate lievitare per 1 ora fino al raddoppio.Versate in uno stampo da 26 cm imburrato, decorate con le uova e fate lievitare per 2 ore nello stampo.Cuocete a 180° per circa 50 minuti fino a doratura. Sfornate e fate raffreddare.",
+    "notes": "Nota originale 6726384B-4DDC-4234-9890-D04DB988D0CB\n\nIngredienti800 g farina 00450 ml circa acqua tiepida12 g lievito di birra (oppure 1 bustina liofilizzato)3 cucchiai olio extra vergine di oliva200 g di salame napoletano200 g di provolone del monaco6 uovaPepe nero qbSale qbPreparazioneSciogliete il lievito in un po' d'acqua tiepida. In una ciotola unite la farina, il lievito sciolto, il resto dell'acqua e l'olio. Impastate fino ad ottenere un composto morbido e elastico.Tagliate a dadini il salame e il provolone, unite all'impasto. Fate lievitare per 1 ora fino al raddoppio.Versate in uno stampo da 26 cm imburrato, decorate con le uova e fate lievitare per 2 ore nello stampo.Cuocete a 180° per circa 50 minuti fino a doratura. Sfornate e fate raffreddare.",
+    "recipeIngredient": [
+        "800 g farina 00",
+        "450 ml circa acqua tiepida",
+        "12 g lievito di birra (oppure 1 bustina liofilizzato)",
+        "3 cucchiai olio extra vergine di oliva",
+        "200 g di salame napoletano",
+        "200 g di provolone del monaco",
+        "6 uova",
+        "Pepe nero qb",
+        "Sale qb"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Sciogliete il lievito in un po' d'acqua tiepida. In una ciotola unite la farina, il lievito sciolto, il resto dell'acqua e l'olio. Impastate fino ad ottenere un composto morbido e elastico."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tagliate a dadini il salame e il provolone, unite all'impasto. Fate lievitare per 1 ora fino al raddoppio."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Versate in uno stampo da 26 cm imburrato, decorate con le uova e fate lievitare per 2 ore nello stampo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Cuocete a 180° per circa 50 minuti fino a doratura. Sfornate e fate raffreddare."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

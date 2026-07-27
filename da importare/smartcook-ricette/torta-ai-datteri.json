@@ -1,0 +1,65 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Torta ai datteri",
+    "inLanguage": "it",
+    "description": "250gr datteri 400ml latte (lasciare in ammollo 20 minuti)Frullare 120gr burro fuso1 uovo160gr farina1 cucchiaino cannella1 cucchiaino colmo lievitoNoci \nIn tortiera 21cm180° forno ventilato 50 minuti",
+    "notes": "Nota originale FED533A1-3E5D-4F4E-BA03-241F862712E7\n\n250gr datteri 400ml latte (lasciare in ammollo 20 minuti)Frullare 120gr burro fuso1 uovo160gr farina1 cucchiaino cannella1 cucchiaino colmo lievitoNoci \nIn tortiera 21cm180° forno ventilato 50 minuti",
+    "recipeIngredient": [
+        "250gr datteri 400ml latte (lasciare in ammollo 20 minuti)Frullare 120gr burro fuso1 uovo160gr farina1 cucchiaino cannella1 cucchiaino colmo lievitoNoci ",
+        "In tortiera 21cm180° forno ventilato 50 minuti"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "250gr datteri "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "400ml latte (lasciare in ammollo 20 minuti)"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Frullare "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "120gr burro fuso"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1 uovo"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "160gr farina"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1 cucchiaino cannella"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1 cucchiaino colmo lievito"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Noci "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "In tortiera 21cm"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "180° forno ventilato 50 minuti"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

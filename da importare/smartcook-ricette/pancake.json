@@ -1,0 +1,28 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pancake",
+    "inLanguage": "it",
+    "description": "Ingredienti250 ml di Latte200 gr di Farina 0065 gr di Zucchero1 uovo1 cucchiaino di Lievito in polvere per dolci",
+    "notes": "Nota originale 9B1EA3C3-C837-43DF-A403-DD2E2524937B\n\nIngredienti250 ml di Latte200 gr di Farina 0065 gr di Zucchero1 uovo1 cucchiaino di Lievito in polvere per dolci",
+    "recipeIngredient": [
+        "250 ml di Latte",
+        "200 gr di Farina 00",
+        "65 gr di Zucchero",
+        "1 uovo",
+        "1 cucchiaino di Lievito in polvere per dolci"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti250 ml di Latte200 gr di Farina 0065 gr di Zucchero1 uovo1 cucchiaino di Lievito in polvere per dolci"
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

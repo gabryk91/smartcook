@@ -21,6 +21,7 @@ jobs:
       - run: npm run build
       - run: npm run build:compat
       - run: node --check js/smartcook-main.js
+      - run: node tests/l10n-fallback-check.js
 
   php:
     runs-on: ubuntu-latest

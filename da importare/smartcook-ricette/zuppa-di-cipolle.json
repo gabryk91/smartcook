@@ -1,0 +1,24 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Zuppa di Cipolle",
+    "inLanguage": "it",
+    "description": "Zuppa francese gratinata. Ingredienti: 1kg cipolle gialle, 100ml olio EVO, 1 litro brodo carne, 200ml vino bianco secco, pane casareccio secco, 200gr emmental grattugiato, sale pepe",
+    "notes": "Nota originale CED32721-04DA-4A37-8941-380763A74F38\n\nZuppa francese gratinata. Ingredienti: 1kg cipolle gialle, 100ml olio EVO, 1 litro brodo carne, 200ml vino bianco secco, pane casareccio secco, 200gr emmental grattugiato, sale pepe",
+    "recipeIngredient": [
+        "Zuppa francese gratinata. Ingredienti: 1kg cipolle gialle, 100ml olio EVO, 1 litro brodo carne, 200ml vino bianco secco, pane casareccio secco, 200gr emmental grattugiato, sale pepe"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Zuppa francese gratinata. Ingredienti: 1kg cipolle gialle, 100ml olio EVO, 1 litro brodo carne, 200ml vino bianco secco, pane casareccio secco, 200gr emmental grattugiato, sale pepe"
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

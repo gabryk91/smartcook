@@ -1,0 +1,24 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Vellutata di Porri e Patate",
+    "inLanguage": "it",
+    "description": "Zuppa cremosa perfetta per autunno e inverno. Ingredienti: 4 porri (parte bianca), 4 patate medie, 1 cipolla, 1 litro brodo vegetale, 150ml panna, 50ml olio EVO, sale pepe noce moscata",
+    "notes": "Nota originale 4972998D-47F5-45B6-9AD0-E88A7CAA34F5\n\nZuppa cremosa perfetta per autunno e inverno. Ingredienti: 4 porri (parte bianca), 4 patate medie, 1 cipolla, 1 litro brodo vegetale, 150ml panna, 50ml olio EVO, sale pepe noce moscata",
+    "recipeIngredient": [
+        "Zuppa cremosa perfetta per autunno e inverno. Ingredienti: 4 porri (parte bianca), 4 patate medie, 1 cipolla, 1 litro brodo vegetale, 150ml panna, 50ml olio EVO, sale pepe noce moscata"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Zuppa cremosa perfetta per autunno e inverno. Ingredienti: 4 porri (parte bianca), 4 patate medie, 1 cipolla, 1 litro brodo vegetale, 150ml panna, 50ml olio EVO, sale pepe noce moscata"
+        }
+    ],
+    "keywords": [
+        "Primi"
+    ],
+    "recipeCategory": [
+        "Primi"
+    ],
+    "recipeYield": "4 0"
+}

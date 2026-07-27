@@ -1,0 +1,35 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Kurtoskalacs: la ricetta originale del camino dolce ungherese",
+    "inLanguage": "it",
+    "description": "Ingredienti1 kg di Farina tipo 00100 gr di Burro100 gr di Zucchero bianco3 uova + 3 tuorli30 gr di Lievito di birra500 ml di Latte fresco intero150 gr di Zucchero bianco1 cucchiaio di CannellaPreparazioneSetacciate la farina e lavorate con gancio impastatore. Cuocete in forno a 180°C per 15 minuti.",
+    "notes": "Nota originale DD8C0B8F-8B7D-441A-BAB6-C4177966F439\n\nIngredienti1 kg di Farina tipo 00100 gr di Burro100 gr di Zucchero bianco3 uova + 3 tuorli30 gr di Lievito di birra500 ml di Latte fresco intero150 gr di Zucchero bianco1 cucchiaio di CannellaPreparazioneSetacciate la farina e lavorate con gancio impastatore. Cuocete in forno a 180°C per 15 minuti.",
+    "recipeIngredient": [
+        "1 kg di Farina tipo 00",
+        "100 gr di Burro",
+        "100 gr di Zucchero bianco",
+        "3 uova + 3 tuorli",
+        "30 gr di Lievito di birra",
+        "500 ml di Latte fresco intero",
+        "150 gr di Zucchero bianco",
+        "1 cucchiaio di Cannella"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Setacciate la farina e lavorate con gancio impastatore. Cuocete in forno a 180°C per 15 minuti."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,36 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Ricetta Castagnaccio",
+    "inLanguage": "it",
+    "description": "Ingredienti300 g di farina di castagne380 g di acqua fredda4 cucchiai di zucchero2 cucchiai di olio extravergine di oliva40 g di uvetta40 g di pinoli40 g di gherigli di noce2 rametti di rosmarino1 pizzico di salePreparazioneIniziate la preparazione mettendo a bagno l'uvetta in acqua fredda e tostando i pinoli in un padellino. In una ciotola setacciate la farina di castagne e unite un pizzico di sale, lo zucchero, 2 cucchiai di olio e l'acqua. L'acqua va aggiunta a filo, poca alla volta, continuando a mescolare con una frusta. Unitevi la metà dell'uvetta strizzata, dei pinoli e delle noci. Ungete con olio una teglia rotonda e versatevi il composto. Guarnite la superficie con le noci, i pinoli e l'uvetta rimasti e con gli aghetti di rosmarino. Terminate con un filo d'olio e passate a cuocere in forno preriscaldato a 180° per 35 minuti, fino a quando sulla superficie non si saranno formate delle piccole crepe.",
+    "notes": "Nota originale 1A8611BD-31EC-4819-B900-7597893AFB4E\n\nIngredienti300 g di farina di castagne380 g di acqua fredda4 cucchiai di zucchero2 cucchiai di olio extravergine di oliva40 g di uvetta40 g di pinoli40 g di gherigli di noce2 rametti di rosmarino1 pizzico di salePreparazioneIniziate la preparazione mettendo a bagno l'uvetta in acqua fredda e tostando i pinoli in un padellino. In una ciotola setacciate la farina di castagne e unite un pizzico di sale, lo zucchero, 2 cucchiai di olio e l'acqua. L'acqua va aggiunta a filo, poca alla volta, continuando a mescolare con una frusta. Unitevi la metà dell'uvetta strizzata, dei pinoli e delle noci. Ungete con olio una teglia rotonda e versatevi il composto. Guarnite la superficie con le noci, i pinoli e l'uvetta rimasti e con gli aghetti di rosmarino. Terminate con un filo d'olio e passate a cuocere in forno preriscaldato a 180° per 35 minuti, fino a quando sulla superficie non si saranno formate delle piccole crepe.",
+    "recipeIngredient": [
+        "300 g di farina di castagne",
+        "380 g di acqua fredda",
+        "4 cucchiai di zucchero",
+        "2 cucchiai di olio extravergine di oliva",
+        "40 g di uvetta",
+        "40 g di pinoli",
+        "40 g di gherigli di noce",
+        "2 rametti di rosmarino",
+        "1 pizzico di sale"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Preparazione"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Iniziate la preparazione mettendo a bagno l'uvetta in acqua fredda e tostando i pinoli in un padellino. In una ciotola setacciate la farina di castagne e unite un pizzico di sale, lo zucchero, 2 cucchiai di olio e l'acqua. L'acqua va aggiunta a filo, poca alla volta, continuando a mescolare con una frusta. Unitevi la metà dell'uvetta strizzata, dei pinoli e delle noci. Ungete con olio una teglia rotonda e versatevi il composto. Guarnite la superficie con le noci, i pinoli e l'uvetta rimasti e con gli aghetti di rosmarino. Terminate con un filo d'olio e passate a cuocere in forno preriscaldato a 180° per 35 minuti, fino a quando sulla superficie non si saranno formate delle piccole crepe."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

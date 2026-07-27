@@ -1,0 +1,73 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Polpette di lenticchie al sugo",
+    "inLanguage": "it",
+    "description": "Ingredienti x 2 persone:300 grammi Lenticchie già cotte10 Pomodorini secchi1/2 Cipolla dorata1 cucchiaio Salsa di soia1 spicchio Spicchio di aglio2 cucchiai Olio extravergine di olivaPangrattatoSalePepe1 cucchiaino Timo\nSTEP 1Preriscaldate il forno a 220 °C, in modalità statica.Versate in un mixer (o tritatutto) le lenticchie, mezza cipolla tritata e i pomodorini secchi, fatti ammorbidire in acqua per qualche minuto. Aggiungete un cucchiaio abbondante di salsa di soia, l’aglio, l'olio, un pizzico di sale, o anche due, e una macinata di pepe e un po' di timo. \nSTEP 2Iniziate a tritare e proseguite finché la consistenza non sarà piuttosto liscia, fermandovi per ripulire i bordi, se necessario. Se non riuscite a tritare, significa che dovete aggiungere un goccio d’acqua (senza esagerate). Dovreste ottenere un composto abbastanza fluido: per riuscire a modellarlo e formare le polpette, rassodatelo con il pangrattato: 5-6 cucchiai dovrebbero essere sufficienti, ma incorporatelo un po' alla volta, in modo da non aggiungerne più del necessario. Se dovesse succedere e vedete che le palline si sgretolano, vi basterà bagnare nuovamente l’impasto con un po’ di acqua. \nSTEP 3Formate le palline, modellandole con le mani. Man mano che le polpette sono pronte, appoggiatele su una teglia ricoperta di carta da forno. Conditele con un po’ di olio e poi infornatele per 20-25 minuti, girandole a metà cottura. \nSTEP 4Mentre le polpette cuociono, preparate il sugo: in una pentola versate un filo di olio e mezza cipolla tagliata a pezzetti. Se avete un mix per soffritto, ancora meglio. Una volta che la cipolla si è dorata, aggiungete la passata di pomodoro, abbassate la fiamma e coprite con il coperchio, cuocendo per 20 minuti e mescolando di tanto in tanto. \nSTEP 5Una volta finita la cottura del sugo, saranno pronte anche le polpette. Togliete dal forno, lasciatele raffreddare un attimo (saranno un po’ fragili, all’inizio) e trasferitele nella pentola con il sugo. Fatele insaporire per qualche istante e poi servitele.",
+    "notes": "Nota originale 1575596A-54B5-4B01-972F-6CD7828242B3\n\nIngredienti x 2 persone:300 grammi Lenticchie già cotte10 Pomodorini secchi1/2 Cipolla dorata1 cucchiaio Salsa di soia1 spicchio Spicchio di aglio2 cucchiai Olio extravergine di olivaPangrattatoSalePepe1 cucchiaino Timo\nSTEP 1Preriscaldate il forno a 220 °C, in modalità statica.Versate in un mixer (o tritatutto) le lenticchie, mezza cipolla tritata e i pomodorini secchi, fatti ammorbidire in acqua per qualche minuto. Aggiungete un cucchiaio abbondante di salsa di soia, l’aglio, l'olio, un pizzico di sale, o anche due, e una macinata di pepe e un po' di timo. \nSTEP 2Iniziate a tritare e proseguite finché la consistenza non sarà piuttosto liscia, fermandovi per ripulire i bordi, se necessario. Se non riuscite a tritare, significa che dovete aggiungere un goccio d’acqua (senza esagerate). Dovreste ottenere un composto abbastanza fluido: per riuscire a modellarlo e formare le polpette, rassodatelo con il pangrattato: 5-6 cucchiai dovrebbero essere sufficienti, ma incorporatelo un po' alla volta, in modo da non aggiungerne più del necessario. Se dovesse succedere e vedete che le palline si sgretolano, vi basterà bagnare nuovamente l’impasto con un po’ di acqua. \nSTEP 3Formate le palline, modellandole con le mani. Man mano che le polpette sono pronte, appoggiatele su una teglia ricoperta di carta da forno. Conditele con un po’ di olio e poi infornatele per 20-25 minuti, girandole a metà cottura. \nSTEP 4Mentre le polpette cuociono, preparate il sugo: in una pentola versate un filo di olio e mezza cipolla tagliata a pezzetti. Se avete un mix per soffritto, ancora meglio. Una volta che la cipolla si è dorata, aggiungete la passata di pomodoro, abbassate la fiamma e coprite con il coperchio, cuocendo per 20 minuti e mescolando di tanto in tanto. \nSTEP 5Una volta finita la cottura del sugo, saranno pronte anche le polpette. Togliete dal forno, lasciatele raffreddare un attimo (saranno un po’ fragili, all’inizio) e trasferitele nella pentola con il sugo. Fatele insaporire per qualche istante e poi servitele.",
+    "recipeIngredient": [
+        "300 grammi Lenticchie già cotte",
+        "10 Pomodorini secchi",
+        "1/2 Cipolla dorata",
+        "1 cucchiaio Salsa di soia",
+        "1 spicchio Spicchio di aglio",
+        "2 cucchiai Olio extravergine di oliva",
+        "Pangrattato",
+        "Sale",
+        "Pepe",
+        "1 cucchiaino Timo"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti x 2 persone:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STEP 1"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Preriscaldate il forno a 220 °C, in modalità statica.Versate in un mixer (o tritatutto) le lenticchie, mezza cipolla tritata e i pomodorini secchi, fatti ammorbidire in acqua per qualche minuto. Aggiungete un cucchiaio abbondante di salsa di soia, l’aglio, l'olio, un pizzico di sale, o anche due, e una macinata di pepe e un po' di timo."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STEP 2"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Iniziate a tritare e proseguite finché la consistenza non sarà piuttosto liscia, fermandovi per ripulire i bordi, se necessario. Se non riuscite a tritare, significa che dovete aggiungere un goccio d’acqua (senza esagerate). Dovreste ottenere un composto abbastanza fluido: per riuscire a modellarlo e formare le polpette, rassodatelo con il pangrattato: 5-6 cucchiai dovrebbero essere sufficienti, ma incorporatelo un po' alla volta, in modo da non aggiungerne più del necessario. Se dovesse succedere e vedete che le palline si sgretolano, vi basterà bagnare nuovamente l’impasto con un po’ di acqua."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STEP 3"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Formate le palline, modellandole con le mani. Man mano che le polpette sono pronte, appoggiatele su una teglia ricoperta di carta da forno. Conditele con un po’ di olio e poi infornatele per 20-25 minuti, girandole a metà cottura."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STEP 4"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mentre le polpette cuociono, preparate il sugo: in una pentola versate un filo di olio e mezza cipolla tagliata a pezzetti. Se avete un mix per soffritto, ancora meglio. Una volta che la cipolla si è dorata, aggiungete la passata di pomodoro, abbassate la fiamma e coprite con il coperchio, cuocendo per 20 minuti e mescolando di tanto in tanto."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "STEP 5"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Una volta finita la cottura del sugo, saranno pronte anche le polpette. Togliete dal forno, lasciatele raffreddare un attimo (saranno un po’ fragili, all’inizio) e trasferitele nella pentola con il sugo. Fatele insaporire per qualche istante e poi servitele."
+        }
+    ],
+    "keywords": [
+        "Secondi"
+    ],
+    "recipeCategory": [
+        "Secondi"
+    ],
+    "recipeYield": "4 0"
+}

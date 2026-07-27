@@ -1,0 +1,39 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Piadine",
+    "inLanguage": "it",
+    "description": "https://www.fattoincasadabenedetta.it/ricetta/piadina/\nX 2 piadine200 g farina 0100 g acqua32 g olio d'oliva3,2 g bicarbonato2 g sale finoX 3 piadine300 g farina 0150 g acqua48 g olio d'oliva4,8 g bicarbonato3 g sale fino",
+    "notes": "Nota originale ACFBD3EC-DC67-4DBB-9406-981D863B114E\n\nhttps://www.fattoincasadabenedetta.it/ricetta/piadina/\nX 2 piadine200 g farina 0100 g acqua32 g olio d'oliva3,2 g bicarbonato2 g sale finoX 3 piadine300 g farina 0150 g acqua48 g olio d'oliva4,8 g bicarbonato3 g sale fino",
+    "recipeIngredient": [
+        "200 g farina 0",
+        "100 g acqua",
+        "32 g olio d'oliva",
+        "3,2 g bicarbonato",
+        "2 g sale fino",
+        "300 g farina 0",
+        "150 g acqua",
+        "48 g olio d'oliva",
+        "4,8 g bicarbonato",
+        "3 g sale fino"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "https://www.fattoincasadabenedetta.it/ricetta/piadina/"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "X 2 piadine"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "X 3 piadine"
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

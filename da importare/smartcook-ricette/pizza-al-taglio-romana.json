@@ -1,0 +1,22 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Pizza al Taglio Romana",
+    "inLanguage": "it",
+    "description": "La vera pizza romana al taglio con impasto digeribile e croccante. Ingredienti: 500gr farina, 350ml acqua tiepida, 10gr lievito di birra secco, 10gr sale, 30ml olio EVO. Maturazione 24 ore.",
+    "notes": "Nota originale 75E4629A-17BE-45A1-98A0-488FC23B9F97\n\nLa vera pizza romana al taglio con impasto digeribile e croccante. Ingredienti: 500gr farina, 350ml acqua tiepida, 10gr lievito di birra secco, 10gr sale, 30ml olio EVO. Maturazione 24 ore.",
+    "recipeIngredient": [
+        "La vera pizza romana al taglio con impasto digeribile e croccante. Ingredienti: 500gr farina, 350ml acqua tiepida, 10gr lievito di birra secco, 10gr sale, 30ml olio EVO. Maturazione 24 ore."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "La vera pizza romana al taglio con impasto digeribile e croccante. Ingredienti: 500gr farina, 350ml acqua tiepida, 10gr lievito di birra secco, 10gr sale, 30ml olio EVO. Maturazione 24 ore."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

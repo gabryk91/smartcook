@@ -1,0 +1,61 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Banana bread",
+    "inLanguage": "it",
+    "description": "Ingredienti\n3 banane mature (2 per l’impasto + 1 per decorare)2 uova150 g di yogurt greco intero1 cucchiaio colmo di crema di mandorle 100% (circa 30 g) o altra crema di frutta secca50 g di olio extravergine di oliva20 g di bevanda vegetale senza zuccheri aggiunti180 g di farina di farro integrale (o altra farina integrale)1 bustina di lievito per dolci50 g di noci pecan (o altra frutta secca)50 g di cioccolato fondente 85%\nProcedimento\n1. Schiacciare 2 banane mature in una ciotola.2. Aggiungere uova, yogurt greco, crema di mandorle, olio evo e bevanda vegetale. Mescolare bene.3. Incorporare la farina setacciata con il lievito.4. Unire le noci pecan tritate grossolanamente e il cioccolato fondente a pezzetti.5. Versare l’impasto in uno stampo da plumcake (lunghezza circa 28–30 cm).6. Decorare in superficie con la banana rimasta tagliata a metà nel senso della lunghezza.7. Cuocere in forno statico a 180°C per 45–50 minuti (fare la prova stecchino).",
+    "notes": "Nota originale ABAFAD1A-DA4D-4FBA-8E12-6CC4F54BCD06\n\nIngredienti\n3 banane mature (2 per l’impasto + 1 per decorare)2 uova150 g di yogurt greco intero1 cucchiaio colmo di crema di mandorle 100% (circa 30 g) o altra crema di frutta secca50 g di olio extravergine di oliva20 g di bevanda vegetale senza zuccheri aggiunti180 g di farina di farro integrale (o altra farina integrale)1 bustina di lievito per dolci50 g di noci pecan (o altra frutta secca)50 g di cioccolato fondente 85%\nProcedimento\n1. Schiacciare 2 banane mature in una ciotola.2. Aggiungere uova, yogurt greco, crema di mandorle, olio evo e bevanda vegetale. Mescolare bene.3. Incorporare la farina setacciata con il lievito.4. Unire le noci pecan tritate grossolanamente e il cioccolato fondente a pezzetti.5. Versare l’impasto in uno stampo da plumcake (lunghezza circa 28–30 cm).6. Decorare in superficie con la banana rimasta tagliata a metà nel senso della lunghezza.7. Cuocere in forno statico a 180°C per 45–50 minuti (fare la prova stecchino).",
+    "recipeIngredient": [
+        "3 banane mature (2 per l’impasto + 1 per decorare)",
+        "2 uova",
+        "150 g di yogurt greco intero",
+        "1 cucchiaio colmo di crema di mandorle 100% (circa 30 g) o altra crema di frutta secca",
+        "50 g di olio extravergine di oliva",
+        "20 g di bevanda vegetale senza zuccheri aggiunti",
+        "180 g di farina di farro integrale (o altra farina integrale)",
+        "1 bustina di lievito per dolci",
+        "50 g di noci pecan (o altra frutta secca)",
+        "50 g di cioccolato fondente 85%"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Schiacciare 2 banane mature in una ciotola."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Aggiungere uova, yogurt greco, crema di mandorle, olio evo e bevanda vegetale. Mescolare bene."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Incorporare la farina setacciata con il lievito."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Unire le noci pecan tritate grossolanamente e il cioccolato fondente a pezzetti."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Versare l’impasto in uno stampo da plumcake (lunghezza circa 28–30 cm)."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "6. Decorare in superficie con la banana rimasta tagliata a metà nel senso della lunghezza."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "7. Cuocere in forno statico a 180°C per 45–50 minuti (fare la prova stecchino)."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

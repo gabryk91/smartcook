@@ -1,0 +1,69 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Torta di Caporali al Marsala con Crema al Cioccolato",
+    "inLanguage": "it",
+    "description": "Ingredienti\n200 g zucchero200 g burro200 g cioccolato fondente2 uova pastorizzate400 g biscotti “caporali”Marsala q.b. per bagnare i biscotti\nProcedimento\n1. CremaLasciare il burro fuori frigo finché è morbido. Metterlo in una ciotola e sbatterlo bene con una forchetta fino a renderlo cremoso. Aggiungere lo zucchero e le 2 uova pastorizzate. Sbattere a lungo fino a ottenere una crema liscia.\n2. CioccolatoSciogliere il cioccolato fondente a bagnomaria. Lasciarlo intiepidire e unirlo alla crema di burro, zucchero e uova. Mescolare bene fino a ottenere una crema uniforme.\n3. BiscottiBagnare i caporali nel Marsala uno per uno (ben imbevuti ma senza romperli).\n4. Assemblare la tortaRivestire il fondo della tortiera da 25cm con carta da cucina. Fare un primo strato di caporali bagnati. Versare sopra tutta la crema al cioccolato e livellare. Coprire con un secondo strato di caporali bagnati. Mettere un foglio di carta da cucina anche sopra.\n5. RiposoCoprire con un coperchio o un vassoio tondo e mettere sopra un peso leggero per pressare. Lasciare in frigo fino al giorno dopo.",
+    "notes": "Nota originale 1DE74A17-816E-4456-863B-1D79C2ED8FD5\n\nIngredienti\n200 g zucchero200 g burro200 g cioccolato fondente2 uova pastorizzate400 g biscotti “caporali”Marsala q.b. per bagnare i biscotti\nProcedimento\n1. CremaLasciare il burro fuori frigo finché è morbido. Metterlo in una ciotola e sbatterlo bene con una forchetta fino a renderlo cremoso. Aggiungere lo zucchero e le 2 uova pastorizzate. Sbattere a lungo fino a ottenere una crema liscia.\n2. CioccolatoSciogliere il cioccolato fondente a bagnomaria. Lasciarlo intiepidire e unirlo alla crema di burro, zucchero e uova. Mescolare bene fino a ottenere una crema uniforme.\n3. BiscottiBagnare i caporali nel Marsala uno per uno (ben imbevuti ma senza romperli).\n4. Assemblare la tortaRivestire il fondo della tortiera da 25cm con carta da cucina. Fare un primo strato di caporali bagnati. Versare sopra tutta la crema al cioccolato e livellare. Coprire con un secondo strato di caporali bagnati. Mettere un foglio di carta da cucina anche sopra.\n5. RiposoCoprire con un coperchio o un vassoio tondo e mettere sopra un peso leggero per pressare. Lasciare in frigo fino al giorno dopo.",
+    "recipeIngredient": [
+        "200 g zucchero",
+        "200 g burro",
+        "200 g cioccolato fondente",
+        "2 uova pastorizzate",
+        "400 g biscotti “caporali”",
+        "Marsala q.b. per bagnare i biscotti"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1. Crema"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Lasciare il burro fuori frigo finché è morbido. Metterlo in una ciotola e sbatterlo bene con una forchetta fino a renderlo cremoso. Aggiungere lo zucchero e le 2 uova pastorizzate. Sbattere a lungo fino a ottenere una crema liscia."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2. Cioccolato"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Sciogliere il cioccolato fondente a bagnomaria. Lasciarlo intiepidire e unirlo alla crema di burro, zucchero e uova. Mescolare bene fino a ottenere una crema uniforme."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3. Biscotti"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Bagnare i caporali nel Marsala uno per uno (ben imbevuti ma senza romperli)."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4. Assemblare la torta"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Rivestire il fondo della tortiera da 25cm con carta da cucina. Fare un primo strato di caporali bagnati. Versare sopra tutta la crema al cioccolato e livellare. Coprire con un secondo strato di caporali bagnati. Mettere un foglio di carta da cucina anche sopra."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5. Riposo"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Coprire con un coperchio o un vassoio tondo e mettere sopra un peso leggero per pressare. Lasciare in frigo fino al giorno dopo."
+        }
+    ],
+    "keywords": [
+        "Dolci"
+    ],
+    "recipeCategory": [
+        "Dolci"
+    ],
+    "recipeYield": "4 0"
+}

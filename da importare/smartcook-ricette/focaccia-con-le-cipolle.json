@@ -1,0 +1,32 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Focaccia con le cipolle",
+    "inLanguage": "it",
+    "description": "tp://vivalafocaccia.com/2009/12/28/focaccia-con-la-cipolla/\nIngredienti200 g di acqua tiepida5 g di sale3 g (circa un cucchiaino) di malto20 g di olio extravergine d’oliva320-340 g di farina7 g di lievito di birra secco (oppure 21 g di lievito di birra fresco)Cipolle affettate sottilmente (quantità a piacere)\nProcedimento\nImpasta bene fino ad ottenere una pasta liscia e omogenea.\nLascia riposare l’impasto per circa 5-10 minuti sul piano di lavoro.\nUngi una teglia (circa 40 × 25 cm) e trasferisci l’impasto al suo interno. Per una teglia di queste dimensioni usa circa 520 g di impasto.\nCospargi la superficie con un filo d’olio per evitare che si formi la crosta.\nLascia lievitare finché la pasta raddoppia di volume (circa 1 ora, ma dipende dalla temperatura).\nStendi l’impasto nella teglia schiacciandolo delicatamente con le dita, senza tirarlo.\nCospargi la superficie con una manciata di sale.\nLascia lievitare nuovamente per circa 30 minuti.\nVersa un po’ d’acqua tiepida e un filo d’olio sulla superficie, poi crea i classici “buchi” della focaccia con la punta delle dita.\nDistribuisci uniformemente le cipolle affettate. Se fa freddo, scaldale 30-40 secondi nel microonde per non rallentare la lievitazione.\nFai lievitare ancora per circa 1 ora.\nCuoci in forno preriscaldato a 220-240 °C per circa 15 minuti, fino a doratura.\nConsiglio: per una crosta più morbida e sottile, metti un pentolino d’acqua nel forno durante la cottura per mantenere l’ambiente umido.",
+    "notes": "Nota originale 287BB325-2259-433E-A457-165594077418\n\ntp://vivalafocaccia.com/2009/12/28/focaccia-con-la-cipolla/\nIngredienti200 g di acqua tiepida5 g di sale3 g (circa un cucchiaino) di malto20 g di olio extravergine d’oliva320-340 g di farina7 g di lievito di birra secco (oppure 21 g di lievito di birra fresco)Cipolle affettate sottilmente (quantità a piacere)\nProcedimento\nImpasta bene fino ad ottenere una pasta liscia e omogenea.\nLascia riposare l’impasto per circa 5-10 minuti sul piano di lavoro.\nUngi una teglia (circa 40 × 25 cm) e trasferisci l’impasto al suo interno. Per una teglia di queste dimensioni usa circa 520 g di impasto.\nCospargi la superficie con un filo d’olio per evitare che si formi la crosta.\nLascia lievitare finché la pasta raddoppia di volume (circa 1 ora, ma dipende dalla temperatura).\nStendi l’impasto nella teglia schiacciandolo delicatamente con le dita, senza tirarlo.\nCospargi la superficie con una manciata di sale.\nLascia lievitare nuovamente per circa 30 minuti.\nVersa un po’ d’acqua tiepida e un filo d’olio sulla superficie, poi crea i classici “buchi” della focaccia con la punta delle dita.\nDistribuisci uniformemente le cipolle affettate. Se fa freddo, scaldale 30-40 secondi nel microonde per non rallentare la lievitazione.\nFai lievitare ancora per circa 1 ora.\nCuoci in forno preriscaldato a 220-240 °C per circa 15 minuti, fino a doratura.\nConsiglio: per una crosta più morbida e sottile, metti un pentolino d’acqua nel forno durante la cottura per mantenere l’ambiente umido.",
+    "recipeIngredient": [
+        "200 g di acqua tiepida",
+        "5 g di sale",
+        "3 g (circa un cucchiaino) di malto",
+        "20 g di olio extravergine d’oliva",
+        "320-340 g di farina",
+        "7 g di lievito di birra secco (oppure 21 g di lievito di birra fresco)",
+        "Cipolle affettate sottilmente (quantità a piacere)"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "tp://vivalafocaccia.com/2009/12/28/focaccia-con-la-cipolla/"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Procedimento Impasta bene fino ad ottenere una pasta liscia e omogenea. Lascia riposare l’impasto per circa 5-10 minuti sul piano di lavoro. Ungi una teglia (circa 40 × 25 cm) e trasferisci l’impasto al suo interno. Per una teglia di queste dimensioni usa circa 520 g di impasto. Cospargi la superficie con un filo d’olio per evitare che si formi la crosta. Lascia lievitare finché la pasta raddoppia di volume (circa 1 ora, ma dipende dalla temperatura). Stendi l’impasto nella teglia schiacciandolo delicatamente con le dita, senza tirarlo. Cospargi la superficie con una manciata di sale. Lascia lievitare nuovamente per circa 30 minuti. Versa un po’ d’acqua tiepida e un filo d’olio sulla superficie, poi crea i classici “buchi” della focaccia con la punta delle dita. Distribuisci uniformemente le cipolle affettate. Se fa freddo, scaldale 30-40 secondi nel microonde per non rallentare la lievitazione. Fai lievitare ancora per circa 1 ora. Cuoci in forno preriscaldato a 220-240 °C per circa 15 minuti, fino a doratura. Consiglio: per una crosta più morbida e sottile, metti un pentolino d’acqua nel forno durante la cottura per mantenere l’ambiente umido."
+        }
+    ],
+    "keywords": [
+        "Pane e lievitati"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

@@ -1,0 +1,31 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Liquore di melograno",
+    "inLanguage": "it",
+    "description": "2 litri di alcool,2 stecche di cannella,7 chiodi di garofano,litri 2,6 di acqua,kg 1,9 di zucchero,2 kg di melograni maturi. Far bollire acqua e zucchero, far raffreddare e miscelare con la parte alcoolici. Imbottigliare e far riposare il tutto per circa 7 giorni. Servire freddo, preferibilmente congelato. N.B.: i grani vanno fatti macerare nell'alcool per circa 30 giorni. Se questi non sono ben rossi, si può aggiungere del colorante alimentare. Per chi lo vuole più alcoolico, deve diminuire la parte di acqua. Lo consiglio, provare per credere.",
+    "notes": "Nota originale 11FEFF22-2AD8-4DFB-843B-50C8F31131FF\n\n2 litri di alcool,2 stecche di cannella,7 chiodi di garofano,litri 2,6 di acqua,kg 1,9 di zucchero,2 kg di melograni maturi. Far bollire acqua e zucchero, far raffreddare e miscelare con la parte alcoolici. Imbottigliare e far riposare il tutto per circa 7 giorni. Servire freddo, preferibilmente congelato. N.B.: i grani vanno fatti macerare nell'alcool per circa 30 giorni. Se questi non sono ben rossi, si può aggiungere del colorante alimentare. Per chi lo vuole più alcoolico, deve diminuire la parte di acqua. Lo consiglio, provare per credere.",
+    "recipeIngredient": [
+        "2 litri di alcool,",
+        "2 stecche di cannella,",
+        "7 chiodi di garofano,",
+        "litri 2,6 di acqua,",
+        "kg 1,9 di zucchero,",
+        "2 kg di melograni maturi."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": " "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Far bollire acqua e zucchero, far raffreddare e miscelare con la parte alcoolici. Imbottigliare e far riposare il tutto per circa 7 giorni. Servire freddo, preferibilmente congelato. N.B.: i grani vanno fatti macerare nell'alcool per circa 30 giorni. Se questi non sono ben rossi, si può aggiungere del colorante alimentare. Per chi lo vuole più alcoolico, deve diminuire la parte di acqua. Lo consiglio, provare per credere."
+        }
+    ],
+    "keywords": [
+        "Liquori"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}

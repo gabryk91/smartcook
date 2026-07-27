@@ -1,0 +1,5 @@
+Importazione SmartCook
+
+Caricare un file .json alla volta dalla sezione Import di SmartCook.
+Sono incluse solo le note del taccuino Ricette non eliminate.
+Il file indice-importazione.csv conserva l'associazione tra ID originale, ricetta, categorie e tag.

@@ -19,6 +19,7 @@ final class TextRecipeParserTest extends TestCase {
         self::assertSame('Pasta al pomodoro', $recipe['title']);
         self::assertSame(2, $recipe['servings']);
         self::assertSame(10, $recipe['prepTime']);
+        self::assertNull($recipe['description']);
         self::assertCount(2, $recipe['ingredients']);
         self::assertCount(2, $recipe['steps']);
     }

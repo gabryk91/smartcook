@@ -1,0 +1,83 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    "name": "Zemino di Ceci",
+    "inLanguage": "it",
+    "description": "Ingredienti x4 persone:Ceci 400 gr Cipolle 150 grCarote 80 grSedano 80 grOlio extravergine d'oliva (EVO) 1 bicchierePassata di pomodoro 500 grPane 4 fetteBietole 300 grSale q.b.Pepe nero q.b.\n1.Mettete a bagno i ceci in acqua fredda per 12 ore.Scolateli e lessateli in una casseruola con l'acqua fredda per almeno due ore,fino a che sono teneri salate solo a fine cottura.\n2.Tritate la cipolla, la carota ed il sedano.  3.Rosolateli quindi in una pentola con l’olio.Unite, a questo punto, un mestolo di passata di pomodoro e lasciate cuocere 5 minuti a fuoco medio. \n4.Unite le bietole e i ceci leggermente scolati,la restante passata, lasciate cuocere per 30 minuti, aggiungete poca acqua se necessario quindi aggiustate di sale e pepe.\n5.Servite i ceci con i crostoni di pane, un filo di olio a crudo e una spolverata di pepe a mulinello.",
+    "notes": "Nota originale 80B0729B-B84D-4F1C-80E0-FB4BD03C2487\n\nIngredienti x4 persone:Ceci 400 gr Cipolle 150 grCarote 80 grSedano 80 grOlio extravergine d'oliva (EVO) 1 bicchierePassata di pomodoro 500 grPane 4 fetteBietole 300 grSale q.b.Pepe nero q.b.\n1.Mettete a bagno i ceci in acqua fredda per 12 ore.Scolateli e lessateli in una casseruola con l'acqua fredda per almeno due ore,fino a che sono teneri salate solo a fine cottura.\n2.Tritate la cipolla, la carota ed il sedano.  3.Rosolateli quindi in una pentola con l’olio.Unite, a questo punto, un mestolo di passata di pomodoro e lasciate cuocere 5 minuti a fuoco medio. \n4.Unite le bietole e i ceci leggermente scolati,la restante passata, lasciate cuocere per 30 minuti, aggiungete poca acqua se necessario quindi aggiustate di sale e pepe.\n5.Servite i ceci con i crostoni di pane, un filo di olio a crudo e una spolverata di pepe a mulinello.",
+    "recipeIngredient": [
+        "Ceci 400 gr",
+        "Cipolle 150 gr",
+        "Carote 80 gr",
+        "Sedano 80 gr",
+        "Olio extravergine d'oliva (EVO) 1 bicchiere",
+        "Passata di pomodoro 500 gr",
+        "Pane 4 fette",
+        "Bietole 300 gr",
+        "Sale q.b.",
+        "Pepe nero q.b."
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "text": "Ingredienti x4 persone:"
+        },
+        {
+            "@type": "HowToStep",
+            "text": "1."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Mettete a bagno i ceci in acqua fredda per 12 ore."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Scolateli e lessateli in una casseruola con l'acqua fredda per almeno due ore,fino a che sono teneri salate solo a fine cottura."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "2."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Tritate la cipolla, la carota ed il sedano."
+        },
+        {
+            "@type": "HowToStep",
+            "text": " "
+        },
+        {
+            "@type": "HowToStep",
+            "text": "3."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Rosolateli quindi in una pentola con l’olio."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Unite, a questo punto, un mestolo di passata di pomodoro e lasciate cuocere 5 minuti a fuoco medio."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "4."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Unite le bietole e i ceci leggermente scolati,la restante passata, lasciate cuocere per 30 minuti, aggiungete poca acqua se necessario quindi aggiustate di sale e pepe."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "5."
+        },
+        {
+            "@type": "HowToStep",
+            "text": "Servite i ceci con i crostoni di pane, un filo di olio a crudo e una spolverata di pepe a mulinello."
+        }
+    ],
+    "keywords": [
+        "Piatti unici"
+    ],
+    "recipeCategory": [],
+    "recipeYield": "4 0"
+}
