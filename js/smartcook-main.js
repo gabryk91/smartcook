@@ -46,6 +46,8 @@ const fallbackTranslations = {
         'Timer quantity': 'Quantità timer',
         'Timer unit': 'Unità timer',
         'View recipes': 'Visualizza ricette',
+        'Select one or more categories': 'Seleziona una o più categorie',
+        'Select one or more tags': 'Seleziona uno o più tag',
     },
 };
 const tr = (text) => {
@@ -210,7 +212,7 @@ function renderShell(section, id) {
 		<aside class="smartcook-sidebar" aria-label="SmartCook">
 			<div class="brand"><img src="${attr(appIconUrl)}" alt=""><div><strong>SmartCook</strong><span>${esc(tr('Recipe intelligence'))}</span></div></div>
 			<nav>${nav.map(([route, label]) => `<a class="${section === route || (route === 'recipes' && ['recipe', 'editor'].includes(section)) ? 'active' : ''}" href="#/${route}">${esc(label)}</a>`).join('')}</nav>
-			<a class="primary" href="#/new">+ ${esc(tr('New recipe'))}</a>
+			<a class="primary mobile-create" href="#/new" aria-label="${attr(tr('New recipe'))}"><span class="mobile-create-icon" aria-hidden="true">+</span><span class="mobile-create-label">${esc(tr('New recipe'))}</span></a>
 		</aside>
 		<main class="smartcook-content">
 			<header class="page-header"><div><h1>${esc(shellTitle(section, id))}</h1><p>${esc(tr('Self-hosted recipes, structured and searchable'))}</p></div><div class="busy" data-smartcook-busy hidden>${esc(tr('Working...'))}</div></header>
@@ -246,8 +248,17 @@ async function renderDashboard(view) {
 	</section>`;
 }
 async function renderRecipes(view, routeParams = new URLSearchParams()) {
+    const taxonomy = await working(() => request('/taxonomy'));
+    const selectedTags = [...new Set(routeParams.getAll('tags'))];
+    const selectedCategories = [...new Set(routeParams.getAll('categories'))];
+    const multiSelectOptions = (items, selected) => items.map(item => {
+        const name = String(item.name || '');
+        return `<option value="${attr(name)}"${selected.includes(name) ? ' selected' : ''}>${esc(name)}</option>`;
+    }).join('');
     view.innerHTML = `<section class="toolbar panel">
 		<label class="search-field"><span>&#9906;</span><input data-search placeholder="${attr(tr('Search recipes, cuisine or course...'))}"></label>
+		<label class="taxonomy-filter">${esc(tr('Categories'))}<select data-categories multiple size="1" aria-describedby="smartcook-category-filter-hint">${multiSelectOptions(taxonomy.categories || [], selectedCategories)}</select><small id="smartcook-category-filter-hint">${esc(tr('Select one or more categories'))}</small></label>
+		<label class="taxonomy-filter">${esc(tr('Tags'))}<select data-tags multiple size="1" aria-describedby="smartcook-tag-filter-hint">${multiSelectOptions(taxonomy.tags || [], selectedTags)}</select><small id="smartcook-tag-filter-hint">${esc(tr('Select one or more tags'))}</small></label>
 		<label class="check-inline"><input data-favorites type="checkbox"> ${esc(tr('Favorites only'))}</label>
 		<label>${esc(tr('Sort'))}<select data-sort><option value="updated_at">${esc(tr('Recently updated'))}</option><option value="title:ASC">${esc(tr('Title'))} A-Z</option><option value="title:DESC">${esc(tr('Title'))} Z-A</option><option value="total_time">${esc(tr('Total time'))}</option><option value="cook_count">${esc(tr('Most cooked'))}</option></select></label>
 		<a class="primary" href="#/new">+ ${esc(tr('New recipe'))}</a>
@@ -256,9 +267,10 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const search = view.querySelector('[data-search]');
     const favorites = view.querySelector('[data-favorites]');
     const sort = view.querySelector('[data-sort]');
-    const tags = routeParams.getAll('tags');
+    const categories = view.querySelector('[data-categories]');
+    const tagSelect = view.querySelector('[data-tags]');
     const ingredients = routeParams.getAll('ingredients');
-    const filterLabel = [...tags.map(name => `#${name}`), ...ingredients].join(', ');
+    const filterLabel = [...selectedCategories, ...selectedTags.map(name => `#${name}`), ...ingredients].join(', ');
     if (filterLabel) {
         search.setAttribute('aria-label', `${tr('Search recipes, cuisine or course...')}: ${filterLabel}`);
         search.title = filterLabel;
@@ -276,7 +288,8 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const load = async () => {
         const [sortField, direction] = sort.value.split(':');
         const params = new URLSearchParams({ search: search.value, favorite: favorites.checked ? '1' : '', sort: sortField, ...(direction ? { direction } : {}) });
-        tags.forEach(tag => params.append('tags', tag));
+        selectedTags.forEach(tag => params.append('tags', tag));
+        selectedCategories.forEach(category => params.append('categories', category));
         ingredients.forEach(ingredient => params.append('ingredients', ingredient));
         const payload = await working(() => request(`/recipes?${params.toString()}`));
         const recipes = payload.recipes;
@@ -296,6 +309,14 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     };
     const delayed = () => { window.clearTimeout(timer); timer = window.setTimeout(() => { void load(); }, 250); };
     search.addEventListener('input', delayed);
+    categories.addEventListener('change', () => {
+        selectedCategories.splice(0, selectedCategories.length, ...[...categories.selectedOptions].map(option => option.value));
+        void load();
+    });
+    tagSelect.addEventListener('change', () => {
+        selectedTags.splice(0, selectedTags.length, ...[...tagSelect.selectedOptions].map(option => option.value));
+        void load();
+    });
     favorites.addEventListener('change', () => { void load(); });
     sort.addEventListener('change', () => {
         try {
@@ -360,7 +381,7 @@ function recipeViewer(recipe) {
         return `<li><span class="recipe-step-number">${index + 1}</span><div><p>${esc(step.text)}</p>${details.length ? `<small>${esc(details.join(' · '))}</small>` : ''}</div></li>`;
     }).join('');
     return `<article class="recipe-view panel">
-        <header class="recipe-view-header">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : ''}<div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
+        <header class="recipe-view-header">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div>`}<div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
         <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span><span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
     </article>`;
@@ -419,9 +440,9 @@ function collectRecipe(view, existing) {
     };
 }
 function editorForm(recipe) {
-    return `<section class="editor-top panel">
+    return `<div class="editor-actions editor-save-actions"><div>${recipe.id ? `<button class="secondary" data-mark-cooked type="button">${esc(tr('Cooked today'))}</button>` : ''}<button class="primary" data-save-recipe type="button">${esc(tr('Save recipe'))}</button></div></div>
+	<section class="editor-top panel">
 		<div><p class="eyebrow">${esc(recipe.id ? tr('Recipe details') : tr('Create manually'))}</p><h2>${esc(recipe.title || tr('Untitled recipe'))}</h2></div>
-		<div class="editor-actions">${recipe.id ? `<button class="secondary" data-mark-cooked type="button">${esc(tr('Cooked today'))}</button>` : ''}<button class="primary" data-save-recipe type="button">${esc(tr('Save recipe'))}</button></div>
 	</section>
 	<div class="editor-layout">
 		<main class="view-stack">
@@ -832,7 +853,7 @@ async function renderShopping(view) {
 }
 async function renderSettings(view) {
     const settings = (await working(() => request('/settings'))).settings;
-    view.innerHTML = `<div class="settings-layout"><main class="view-stack">
+	view.innerHTML = `<div class="settings-layout"><main class="view-stack"><div class="editor-actions settings-actions"><div><button class="primary" data-save-settings type="button">${esc(tr('Save settings'))}</button></div></div>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('General'))}</p><h2>${esc(tr('Library preferences'))}</h2></div></div><div class="form-grid"><label>${esc(tr('Default language'))}<input data-setting="language" value="${attr(settings.language)}" placeholder="auto / it / en"></label><label>${esc(tr('Measurement system'))}<select data-setting="measurementSystem"><option value="metric"${settings.measurementSystem === 'metric' ? ' selected' : ''}>${esc(tr('Metric'))}</option><option value="imperial"${settings.measurementSystem === 'imperial' ? ' selected' : ''}>${esc(tr('Imperial'))}</option></select></label><label class="span-2">${esc(tr('Attachments folder in Nextcloud Files'))}<input data-setting="attachmentsFolder" value="${attr(settings.attachmentsFolder)}"></label><label>${esc(tr('Maximum URL import size'))}<input data-setting="maxImportBytes" type="number" min="100000" max="20000000" value="${settings.maxImportBytes}"><small>${esc(tr('bytes'))}</small></label></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Optional intelligence'))}</p><h2>${esc(tr('AI provider'))}</h2></div><span class="status-pill ${settings.aiProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.aiProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid">
 			<label>${esc(tr('Provider'))}<select data-setting="aiProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option><option value="custom">${esc(tr('Custom OpenAI-compatible'))}</option></select></label>
@@ -841,7 +862,7 @@ async function renderSettings(view) {
 		</div><div class="info-box"><b>Nextcloud Assistant</b><p>${esc(tr('Uses the language-model provider already configured by the instance administrator and requires no duplicate API key.'))}</p></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('AI meal planner'))}</p><h2>${esc(tr('Planner prompt'))}</h2></div></div><div class="form-grid"><label class="span-2">${esc(tr('Planner prompt'))}<textarea data-setting="aiPlannerPrompt" rows="3">${esc(settings.aiPlannerPrompt)}</textarea></label><label class="span-2">${esc(tr('Dietary preferences and constraints'))}<textarea data-setting="plannerPreferences" rows="3" placeholder="${attr(tr('Example: vegetarian, no peanuts, low salt'))}">${esc(settings.plannerPreferences)}</textarea></label><label>${esc(tr('Maximum cooking time per meal'))}<input data-setting="plannerCookingTime" type="number" min="5" max="600" value="${settings.plannerCookingTime}"><small>${esc(tr('minutes'))}</small></label><label>${esc(tr('Default servings'))}<input data-setting="plannerServings" type="number" min="1" max="30" value="${settings.plannerServings}"></label></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Documents'))}</p><h2>${esc(tr('OCR and PDF extraction'))}</h2></div><span class="status-pill ${settings.ocrProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.ocrProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid"><label>${esc(tr('Extractor'))}<select data-setting="ocrProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="local">${esc(tr('Local Tesseract / pdftotext'))}</option><option value="external">${esc(tr('External HTTP service'))}</option></select></label><label>${esc(tr('OCR languages'))}<input data-setting="ocrLanguage" value="${attr(settings.ocrLanguage)}"></label><label>${esc(tr('Tesseract executable'))}<input data-setting="tesseractPath" value="${attr(settings.tesseractPath)}"></label><label>${esc(tr('pdftotext executable'))}<input data-setting="pdfToTextPath" value="${attr(settings.pdfToTextPath)}"></label><label class="span-2">${esc(tr('External endpoint'))}<input data-setting="ocrEndpoint" type="url" value="${attr(settings.ocrEndpoint)}"></label><label>${esc(tr('API key'))}<input data-setting="ocrApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasOcrApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="ocrApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label></div></section>
-		<div class="save-bar"><button class="primary" data-save-settings type="button">${esc(tr('Save settings'))}</button></div></main>
+		</main>
 		<aside class="panel privacy-card"><p class="eyebrow">${esc(tr('Privacy'))}</p><h2>${esc(tr('You control every processor'))}</h2><p>${esc(tr('Deterministic URL and text parsing stays in your Nextcloud. Content is sent to an AI or external OCR service only when you enable and invoke it.'))}</p><ul><li>${esc(tr('API keys are encrypted with the Nextcloud server secret.'))}</li><li>${esc(tr('Imported data is always shown as an editable preview.'))}</li><li>${esc(tr('URL imports reject private and reserved network addresses.'))}</li></ul></aside></div>`;
     const aiProvider = view.querySelector('[data-setting="aiProvider"]');
     if (aiProvider)

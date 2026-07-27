@@ -14,22 +14,38 @@ final class StatsService {
         $totalTime = 0;
         $favorites = 0;
         $cookCount = 0;
-        $tags = [];
-        $ingredients = [];
+        $tagLabels = [];
+        $recipeTags = [];
+        $ingredientLabels = [];
+        $recipeIngredients = [];
         foreach ($recipes as $summary) {
             $totalTime += (int)($summary['totalTime'] ?? 0);
             $favorites += (bool)($summary['favorite'] ?? false) ? 1 : 0;
             $cookCount += (int)($summary['cookCount'] ?? 0);
             $detail = $this->recipes->get((int)$summary['id']);
+            $names = [];
             foreach ((array)($detail['tags'] ?? []) as $tag) {
-                $name = (string)($tag['name'] ?? '');
-                $tags[$name] = ($tags[$name] ?? 0) + 1;
+                $name = trim((string)($tag['name'] ?? ''));
+                $normalizedName = mb_strtolower($name);
+                if ($normalizedName !== '') {
+                    $names[$normalizedName] = true;
+                    $tagLabels[$normalizedName] ??= $name;
+                }
             }
+            $recipeTags[] = array_keys($names);
+            $names = [];
             foreach ((array)($detail['ingredients'] ?? []) as $ingredient) {
-                $name = (string)($ingredient['name'] ?? '');
-                $ingredients[$name] = ($ingredients[$name] ?? 0) + 1;
+                $name = trim((string)($ingredient['name'] ?? ''));
+                $normalizedName = mb_strtolower($name);
+                if ($normalizedName !== '') {
+                    $names[$normalizedName] = true;
+                    $ingredientLabels[$normalizedName] ??= $name;
+                }
             }
+            $recipeIngredients[] = array_keys($names);
         }
+        $tags = $this->matchingRecipeCounts($tagLabels, $recipeTags);
+        $ingredients = $this->matchingRecipeCounts($ingredientLabels, $recipeIngredients);
         arsort($tags);
         arsort($ingredients);
         return [
@@ -52,5 +68,25 @@ final class StatsService {
             }
         }
         return $result;
+    }
+
+    /**
+     * @param array<string,string> $labels
+     * @param list<list<string>> $recipeNames
+     * @return array<string,int>
+     */
+    private function matchingRecipeCounts(array $labels, array $recipeNames): array {
+        $counts = [];
+        foreach ($labels as $needle => $label) {
+            foreach ($recipeNames as $names) {
+                foreach ($names as $name) {
+                    if (str_contains($name, $needle)) {
+                        $counts[$label] = ($counts[$label] ?? 0) + 1;
+                        break;
+                    }
+                }
+            }
+        }
+        return $counts;
     }
 }
