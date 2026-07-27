@@ -33,6 +33,9 @@ final class PlannerController extends BaseController {
     #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/planner')]
     public function create(): JSONResponse {
+        if (is_array($this->request->getParam('plan', null))) {
+            return $this->respond(fn (): array => $this->planner->generate($this->payload('plan')));
+        }
         return $this->respond(fn (): array => ['meal' => $this->planner->create($this->payload('meal'))], Http::STATUS_CREATED);
     }
 

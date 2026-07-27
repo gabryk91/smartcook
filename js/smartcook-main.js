@@ -13,6 +13,7 @@ let busyCount = 0;
 let messageTimer = 0;
 const fallbackTranslations = {
     it: {
+        // Keep bundle-only UI text translated when the Nextcloud catalog has not been regenerated yet.
         minutes: 'minuti',
         hours: 'ore',
         'Remove this ingredient?': 'Rimuovere questo ingrediente?',
@@ -28,6 +29,23 @@ const fallbackTranslations = {
         'Maximum cooking time per meal': 'Tempo massimo di cucina per pasto',
         'Default servings': 'Porzioni predefinite',
         'Planner prompt': 'Prompt del pianificatore',
+        'Example: use more legumes and prepare leftovers for lunch': 'Esempio: usa più legumi e prepara gli avanzi per il pranzo',
+        'Example: vegetarian, no peanuts, low salt': 'Esempio: vegetariana, senza arachidi, poco sale',
+        'Import previews': 'Anteprime di importazione',
+        'Imported recipes saved': 'Ricette importate salvate',
+        'Importing file': 'Importazione file',
+        'Importing recipe': 'Importazione ricetta',
+        of: 'di',
+        'Please wait while the source is analyzed.': 'Attendi mentre la fonte viene analizzata.',
+        'recipes extracted. Review them before saving.': 'ricette estratte. Controllale prima di salvarle.',
+        'Save all recipes': 'Salva tutte le ricette',
+        'Saving recipe': 'Salvataggio ricetta',
+        'Select one or more files. Images and PDFs require a configured OCR/document extractor.': 'Seleziona uno o più file. Immagini e PDF richiedono un estrattore OCR/documenti configurato.',
+        'Some files could not be imported': 'Non è stato possibile importare alcuni file',
+        'Some recipes could not be saved': 'Non è stato possibile salvare alcune ricette',
+        'Timer quantity': 'Quantità timer',
+        'Timer unit': 'Unità timer',
+        'View recipes': 'Visualizza ricette',
     },
 };
 const tr = (text) => {
@@ -170,14 +188,16 @@ function shellTitle(section, id) {
     return titles[section] || 'SmartCook';
 }
 function parseRoute() {
-    const parts = (location.hash.replace(/^#\/?/, '') || 'dashboard').split('/');
+    const [path, query = ''] = (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?');
+    const parts = path.split('/');
+    const params = new URLSearchParams(query);
     if (parts[0] === 'recipes' && parts[1]) {
         const id = asNumber(parts[1]) || undefined;
-        return { section: parts[2] === 'edit' ? 'editor' : 'recipe', id };
+        return { section: parts[2] === 'edit' ? 'editor' : 'recipe', id, params };
     }
     if (parts[0] === 'new')
-        return { section: 'editor' };
-    return { section: parts[0] || 'dashboard' };
+        return { section: 'editor', params };
+    return { section: parts[0] || 'dashboard', params };
 }
 function renderShell(section, id) {
     if (!root)
@@ -190,7 +210,7 @@ function renderShell(section, id) {
 		<aside class="smartcook-sidebar" aria-label="SmartCook">
 			<div class="brand"><img src="${attr(appIconUrl)}" alt=""><div><strong>SmartCook</strong><span>${esc(tr('Recipe intelligence'))}</span></div></div>
 			<nav>${nav.map(([route, label]) => `<a class="${section === route || (route === 'recipes' && ['recipe', 'editor'].includes(section)) ? 'active' : ''}" href="#/${route}">${esc(label)}</a>`).join('')}</nav>
-			<a class="primary full" href="#/new">+ ${esc(tr('New recipe'))}</a>
+			<a class="primary" href="#/new">+ ${esc(tr('New recipe'))}</a>
 		</aside>
 		<main class="smartcook-content">
 			<header class="page-header"><div><h1>${esc(shellTitle(section, id))}</h1><p>${esc(tr('Self-hosted recipes, structured and searchable'))}</p></div><div class="busy" data-smartcook-busy hidden>${esc(tr('Working...'))}</div></header>
@@ -220,25 +240,44 @@ async function renderDashboard(view) {
 			${stats.recentRecipes.length ? `<div class="compact-list">${stats.recentRecipes.map(recipe => `<a href="#/recipes/${recipe.id}"><div class="recipe-thumb">${recipeThumb(recipe)}</div><div><strong>${esc(recipe.title)}</strong><small>${esc(recipe.cuisine || tr('Uncategorized'))} - ${asNumber(recipe.totalTime)} min</small></div><span>&rsaquo;</span></a>`).join('')}</div>` : `<div class="empty-state"><h3>${esc(tr('Your cookbook is ready'))}</h3><p>${esc(tr('Create a recipe or import one from a webpage or text.'))}</p><a class="primary" href="#/import">${esc(tr('Import a recipe'))}</a></div>`}
 		</article>
 		<div class="view-stack">
-			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Most used'))}</p><h2>${esc(tr('Ingredients'))}</h2><div class="tag-cloud">${stats.topIngredients.map(item => `<span>${esc(item.name)} <b>${item.count}</b></span>`).join('') || `<small>${esc(tr('No data yet'))}</small>`}</div></article>
-			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Organization'))}</p><h2>${esc(tr('Top tags'))}</h2><div class="tag-cloud">${stats.topTags.map(item => `<span>#${esc(item.name)} <b>${item.count}</b></span>`).join('') || `<small>${esc(tr('No tags yet'))}</small>`}</div></article>
+			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Most used'))}</p><h2>${esc(tr('Ingredients'))}</h2><div class="tag-cloud">${stats.topIngredients.map(item => `<a href="#/recipes?ingredients=${encodeURIComponent(item.name)}">${esc(item.name)} <b>${item.count}</b></a>`).join('') || `<small>${esc(tr('No data yet'))}</small>`}</div></article>
+			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Organization'))}</p><h2>${esc(tr('Top tags'))}</h2><div class="tag-cloud">${stats.topTags.map(item => `<a href="#/recipes?tags=${encodeURIComponent(item.name)}">#${esc(item.name)} <b>${item.count}</b></a>`).join('') || `<small>${esc(tr('No tags yet'))}</small>`}</div></article>
 		</div>
 	</section>`;
 }
-async function renderRecipes(view) {
+async function renderRecipes(view, routeParams = new URLSearchParams()) {
     view.innerHTML = `<section class="toolbar panel">
 		<label class="search-field"><span>&#9906;</span><input data-search placeholder="${attr(tr('Search recipes, cuisine or course...'))}"></label>
 		<label class="check-inline"><input data-favorites type="checkbox"> ${esc(tr('Favorites only'))}</label>
-		<label>${esc(tr('Sort'))}<select data-sort><option value="updated_at">${esc(tr('Recently updated'))}</option><option value="title">${esc(tr('Title'))}</option><option value="total_time">${esc(tr('Total time'))}</option><option value="cook_count">${esc(tr('Most cooked'))}</option></select></label>
+		<label>${esc(tr('Sort'))}<select data-sort><option value="updated_at">${esc(tr('Recently updated'))}</option><option value="title:ASC">${esc(tr('Title'))} A-Z</option><option value="title:DESC">${esc(tr('Title'))} Z-A</option><option value="total_time">${esc(tr('Total time'))}</option><option value="cook_count">${esc(tr('Most cooked'))}</option></select></label>
 		<a class="primary" href="#/new">+ ${esc(tr('New recipe'))}</a>
 	</section><section data-recipe-results></section>`;
     const results = view.querySelector('[data-recipe-results]');
     const search = view.querySelector('[data-search]');
     const favorites = view.querySelector('[data-favorites]');
     const sort = view.querySelector('[data-sort]');
+    const tags = routeParams.getAll('tags');
+    const ingredients = routeParams.getAll('ingredients');
+    const filterLabel = [...tags.map(name => `#${name}`), ...ingredients].join(', ');
+    if (filterLabel) {
+        search.setAttribute('aria-label', `${tr('Search recipes, cuisine or course...')}: ${filterLabel}`);
+        search.title = filterLabel;
+    }
+    const recipeSortKey = 'smartcook.recipe-sort';
+    try {
+        const savedSort = window.localStorage.getItem(recipeSortKey);
+        if (savedSort && [...sort.options].some(option => option.value === savedSort))
+            sort.value = savedSort;
+    }
+    catch (_) {
+        // Continue with the default ordering when browser storage is unavailable.
+    }
     let timer = 0;
     const load = async () => {
-        const params = new URLSearchParams({ search: search.value, favorite: favorites.checked ? '1' : '', sort: sort.value });
+        const [sortField, direction] = sort.value.split(':');
+        const params = new URLSearchParams({ search: search.value, favorite: favorites.checked ? '1' : '', sort: sortField, ...(direction ? { direction } : {}) });
+        tags.forEach(tag => params.append('tags', tag));
+        ingredients.forEach(ingredient => params.append('ingredients', ingredient));
         const payload = await working(() => request(`/recipes?${params.toString()}`));
         const recipes = payload.recipes;
         results.innerHTML = recipes.length ? `<div class="recipe-grid">${recipes.map(recipe => {
@@ -258,7 +297,15 @@ async function renderRecipes(view) {
     const delayed = () => { window.clearTimeout(timer); timer = window.setTimeout(() => { void load(); }, 250); };
     search.addEventListener('input', delayed);
     favorites.addEventListener('change', () => { void load(); });
-    sort.addEventListener('change', () => { void load(); });
+    sort.addEventListener('change', () => {
+        try {
+            window.localStorage.setItem(recipeSortKey, sort.value);
+        }
+        catch (_) {
+            // The selected order still applies for the current page.
+        }
+        void load();
+    });
     await load();
 }
 function textInput(label, field, value, options = {}) {
@@ -391,9 +438,9 @@ function editorForm(recipe) {
 		<aside class="view-stack editor-aside">
 			${recipe.id ? `<section class="panel form-section"><p class="eyebrow">${esc(tr('Exports'))}</p><h2>${esc(tr('Download'))}</h2><div class="export-buttons"><a class="secondary" href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></section>
 			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2><div class="media-upload-group cover-upload"><label><strong>${esc(tr('Cover image'))}</strong><input data-cover-file type="file" accept="image/*"></label><small>${esc(tr('The uploaded image becomes the recipe cover after saving.'))}</small></div><div class="media-upload-group"><label><strong>${esc(tr('Additional attachment'))}</strong><input data-media-file type="file"></label><button class="secondary" data-upload-media type="button">${esc(tr('Upload attachment'))}</button></div><ul class="media-list">${recipe.media.map(item => item.id ? `<li><a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener"><strong>${esc(item.altText || item.path.split('/').pop() || item.kind)}</strong><small>${esc(item.mime || item.kind)} · ${formatBytes(item.fileSize)} · ${formatMediaDate(item.createdAt)}</small></a></li>` : '').join('')}</ul></section>
-			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with placeholder="${attr(tr('User or group ID'))}"><input data-share-password type="password" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary full" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
+			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with placeholder="${attr(tr('User or group ID'))}"><input data-share-password type="password" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
 			<section class="panel form-section" data-history-section><p class="eyebrow">${esc(tr('Audit trail'))}</p><h2>${esc(tr('Version history'))}</h2><div class="version-list" data-version-list></div></section>
-			<section class="panel form-section danger-zone"><h2>${esc(tr('Danger zone'))}</h2><button class="danger secondary full" data-delete-recipe type="button">${esc(tr('Delete recipe'))}</button></section>` : `<section class="panel empty-state"><h2>${esc(tr('Save first'))}</h2><p>${esc(tr('Attachments, sharing, exports and version history become available after the first save.'))}</p></section>`}
+			<section class="panel form-section danger-zone"><h2>${esc(tr('Danger zone'))}</h2><button class="danger secondary" data-delete-recipe type="button">${esc(tr('Delete recipe'))}</button></section>` : `<section class="panel empty-state"><h2>${esc(tr('Save first'))}</h2><p>${esc(tr('Attachments, sharing, exports and version history become available after the first save.'))}</p></section>`}
 		</aside>
 	</div>`;
 }
@@ -519,34 +566,68 @@ async function loadVersions(view, recipeId) {
 }
 async function renderImport(view) {
     let kind = 'url';
-    let preview = null;
+    let previews = [];
+    let savedPreviews = new Set();
+    const setImportBusy = (active, title = tr('Importing recipe'), detail = tr('Please wait while the source is analyzed.')) => {
+        const modal = view.querySelector('[data-import-loading]');
+        if (modal) {
+            const titleNode = modal.querySelector('[data-import-loading-title]');
+            const detailNode = modal.querySelector('[data-import-loading-detail]');
+            if (titleNode)
+                titleNode.textContent = title;
+            if (detailNode)
+                detailNode.textContent = detail;
+            modal.hidden = !active;
+        }
+    };
     const paint = () => {
         view.innerHTML = `<section class="import-hero panel"><div><p class="eyebrow">${esc(tr('Smart import'))}</p><h2>${esc(tr('Turn almost any source into a structured recipe'))}</h2><p>${esc(tr('SmartCook checks Schema.org data first, then deterministic parsing, and uses AI only when requested.'))}</p></div><div class="pipeline"><span>URL / Text / PDF</span><b>-&gt;</b><span>${esc(tr('Parser'))}</span><b>-&gt;</b><span>${esc(tr('Review'))}</span><b>-&gt;</b><span>${esc(tr('Recipe'))}</span></div></section>
 		<section class="two-column import-layout"><article class="panel form-section">
 			<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>
-			${kind === 'url' ? `<label>${esc(tr('Recipe URL'))}<input data-import-url type="url" placeholder="https://example.com/recipe"></label>` : kind === 'file' ? `<label>${esc(tr('PDF, image, Markdown, HTML or JSON'))}<input data-import-file type="file" accept="image/*,.pdf,.txt,.md,.markdown,.html,.htm,.json"><small>${esc(tr('Images and PDFs require a configured OCR/document extractor.'))}</small></label>` : `<label>${esc(tr('Source content'))}<textarea data-import-text rows="18" placeholder="${attr(tr('Paste the recipe, including ingredients and procedure...'))}"></textarea></label>`}
+            ${kind === 'url' ? `<label>${esc(tr('Recipe URL'))}<input data-import-url type="url" placeholder="https://example.com/recipe"></label>` : kind === 'file' ? `<label>${esc(tr('PDF, image, Markdown, HTML or JSON'))}<input data-import-file type="file" multiple accept="image/*,.pdf,.txt,.md,.markdown,.html,.htm,.json"><small>${esc(tr('Select one or more files. Images and PDFs require a configured OCR/document extractor.'))}</small></label>` : `<label>${esc(tr('Source content'))}<textarea data-import-text rows="18" placeholder="${attr(tr('Paste the recipe, including ingredients and procedure...'))}"></textarea></label>`}
 			<div class="form-grid"><label>${esc(tr('Output language'))}<input data-import-language value="${attr(document.documentElement.lang || 'it')}"></label><label>${esc(tr('AI provider override'))}<select data-import-provider><option value="">${esc(tr('Use settings'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option></select></label></div>
 			<label class="check-inline ai-toggle"><input data-import-ai type="checkbox"><span><b>${esc(tr('Use AI refinement'))}</b><small>${esc(tr('Optional fallback for incomplete or unstructured sources'))}</small></span></label>
-			<button class="primary full" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
-		</article><article class="panel preview-panel" data-import-preview>${preview ? importPreviewHtml(preview) : `<div class="empty-preview"><div>&#8761;</div><h2>${esc(tr('Preview appears here'))}</h2><p>${esc(tr('The source is never saved as a recipe until you review and confirm the extracted fields.'))}</p></div>`}</article></section>`;
-        view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; preview = null; paint(); }));
+			<button class="primary" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
+        </article><article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews)}</article></section>
+		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
+        view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); paint(); }));
         view.querySelector('[data-extract]')?.addEventListener('click', async () => {
             const language = view.querySelector('[data-import-language]')?.value || 'en';
             const useAi = view.querySelector('[data-import-ai]')?.checked || false;
             const provider = view.querySelector('[data-import-provider]')?.value || '';
             if (kind === 'file') {
-                const file = view.querySelector('[data-import-file]')?.files?.[0];
-                if (!file) {
+                const files = Array.from(view.querySelector('[data-import-file]')?.files || []);
+                if (!files.length) {
                     showNotice(tr('Choose a file first'), 'error');
                     return;
                 }
-                const form = new FormData();
-                form.append('file', file);
-                form.append('language', language);
-                form.append('useAi', String(useAi));
-                if (provider)
-                    form.append('provider', provider);
-                preview = await working(() => request('/import/file', { method: 'POST', body: form }));
+                previews = [];
+                savedPreviews = new Set();
+                const failedFiles = [];
+                try {
+                    for (const [index, file] of files.entries()) {
+                        setImportBusy(true, `${tr('Importing file')} ${index + 1} ${tr('of')} ${files.length}`, file.name);
+                        const form = new FormData();
+                        form.append('file', file);
+                        form.append('language', language);
+                        form.append('useAi', String(useAi));
+                        if (provider)
+                            form.append('provider', provider);
+                        try {
+                            previews.push(await request('/import/file', { method: 'POST', body: form }));
+                        }
+                        catch (error) {
+                            failedFiles.push(`${file.name}: ${error instanceof Error ? error.message : tr('Unexpected error')}`);
+                        }
+                    }
+                }
+                finally {
+                    setImportBusy(false);
+                }
+                if (failedFiles.length)
+                    showNotice(`${tr('Some files could not be imported')}: ${failedFiles.join('; ')}`, 'error');
+                if (!previews.length)
+                    return;
             }
             else {
                 const text = view.querySelector('[data-import-text]')?.value || '';
@@ -555,37 +636,81 @@ async function renderImport(view) {
                     showNotice(tr('Enter a source first'), 'error');
                     return;
                 }
-                preview = await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi, provider: provider || null } }));
+                setImportBusy(true);
+                try {
+                    previews = [await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi, provider: provider || null } }))];
+                    savedPreviews = new Set();
+                }
+                finally {
+                    setImportBusy(false);
+                }
             }
-            showNotice(tr('Recipe data extracted. Review it before saving.'));
+            showNotice(previews.length > 1 ? `${previews.length} ${tr('recipes extracted. Review them before saving.')}` : tr('Recipe data extracted. Review it before saving.'));
             const holder = view.querySelector('[data-import-preview]');
-            holder.innerHTML = importPreviewHtml(preview);
+            holder.innerHTML = importPreviewsHtml(previews, savedPreviews);
             bindImportSave(holder);
         });
-        if (preview)
+        if (previews.length)
             bindImportSave(view.querySelector('[data-import-preview]'));
     };
     const bindImportSave = (holder) => {
-        holder.querySelector('[data-save-import]')?.addEventListener('click', async () => {
-            if (!preview)
+        holder.querySelector('[data-save-all-import]')?.addEventListener('click', async (event) => {
+            const button = event.currentTarget;
+            const pendingIndexes = previews.map((_, index) => index).filter(index => !savedPreviews.has(index));
+            if (!pendingIndexes.length) {
+                location.hash = '#/recipes';
                 return;
-            preview.recipe.title = holder.querySelector('[data-preview-title]')?.value.trim() || preview.recipe.title;
-            preview.recipe.description = holder.querySelector('[data-preview-description]')?.value.trim() || preview.recipe.description;
-            const saved = (await working(() => request('/recipes', { method: 'POST', json: { recipe: preview.recipe } }))).recipe;
-            showNotice(tr('Imported recipe saved'));
-            location.hash = `#/recipes/${saved.id}`;
+            }
+            holder.querySelectorAll('[data-import-preview-card]').forEach((card, index) => {
+                const preview = previews[index];
+                preview.recipe.title = card.querySelector('[data-preview-title]')?.value.trim() || preview.recipe.title;
+                preview.recipe.description = card.querySelector('[data-preview-description]')?.value.trim() || preview.recipe.description;
+            });
+            button.disabled = true;
+            const failedRecipes = [];
+            try {
+                for (const [position, index] of pendingIndexes.entries()) {
+                    const preview = previews[index];
+                    setImportBusy(true, `${tr('Saving recipe')} ${position + 1} ${tr('of')} ${pendingIndexes.length}`, preview.recipe.title);
+                    try {
+                        await request('/recipes', { method: 'POST', json: { recipe: preview.recipe } });
+                        savedPreviews.add(index);
+                    }
+                    catch (error) {
+                        failedRecipes.push(`${preview.recipe.title}: ${error instanceof Error ? error.message : tr('Unexpected error')}`);
+                    }
+                }
+            }
+            finally {
+                setImportBusy(false);
+                button.disabled = false;
+            }
+            if (failedRecipes.length) {
+                showNotice(`${tr('Some recipes could not be saved')}: ${failedRecipes.join('; ')}`, 'error');
+                holder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+                bindImportSave(holder);
+                return;
+            }
+            showNotice(tr('Imported recipes saved'));
+            location.hash = '#/recipes';
         });
     };
     paint();
 }
-function importPreviewHtml(preview) {
+function importPreviewsHtml(previews, savedPreviews) {
+    if (!previews.length)
+        return `<div class="empty-preview"><div>&#8761;</div><h2>${esc(tr('Preview appears here'))}</h2><p>${esc(tr('The source is never saved as a recipe until you review and confirm the extracted fields.'))}</p></div>`;
+    const pending = previews.length - savedPreviews.size;
+    return `<div class="section-heading"><div><p class="eyebrow">${previews.length} ${esc(tr('recipes extracted. Review them before saving.'))}</p><h2>${esc(tr('Import previews'))}</h2></div><button class="primary" data-save-all-import type="button">${esc(pending ? tr('Save all recipes') : tr('View recipes'))}</button></div>${previews.map((item, index) => importPreviewHtml(item, savedPreviews.has(index))).join('')}`;
+}
+function importPreviewHtml(preview, saved = false) {
     const recipe = preview.recipe;
-    return `<div class="section-heading"><div><p class="eyebrow">${esc(preview.strategy)}</p><h2>${esc(tr('Import preview'))}</h2></div><button class="primary" data-save-import type="button">${esc(tr('Save recipe'))}</button></div>
+    return `<div class="import-preview-card" data-import-preview-card><div class="section-heading"><div><p class="eyebrow">${esc(preview.strategy)}</p><h3>${esc(recipe.title || tr('Import preview'))}</h3></div>${saved ? `<span class="status-pill enabled">${esc(tr('Saved'))}</span>` : ''}</div>
 		${preview.warnings.length ? `<div class="warning-list">${preview.warnings.map(warning => `<p>${esc(warning)}</p>`).join('')}</div>` : ''}
 		<label>${esc(tr('Title'))}<input data-preview-title value="${attr(recipe.title)}"></label><label>${esc(tr('Description'))}<textarea data-preview-description rows="3">${esc(recipe.description)}</textarea></label>
 		<div class="preview-metrics"><span>${recipe.servings} ${esc(tr('servings'))}</span><span>${recipe.prepTime} min ${esc(tr('prep'))}</span><span>${recipe.cookTime} min ${esc(tr('cook'))}</span><span>${recipe.totalTime} min ${esc(tr('total'))}</span></div>
 		<div class="preview-columns"><div><h3>${esc(tr('Ingredients'))} <small>${recipe.ingredients.length}</small></h3><ul>${recipe.ingredients.map(item => `<li><b>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</b> ${esc(item.name)}</li>`).join('')}</ul></div><div><h3>${esc(tr('Procedure'))} <small>${recipe.steps.length}</small></h3><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></div></div>
-		${preview.duplicates.length ? `<div class="duplicate-box"><h3>${esc(tr('Possible duplicates'))}</h3>${preview.duplicates.map(match => `<a href="#/recipes/${match.recipe.id}">${esc(match.recipe.title)} <span>${Math.round(match.score * 100)}%</span></a>`).join('')}</div>` : ''}`;
+		${preview.duplicates.length ? `<div class="duplicate-box"><h3>${esc(tr('Possible duplicates'))}</h3>${preview.duplicates.map(match => `<a href="#/recipes/${match.recipe.id}">${esc(match.recipe.title)} <span>${Math.round(match.score * 100)}%</span></a>`).join('')}</div>` : ''}</div>`;
 }
 function startOfWeek(date) {
     const copy = new Date(date);
@@ -618,7 +743,7 @@ async function renderPlanner(view) {
         view.querySelector('[data-week-today]')?.addEventListener('click', () => { weekStart = startOfWeek(new Date()); void load(); });
 		view.querySelector('[data-generate-plan]')?.addEventListener('click', async () => {
 			const instruction = view.querySelector('[data-planner-instruction]')?.value || '';
-			await working(() => request('/planner/ai', { method: 'POST', json: { plan: { from: dateIso(days[0]), to: dateIso(days[6]), instruction } } }));
+			await working(() => request('/planner', { method: 'POST', json: { plan: { from: dateIso(days[0]), to: dateIso(days[6]), instruction } } }));
 			showNotice(tr('Meal plan generated'));
 			await load();
 		});
@@ -768,7 +893,7 @@ async function route() {
                 await renderDashboard(view);
                 break;
             case 'recipes':
-                await renderRecipes(view);
+                await renderRecipes(view, current.params);
                 break;
             case 'recipe':
                 await renderRecipe(view, current.id);

@@ -38,7 +38,7 @@ final class AiPromptFactory {
   "categories": [{"name":"string"}]
 }
 JSON;
-        return "Extract one cooking recipe from the source below. Return only one valid JSON object, with no Markdown and no commentary. Preserve facts; never invent missing quantities, times, nutrition or tools. Times are integer minutes, timerSeconds are seconds. Split ingredients and procedure into ordered arrays. Normalize units while retaining originalText. Output language should be {$language}. Use this exact shape:\n{$schema}\n\nSOURCE:\n{$text}";
+        return "Extract one cooking recipe from the source below. Return only one valid JSON object, with no Markdown and no commentary. Preserve facts; never invent missing quantities, times, nutrition or tools. The description must be a brief description of the finished recipe result, not a repetition or list of ingredients or procedure; return null if no suitable description can be derived. Times are integer minutes, timerSeconds are seconds. Split ingredients and procedure into ordered arrays. Normalize units while retaining originalText. Output language should be {$language}. Use this exact shape:\n{$schema}\n\nSOURCE:\n{$text}";
     }
 
     /** @param list<array<string, mixed>> $recipes @param array<string, mixed> $preferences */

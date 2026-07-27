@@ -75,7 +75,7 @@ final class TextRecipeParser {
         $metadataText = implode("\n", $sections['intro']);
         $data = [
             'title' => $title !== '' ? $title : 'Imported recipe',
-            'description' => $hints['description'] ?? $this->description($sections['intro'], $title),
+            'description' => $hints['description'] ?? null,
             'language' => $hints['language'] ?? 'en',
             'imagePath' => $hints['image'] ?? null,
             'sourceUrl' => $hints['sourceUrl'] ?? null,
@@ -112,16 +112,6 @@ final class TextRecipeParser {
         }
         if (in_array($normalized, self::TOOL_HEADERS, true)) {
             return 'tools';
-        }
-        return null;
-    }
-
-    /** @param list<string> $lines */
-    private function description(array $lines, string $title): ?string {
-        foreach ($lines as $line) {
-            if ($line !== $title && mb_strlen($line) > 30 && !$this->ingredients->looksLikeIngredient($line) && !str_contains($line, ':')) {
-                return $line;
-            }
         }
         return null;
     }
