@@ -105,6 +105,26 @@ final class FileStorageService {
         ];
     }
 
+    public function delete(int $recipeId, int $mediaId): void {
+        $recipe = $this->access->owned($recipeId);
+        $media = $this->recipes->findMedia($mediaId) ?? throw new NotFoundException('Attachment not found');
+        if ((int)$media['recipeId'] !== $recipeId) {
+            throw new NotFoundException('Attachment not found');
+        }
+        $remaining = array_values(array_filter((array)($recipe['media'] ?? []), static fn (mixed $item): bool => !is_array($item) || (int)($item['id'] ?? 0) !== $mediaId));
+        $changes = ['media' => $remaining];
+        if ((string)($recipe['imagePath'] ?? '') === 'media:' . $mediaId) {
+            $changes['imagePath'] = null;
+        }
+        $this->recipeService->update($recipeId, $changes);
+        try {
+            $node = $this->rootFolder->getUserFolder((string)$recipe['ownerId'])->get((string)$media['path']);
+            $node->delete();
+        } catch (\Throwable) {
+            // The database reference has already been removed; a missing file is harmless.
+        }
+    }
+
     private function ensureFolder(Folder $root, string $path): Folder {
         $current = $root;
         foreach (array_filter(explode('/', trim($path, '/'))) as $part) {

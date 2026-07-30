@@ -111,6 +111,19 @@ final class RecipeRepository extends AbstractRepository {
         return $row === null ? null : $this->mapRecipeRow($row);
     }
 
+    /** @return list<int> */
+    public function listMissingCoverIds(string $userId): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('id')->from('smartcook_recipes')
+            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->isNull('image_path'),
+                $qb->expr()->eq('image_path', $qb->createNamedParameter('')),
+            ))
+            ->orderBy('id', 'ASC');
+        return array_map(static fn (array $row): int => (int)$row['id'], $this->fetchAll($qb));
+    }
+
     /** @return array<string, mixed>|null */
     public function findMedia(int $mediaId): ?array {
         $qb = $this->db->getQueryBuilder();

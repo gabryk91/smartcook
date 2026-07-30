@@ -28,6 +28,8 @@ final class SettingsService {
         'tesseractPath' => 'tesseract',
         'pdfToTextPath' => 'pdftotext',
         'maxImportBytes' => '3000000',
+        'googleImageSearchEngineId' => '',
+        'coverImageProvider' => 'google',
     ];
 
     public function __construct(private IConfig $config, private ICrypto $crypto) {
@@ -46,9 +48,15 @@ final class SettingsService {
         $result['maxImportBytes'] = (int)$result['maxImportBytes'];
         $result['hasAiApiKey'] = $this->secret($userId, 'aiApiKey') !== '';
         $result['hasOcrApiKey'] = $this->secret($userId, 'ocrApiKey') !== '';
+        $result['hasGoogleImageSearchApiKey'] = $this->secret($userId, 'googleImageSearchApiKey') !== '';
+        $result['hasPexelsApiKey'] = $this->secret($userId, 'pexelsApiKey') !== '';
+        $result['hasUnsplashAccessKey'] = $this->secret($userId, 'unsplashAccessKey') !== '';
         if ($includeSecrets) {
             $result['aiApiKey'] = $this->secret($userId, 'aiApiKey');
             $result['ocrApiKey'] = $this->secret($userId, 'ocrApiKey');
+            $result['googleImageSearchApiKey'] = $this->secret($userId, 'googleImageSearchApiKey');
+            $result['pexelsApiKey'] = $this->secret($userId, 'pexelsApiKey');
+            $result['unsplashAccessKey'] = $this->secret($userId, 'unsplashAccessKey');
         }
         return $result;
     }
@@ -69,6 +77,9 @@ final class SettingsService {
             if ($key === 'ocrProvider' && !in_array($value, ['disabled', 'local', 'external'], true)) {
                 continue;
             }
+            if ($key === 'coverImageProvider' && !in_array($value, ['google', 'pexels', 'unsplash'], true)) {
+                continue;
+            }
             if ($key === 'aiTemperature') {
                 $value = (string)max(0.0, min(2.0, (float)$value));
             } elseif ($key === 'aiTimeout') {
@@ -84,7 +95,7 @@ final class SettingsService {
             }
             $this->config->setUserValue($userId, Application::APP_ID, $key, $value);
         }
-        foreach (['aiApiKey', 'ocrApiKey'] as $key) {
+        foreach (['aiApiKey', 'ocrApiKey', 'googleImageSearchApiKey', 'pexelsApiKey', 'unsplashAccessKey'] as $key) {
             $clearKey = 'clear' . ucfirst($key);
             if (($values[$clearKey] ?? false) === true || ($values[$clearKey] ?? '') === '1') {
                 $this->config->deleteUserValue($userId, Application::APP_ID, $key);

@@ -52,6 +52,15 @@ final class MediaController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'DELETE', url: '/recipes/{recipeId}/media/{mediaId}')]
+    public function delete(int $recipeId, int $mediaId): JSONResponse {
+        return $this->respond(function () use ($recipeId, $mediaId): array {
+            $this->files->delete($recipeId, $mediaId);
+            return ['ok' => true];
+        });
+    }
+
+    #[NoAdminRequired]
     #[NoCSRFRequired]
     #[FrontpageRoute(verb: 'GET', url: '/media/{id}')]
     public function display(int $id): DataDisplayResponse|DataDownloadResponse|JSONResponse {

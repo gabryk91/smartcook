@@ -20,6 +20,12 @@ const fallbackTranslations = {
         'Remove this step?': 'Rimuovere questo passaggio?',
         'Delete this share?': 'Eliminare questa condivisione?',
         'Delete this meal?': 'Eliminare questo pasto?',
+        'Empty week': 'Svuota settimana',
+        'Clear all meals from this week?': 'Rimuovere tutti i pasti assegnati a questa settimana?',
+        'Search recipes...': 'Cerca ricette...',
+        'Search categories...': 'Cerca categorie...',
+        'Search tags...': 'Cerca tag...',
+        'Selected items': 'Elementi selezionati',
         'Additional attachment': 'Allegato aggiuntivo',
         'Generate with AI': 'Genera con AI',
         'AI meal planner': 'Pianificatore pasti AI',
@@ -40,6 +46,17 @@ const fallbackTranslations = {
         'recipes extracted. Review them before saving.': 'ricette estratte. Controllale prima di salvarle.',
         'Save all recipes': 'Salva tutte le ricette',
         'Saving recipe': 'Salvataggio ricetta',
+		'Servings per recipe': 'Porzioni per ricetta',
+		'Add': 'Aggiungi',
+		'Cost': 'Costo',
+		'Cost and currency': 'Costo e valuta',
+		'Planning details help': 'Indica porzioni e resa per ricalcolare la ricetta; i tempi sono espressi in minuti e vengono sommati automaticamente.',
+		'Choose existing values or type a new one. Press Enter or comma to add it.': 'Scegli un valore esistente oppure scrivine uno nuovo. Premi Invio o virgola per aggiungerlo.',
+		'Select an option': 'Seleziona un’opzione',
+		'Spring': 'Primavera',
+		'Summer': 'Estate',
+		'Autumn': 'Autunno',
+		'Winter': 'Inverno',
         'Select one or more files. Images and PDFs require a configured OCR/document extractor.': 'Seleziona uno o più file. Immagini e PDF richiedono un estrattore OCR/documenti configurato.',
         'Some files could not be imported': 'Non è stato possibile importare alcuni file',
         'Some recipes could not be saved': 'Non è stato possibile salvare alcune ricette',
@@ -48,6 +65,28 @@ const fallbackTranslations = {
         'View recipes': 'Visualizza ricette',
         'Select one or more categories': 'Seleziona una o più categorie',
         'Select one or more tags': 'Seleziona uno o più tag',
+        'Find cover image': 'Trova immagine di copertina',
+        'Cover image found': 'Immagine di copertina trovata',
+        'Remove attachment?': 'Rimuovere l’allegato?',
+        'Attachment removed': 'Allegato rimosso',
+        'Google image search': 'Ricerca immagini Google',
+        'Image search provider': 'Provider ricerca immagini',
+        'Pexels API key': 'Chiave API Pexels',
+        'Unsplash access key': 'Chiave di accesso Unsplash',
+        'Remove stored Pexels key': 'Rimuovi chiave Pexels salvata',
+        'Remove stored Unsplash key': 'Rimuovi chiave Unsplash salvata',
+        'Find covers for all missing recipes': 'Trova copertine per tutte le ricette senza immagine',
+        'This will search for and download covers for all your recipes without an image. Continue?': 'Saranno cercate e scaricate le copertine per tutte le tue ricette senza immagine. Continuare?',
+        'Cover search completed': 'Ricerca copertine completata',
+        failed: 'non riuscite',
+        'Choose a cover image': 'Scegli un’immagine di copertina',
+        'Use this image': 'Usa questa immagine',
+        'Programmable Search engine ID': 'ID motore Programmable Search',
+        'Google API key': 'Chiave API Google',
+        'Key already stored; leave blank to keep it': 'Chiave già salvata; lascia vuoto per conservarla',
+        'Remove stored Google key': 'Rimuovi chiave Google salvata',
+        'Searches Google Images using the recipe title and saves the first suitable result as the cover.': 'Cerca in Google Immagini usando il titolo della ricetta e salva il primo risultato idoneo come copertina.',
+        'Uses the selected provider with the recipe title and saves the first suitable result as the cover.': 'Usa il provider selezionato con il titolo della ricetta e salva il primo risultato idoneo come copertina.',
     },
 };
 const tr = (text) => {
@@ -87,7 +126,23 @@ const dateIso = (value) => {
 const appUrl = (path) => smartWindow.OC?.generateUrl
     ? smartWindow.OC.generateUrl(`/apps/${appId}${path}`)
     : `/index.php/apps/${appId}${path}`;
-const appIconUrl = '/custom_apps/smartcook/img/app.svg';
+const appVersion = '1.0.40';
+const appIconUrl = `/custom_apps/smartcook/img/app-${appVersion}.svg?v=${appVersion}`;
+const faviconUrl = `/custom_apps/smartcook/img/favicon-${appVersion}.ico?v=${appVersion}`;
+
+function installFavicon() {
+	let icon = document.head.querySelector('link[data-smartcook-favicon]');
+	if (!icon) {
+		icon = document.createElement('link');
+		icon.rel = 'icon';
+		icon.dataset.smartcookFavicon = 'true';
+		document.head.append(icon);
+	}
+	icon.type = 'image/x-icon';
+	icon.href = faviconUrl;
+}
+
+installFavicon();
 const mediaUrl = (id) => appUrl(`/media/${id}`);
 const formatBytes = (value) => {
     if (!value || value < 0)
@@ -215,7 +270,7 @@ function renderShell(section, id) {
 			<a class="primary mobile-create" href="#/new" aria-label="${attr(tr('New recipe'))}"><span class="mobile-create-icon" aria-hidden="true">+</span><span class="mobile-create-label">${esc(tr('New recipe'))}</span></a>
 		</aside>
 		<main class="smartcook-content">
-			<header class="page-header"><div><h1>${esc(shellTitle(section, id))}</h1><p>${esc(tr('Self-hosted recipes, structured and searchable'))}</p></div><div class="busy" data-smartcook-busy hidden>${esc(tr('Working...'))}</div></header>
+			<header class="page-header"><div><h1>${esc(shellTitle(section, id))}</h1></div><div class="busy" data-smartcook-busy hidden>${esc(tr('Working...'))}</div></header>
 			<div data-smartcook-notices></div>
 			<div data-smartcook-view class="view-stack"></div>
 		</main>
@@ -247,18 +302,57 @@ async function renderDashboard(view) {
 		</div>
 	</section>`;
 }
+function taxonomyPicker(kind, items, selected) {
+	const searchLabel = kind === 'categories' ? tr('Search categories...') : tr('Search tags...');
+	return `<div class="taxonomy-picker" data-taxonomy-picker="${attr(kind)}"><button class="taxonomy-picker-trigger" data-taxonomy-trigger type="button" aria-expanded="false"><span data-taxonomy-count>${esc(tr('Selected items'))}: ${selected.length}</span><span aria-hidden="true">&#9662;</span></button><div class="taxonomy-picker-menu" data-taxonomy-menu hidden><input data-taxonomy-search type="search" autocomplete="off" placeholder="${attr(searchLabel)}"><div class="taxonomy-picker-options">${items.map(item => { const name = String(item.name || ''); return `<label data-taxonomy-option><input type="checkbox" value="${attr(name)}"${selected.includes(name) ? ' checked' : ''}><span>${esc(name)}</span></label>`; }).join('')}<p data-taxonomy-empty hidden>${esc(tr('No data yet'))}</p></div></div></div>`;
+}
+function bindTaxonomyPicker(view, kind, selected, onChange) {
+	const picker = view.querySelector(`[data-taxonomy-picker="${kind}"]`);
+	if (!picker)
+		return;
+	const trigger = picker.querySelector('[data-taxonomy-trigger]');
+	const menu = picker.querySelector('[data-taxonomy-menu]');
+	const search = picker.querySelector('[data-taxonomy-search]');
+	const count = picker.querySelector('[data-taxonomy-count]');
+	const options = [...picker.querySelectorAll('[data-taxonomy-option]')];
+	const empty = picker.querySelector('[data-taxonomy-empty]');
+	const update = () => {
+		selected.splice(0, selected.length, ...options.filter(option => option.querySelector('input')?.checked).map(option => option.querySelector('input')?.value || ''));
+		if (count)
+			count.textContent = `${tr('Selected items')}: ${selected.length}`;
+		onChange();
+	};
+	const filter = () => {
+		const query = search?.value.trim().toLocaleLowerCase() || '';
+		let visible = 0;
+		options.forEach(option => {
+			const matches = !query || option.textContent?.toLocaleLowerCase().includes(query);
+			option.hidden = !matches;
+			visible += matches ? 1 : 0;
+		});
+		if (empty)
+			empty.hidden = visible > 0;
+	};
+	const close = () => { menu.hidden = true; trigger?.setAttribute('aria-expanded', 'false'); };
+	trigger?.addEventListener('click', () => {
+		menu.hidden = !menu.hidden;
+		trigger.setAttribute('aria-expanded', menu.hidden ? 'false' : 'true');
+		if (!menu.hidden)
+			search?.focus();
+	});
+	search?.addEventListener('input', filter);
+	search?.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+	options.forEach(option => option.querySelector('input')?.addEventListener('change', update));
+	view.addEventListener('click', event => { if (!picker.contains(event.target)) close(); });
+}
 async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const taxonomy = await working(() => request('/taxonomy'));
     const selectedTags = [...new Set(routeParams.getAll('tags'))];
     const selectedCategories = [...new Set(routeParams.getAll('categories'))];
-    const multiSelectOptions = (items, selected) => items.map(item => {
-        const name = String(item.name || '');
-        return `<option value="${attr(name)}"${selected.includes(name) ? ' selected' : ''}>${esc(name)}</option>`;
-    }).join('');
     view.innerHTML = `<section class="toolbar panel">
 		<label class="search-field"><span>&#9906;</span><input data-search placeholder="${attr(tr('Search recipes, cuisine or course...'))}"></label>
-		<label class="taxonomy-filter">${esc(tr('Categories'))}<select data-categories multiple size="1" aria-describedby="smartcook-category-filter-hint">${multiSelectOptions(taxonomy.categories || [], selectedCategories)}</select><small id="smartcook-category-filter-hint">${esc(tr('Select one or more categories'))}</small></label>
-		<label class="taxonomy-filter">${esc(tr('Tags'))}<select data-tags multiple size="1" aria-describedby="smartcook-tag-filter-hint">${multiSelectOptions(taxonomy.tags || [], selectedTags)}</select><small id="smartcook-tag-filter-hint">${esc(tr('Select one or more tags'))}</small></label>
+		<div class="taxonomy-filter"><span>${esc(tr('Categories'))}</span>${taxonomyPicker('categories', taxonomy.categories || [], selectedCategories)}</div>
+		<div class="taxonomy-filter"><span>${esc(tr('Tags'))}</span>${taxonomyPicker('tags', taxonomy.tags || [], selectedTags)}</div>
 		<label class="check-inline"><input data-favorites type="checkbox"> ${esc(tr('Favorites only'))}</label>
 		<label>${esc(tr('Sort'))}<select data-sort><option value="updated_at">${esc(tr('Recently updated'))}</option><option value="title:ASC">${esc(tr('Title'))} A-Z</option><option value="title:DESC">${esc(tr('Title'))} Z-A</option><option value="total_time">${esc(tr('Total time'))}</option><option value="cook_count">${esc(tr('Most cooked'))}</option></select></label>
 		<a class="primary" href="#/new">+ ${esc(tr('New recipe'))}</a>
@@ -267,8 +361,6 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const search = view.querySelector('[data-search]');
     const favorites = view.querySelector('[data-favorites]');
     const sort = view.querySelector('[data-sort]');
-    const categories = view.querySelector('[data-categories]');
-    const tagSelect = view.querySelector('[data-tags]');
     const ingredients = routeParams.getAll('ingredients');
     const filterLabel = [...selectedCategories, ...selectedTags.map(name => `#${name}`), ...ingredients].join(', ');
     if (filterLabel) {
@@ -309,14 +401,8 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     };
     const delayed = () => { window.clearTimeout(timer); timer = window.setTimeout(() => { void load(); }, 250); };
     search.addEventListener('input', delayed);
-    categories.addEventListener('change', () => {
-        selectedCategories.splice(0, selectedCategories.length, ...[...categories.selectedOptions].map(option => option.value));
-        void load();
-    });
-    tagSelect.addEventListener('change', () => {
-        selectedTags.splice(0, selectedTags.length, ...[...tagSelect.selectedOptions].map(option => option.value));
-        void load();
-    });
+	bindTaxonomyPicker(view, 'categories', selectedCategories, () => { void load(); });
+	bindTaxonomyPicker(view, 'tags', selectedTags, () => { void load(); });
     favorites.addEventListener('change', () => { void load(); });
     sort.addEventListener('change', () => {
         try {
@@ -332,11 +418,18 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
 function textInput(label, field, value, options = {}) {
     return `<label class="${attr(options.className || '')}">${esc(label)}<input data-field="${attr(field)}" type="${attr(options.type || 'text')}" value="${attr(value)}"${options.placeholder ? ` placeholder="${attr(options.placeholder)}"` : ''}${options.min !== undefined ? ` min="${options.min}"` : ''}${options.step !== undefined ? ` step="${options.step}"` : ''}></label>`;
 }
+function labelInput(label, control, className = '') {
+    return `<label class="${attr(className)}">${esc(label)}${control}</label>`;
+}
 function textareaInput(label, field, value, rows = 4, className = '') {
     return `<label class="${attr(className)}">${esc(label)}<textarea data-field="${attr(field)}" rows="${rows}">${esc(value)}</textarea></label>`;
 }
 function selectInput(label, field, value, options, className = '') {
     return `<label class="${attr(className)}">${esc(label)}<select data-field="${attr(field)}">${options.map(([id, name]) => `<option value="${attr(id)}"${String(value ?? '') === id ? ' selected' : ''}>${esc(name)}</option>`).join('')}</select></label>`;
+}
+function predefinedOptions(currentValue, options) {
+    const current = String(currentValue || '').trim();
+    return current && !options.some(([value]) => value === current) ? [[current, current], ...options] : options;
 }
 function ingredientRow(item = { name: '' }) {
     return `<div class="ingredient-row" data-ingredient-row>
@@ -381,10 +474,30 @@ function recipeViewer(recipe) {
         return `<li><span class="recipe-step-number">${index + 1}</span><div><p>${esc(step.text)}</p>${details.length ? `<small>${esc(details.join(' · '))}</small>` : ''}</div></li>`;
     }).join('');
     return `<article class="recipe-view panel">
-        <header class="recipe-view-header">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div>`}<div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
+        <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
         <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span><span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
     </article>`;
+}
+function coverPreviewUrl(recipeId, thumbnailUrl) {
+    return appUrl(`/recipes/${recipeId}/cover/preview?url=${encodeURIComponent(thumbnailUrl)}`);
+}
+function chooseCoverCandidate(recipeId, candidates) {
+    return new Promise(resolve => {
+        const safeCandidates = (candidates || []).filter(candidate => safeExternalUrl(candidate.url) && safeExternalUrl(candidate.thumbnailUrl));
+        const modal = document.createElement('div');
+        modal.className = 'cover-picker-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', tr('Choose a cover image'));
+        modal.innerHTML = `<div class="cover-picker-card"><div class="section-heading"><h2>${esc(tr('Choose a cover image'))}</h2><button class="icon-button" data-close-cover-picker type="button" aria-label="${attr(tr('Close'))}">x</button></div><div class="cover-picker-grid">${safeCandidates.map((candidate, index) => `<button data-cover-candidate="${index}" type="button"><img src="${attr(coverPreviewUrl(recipeId, candidate.thumbnailUrl))}" alt=""><span>${esc(candidate.label || tr('Use this image'))}</span></button>`).join('')}</div><button class="secondary" data-close-cover-picker type="button">${esc(tr('Cancel'))}</button></div>`;
+        const close = (candidate = null) => { modal.remove(); resolve(candidate); };
+        modal.querySelectorAll('[data-close-cover-picker]').forEach(button => button.addEventListener('click', () => close()));
+        modal.querySelectorAll('[data-cover-candidate]').forEach(button => button.addEventListener('click', () => close(safeCandidates[asNumber(button.dataset.coverCandidate)] || null)));
+        modal.addEventListener('click', event => { if (event.target === modal) close(); });
+        document.body.append(modal);
+        modal.querySelector('[data-cover-candidate], [data-close-cover-picker]')?.focus();
+    });
 }
 async function renderRecipe(view, id) {
     const recipe = (await working(() => request(`/recipes/${id}`))).recipe;
@@ -392,6 +505,15 @@ async function renderRecipe(view, id) {
     view.querySelector('[data-view-mark-cooked]')?.addEventListener('click', async () => {
         await working(() => request(`/recipes/${recipe.id}/cooked`, { method: 'POST', json: {} }));
         showNotice(tr('Preparation recorded'));
+    });
+    view.querySelector('[data-find-cover]')?.addEventListener('click', async () => {
+        const response = await working(() => request(`/recipes/${recipe.id}/cover/search`, { method: 'POST', json: {} }));
+        const candidate = await chooseCoverCandidate(recipe.id, response.candidates);
+        if (!candidate)
+            return;
+        await working(() => request(`/recipes/${recipe.id}/cover`, { method: 'POST', json: { url: candidate.url, downloadUrl: candidate.downloadUrl || '' } }));
+        showNotice(tr('Cover image found'));
+        await renderRecipe(view, id);
     });
 }
 function bindRowRemoval(container) {
@@ -432,14 +554,84 @@ function collectRecipe(view, existing) {
         status: value('status'), visibility: value('visibility'),
         servings: Math.max(1, numeric('servings')), yieldText: value('yieldText').trim() || null,
         prepTime, restTime, cookTime, totalTime: prepTime + restTime + cookTime,
-        difficulty: value('difficulty').trim() || null, costCents: numeric('costCents') || null, currency: value('currency').trim() || null,
+        difficulty: value('difficulty').trim() || null, costCents: Math.round(Math.max(0, numeric('costAmount')) * 100) || null, currency: value('currency').trim().toUpperCase() || null,
         cuisine: value('cuisine').trim() || null, course: value('course').trim() || null, mealType: value('mealType').trim() || null,
         cookingMethod: value('cookingMethod').trim() || null, season: value('season').trim() || null, origin: value('origin').trim() || null,
         calories: numeric('calories') || null, notes: value('notes').trim() || null,
         ingredients, steps, tags: splitNames(value('tags')), categories: splitNames(value('categories')), tools: splitNames(value('tools')),
     };
 }
-function editorForm(recipe) {
+function chipPicker(name, selected, suggestions, single = false) {
+	const values = [...new Map(selected.map(item => String(item?.name || item).trim()).filter(Boolean).map(item => [item.toLocaleLowerCase(), item])).values()].slice(0, single ? 1 : undefined);
+	const options = [...new Map(suggestions.map(item => String(item?.name || item).trim()).filter(Boolean).map(item => [item.toLocaleLowerCase(), item])).values()];
+	return `<div class="chip-picker" data-chip-picker="${attr(name)}"${single ? ' data-chip-single="true"' : ''}><input data-field="${attr(name)}" type="hidden" value="${attr(values.join(', '))}"><div class="chip-picker-input" data-chip-input-wrap><span data-chip-values>${values.map(value => `<button class="chip-picker-value" data-chip-remove="${attr(value)}" type="button">${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</span><input data-chip-input type="text" autocomplete="off" placeholder="${attr(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}" role="combobox" aria-autocomplete="list" aria-expanded="false"></div><div class="chip-picker-options" data-chip-options role="listbox" hidden>${options.map(value => `<button data-chip-option="${attr(value)}" type="button" role="option">${esc(value)}</button>`).join('')}<p data-chip-empty hidden>${esc(tr('No data yet'))}</p></div></div>`;
+}
+function bindChipPicker(view, name) {
+	const picker = view.querySelector(`[data-chip-picker="${name}"]`);
+	const hidden = picker?.querySelector(`[data-field="${name}"]`);
+	const input = picker?.querySelector('[data-chip-input]');
+	const options = picker?.querySelector('[data-chip-options]');
+	const valuesHolder = picker?.querySelector('[data-chip-values]');
+	if (!picker || !hidden || !input || !options || !valuesHolder)
+		return;
+	const single = picker.dataset.chipSingle === 'true';
+	const available = [...options.querySelectorAll('[data-chip-option]')].map(option => option.dataset.chipOption || '');
+	let values = [...new Map(String(hidden.value || '').split(/[,;]+/).map(value => value.trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, single ? 1 : undefined);
+	const sync = () => { hidden.value = values.join(', '); valuesHolder.innerHTML = values.map(value => `<button class="chip-picker-value" data-chip-remove="${attr(value)}" type="button">${esc(value)} <span aria-hidden="true">×</span></button>`).join(''); };
+	const close = () => { options.hidden = true; input.setAttribute('aria-expanded', 'false'); };
+	const renderOptions = () => {
+		const query = input.value.trim();
+		const normalizedQuery = query.toLocaleLowerCase();
+		let count = 0;
+		[...options.querySelectorAll('[data-chip-option]')].forEach(option => {
+			const value = option.dataset.chipOption || '';
+			const visible = !values.some(selected => selected.toLocaleLowerCase() === value.toLocaleLowerCase()) && (!normalizedQuery || value.toLocaleLowerCase().includes(normalizedQuery));
+			option.hidden = !visible;
+			count += visible ? 1 : 0;
+		});
+		options.querySelector('[data-chip-create]')?.remove();
+		if (query && !values.some(value => value.toLocaleLowerCase() === normalizedQuery) && !available.some(value => value.toLocaleLowerCase() === normalizedQuery))
+			options.insertAdjacentHTML('beforeend', `<button data-chip-create="${attr(query)}" type="button" role="option">${esc(tr('Add'))}: ${esc(query)}</button>`);
+		const empty = options.querySelector('[data-chip-empty]');
+		if (empty)
+			empty.hidden = count > 0 || Boolean(query);
+	};
+	const add = (raw) => {
+		String(raw || '').split(/[,;]+/).map(value => value.trim()).filter(Boolean).forEach(value => {
+			if (single)
+				values = [value];
+			else if (!values.some(selected => selected.toLocaleLowerCase() === value.toLocaleLowerCase()))
+				values.push(value);
+		});
+		input.value = '';
+		sync();
+		renderOptions();
+	};
+	sync();
+	input.addEventListener('focus', () => { options.hidden = false; input.setAttribute('aria-expanded', 'true'); renderOptions(); });
+	input.addEventListener('input', () => { options.hidden = false; input.setAttribute('aria-expanded', 'true'); renderOptions(); });
+	input.addEventListener('keydown', event => {
+		if (event.key === 'Enter' || event.key === ',') { event.preventDefault(); add(input.value); }
+		else if (event.key === 'Backspace' && !input.value && values.length) { values.pop(); sync(); renderOptions(); }
+		else if (event.key === 'Escape') close();
+	});
+	options.addEventListener('click', event => {
+		const option = event.target.closest('[data-chip-option], [data-chip-create]');
+		if (option)
+			add(option.dataset.chipOption || option.dataset.chipCreate || '');
+	});
+	valuesHolder.addEventListener('click', event => {
+		const button = event.target.closest('[data-chip-remove]');
+		if (!button)
+			return;
+		values = values.filter(value => value.toLocaleLowerCase() !== String(button.dataset.chipRemove || '').toLocaleLowerCase());
+		sync();
+		renderOptions();
+	});
+	view.addEventListener('click', event => { if (!picker.contains(event.target)) close(); });
+}
+function editorForm(recipe, taxonomy = {}) {
+	const costAmount = recipe.costCents === null || recipe.costCents === undefined ? '' : (asNumber(recipe.costCents) / 100).toFixed(2);
     return `<div class="editor-actions editor-save-actions"><div>${recipe.id ? `<button class="secondary" data-mark-cooked type="button">${esc(tr('Cooked today'))}</button>` : ''}<button class="primary" data-save-recipe type="button">${esc(tr('Save recipe'))}</button></div></div>
 	<section class="editor-top panel">
 		<div><p class="eyebrow">${esc(recipe.id ? tr('Recipe details') : tr('Create manually'))}</p><h2>${esc(recipe.title || tr('Untitled recipe'))}</h2></div>
@@ -451,14 +643,14 @@ function editorForm(recipe) {
 				${textInput(tr('Author'), 'author', recipe.author)}${textInput(tr('Language'), 'language', recipe.language)}${textInput(tr('Source name'), 'sourceName', recipe.sourceName)}${textInput(tr('Source URL'), 'sourceUrl', recipe.sourceUrl, { type: 'url' })}${textInput(tr('License'), 'license', recipe.license)}
 				${selectInput(tr('Status'), 'status', recipe.status, [['draft', tr('Draft')], ['published', tr('Published')]])}${selectInput(tr('Visibility'), 'visibility', recipe.visibility, [['private', tr('Private')], ['shared', tr('Shared')], ['public', tr('Public')]])}</div>
 			</section>
-			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Yield and timing'))}</p><h2>${esc(tr('Planning data'))}</h2></div></div><div class="form-grid four">${textInput(tr('Servings'), 'servings', recipe.servings, { type: 'number', min: 1 })}${textInput(tr('Yield'), 'yieldText', recipe.yieldText)}${textInput(tr('Preparation (min)'), 'prepTime', recipe.prepTime, { type: 'number', min: 0 })}${textInput(tr('Rest (min)'), 'restTime', recipe.restTime, { type: 'number', min: 0 })}${textInput(tr('Cooking (min)'), 'cookTime', recipe.cookTime, { type: 'number', min: 0 })}${textInput(tr('Difficulty'), 'difficulty', recipe.difficulty)}${textInput(tr('Calories'), 'calories', recipe.calories, { type: 'number', min: 0 })}${textInput(tr('Cost in cents'), 'costCents', recipe.costCents, { type: 'number', min: 0 })}${textInput(tr('Currency'), 'currency', recipe.currency)}</div></section>
+			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Yield and timing'))}</p><h2>${esc(tr('Planning data'))}</h2><p class="section-help">${esc(tr('Planning details help'))}</p></div></div><div class="planning-grid">${textInput(tr('Servings'), 'servings', recipe.servings, { type: 'number', min: 1 })}${textInput(tr('Yield'), 'yieldText', recipe.yieldText)}${textInput(tr('Preparation (min)'), 'prepTime', recipe.prepTime, { type: 'number', min: 0 })}${textInput(tr('Rest (min)'), 'restTime', recipe.restTime, { type: 'number', min: 0 })}${textInput(tr('Cooking (min)'), 'cookTime', recipe.cookTime, { type: 'number', min: 0 })}${textInput(tr('Difficulty'), 'difficulty', recipe.difficulty)}${textInput(tr('Calories'), 'calories', recipe.calories, { type: 'number', min: 0 })}<label class="planning-cost">${esc(tr('Cost and currency'))}<span><input data-field="costAmount" type="number" min="0" step="0.01" inputmode="decimal" value="${attr(costAmount)}" placeholder="0.00"><input data-field="currency" value="${attr(recipe.currency || 'EUR')}" maxlength="3" aria-label="${attr(tr('Currency'))}"></span></label></div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Structured list'))}</p><h2>${esc(tr('Ingredients'))}</h2></div><button class="secondary" data-add-ingredient type="button">+ ${esc(tr('Ingredient'))}</button></div><div data-ingredients>${(recipe.ingredients.length ? recipe.ingredients : [{ name: '' }]).map(item => ingredientRow(item)).join('')}</div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Method'))}</p><h2>${esc(tr('Procedure'))}</h2></div><button class="secondary" data-add-step type="button">+ ${esc(tr('Step'))}</button></div><div data-steps>${(recipe.steps.length ? recipe.steps : [{ text: '' }]).map((item, index) => stepRow(item, index)).join('')}</div></section>
-			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Classification'))}</p><h2>${esc(tr('Organization'))}</h2></div></div><div class="form-grid">${textInput(tr('Tags (comma separated)'), 'tags', recipe.tags.map(item => item.name).join(', '), { className: 'span-2' })}${textInput(tr('Categories'), 'categories', recipe.categories.map(item => item.name).join(', '), { className: 'span-2' })}${textInput(tr('Tools'), 'tools', recipe.tools.map(item => item.name).join(', '), { className: 'span-2' })}${textInput(tr('Cuisine'), 'cuisine', recipe.cuisine)}${textInput(tr('Course'), 'course', recipe.course)}${textInput(tr('Meal type'), 'mealType', recipe.mealType)}${textInput(tr('Cooking method'), 'cookingMethod', recipe.cookingMethod)}${textInput(tr('Season'), 'season', recipe.season)}${textInput(tr('Origin'), 'origin', recipe.origin)}${textareaInput(tr('Personal notes'), 'notes', recipe.notes, 5, 'span-2')}</div></section>
+			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Classification'))}</p><h2>${esc(tr('Organization'))}</h2><p class="section-help">${esc(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}</p></div></div><div class="form-grid">${labelInput(tr('Tags'), chipPicker('tags', recipe.tags || [], taxonomy.tags || []), 'span-2')}${labelInput(tr('Categories'), chipPicker('categories', recipe.categories || [], taxonomy.categories || []), 'span-2')}${labelInput(tr('Tools'), chipPicker('tools', recipe.tools || [], taxonomy.tools || []), 'span-2')}${labelInput(tr('Cuisine'), chipPicker('cuisine', [recipe.cuisine].filter(Boolean), taxonomy.cuisine || [], true))}${labelInput(tr('Course'), chipPicker('course', [recipe.course].filter(Boolean), taxonomy.course || [], true))}${labelInput(tr('Meal type'), chipPicker('mealType', [recipe.mealType].filter(Boolean), taxonomy.mealType || [], true))}${labelInput(tr('Cooking method'), chipPicker('cookingMethod', [recipe.cookingMethod].filter(Boolean), taxonomy.cookingMethod || [], true))}${selectInput(tr('Season'), 'season', recipe.season, predefinedOptions(recipe.season, [['', tr('Select an option')], ['Primavera', tr('Spring')], ['Estate', tr('Summer')], ['Autunno', tr('Autumn')], ['Inverno', tr('Winter')]]))}${labelInput(tr('Origin'), chipPicker('origin', [recipe.origin].filter(Boolean), taxonomy.origin || [], true))}${textareaInput(tr('Personal notes'), 'notes', recipe.notes, 5, 'span-2')}</div></section>
 		</main>
 		<aside class="view-stack editor-aside">
 			${recipe.id ? `<section class="panel form-section"><p class="eyebrow">${esc(tr('Exports'))}</p><h2>${esc(tr('Download'))}</h2><div class="export-buttons"><a class="secondary" href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></section>
-			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2><div class="media-upload-group cover-upload"><label><strong>${esc(tr('Cover image'))}</strong><input data-cover-file type="file" accept="image/*"></label><small>${esc(tr('The uploaded image becomes the recipe cover after saving.'))}</small></div><div class="media-upload-group"><label><strong>${esc(tr('Additional attachment'))}</strong><input data-media-file type="file"></label><button class="secondary" data-upload-media type="button">${esc(tr('Upload attachment'))}</button></div><ul class="media-list">${recipe.media.map(item => item.id ? `<li><a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener"><strong>${esc(item.altText || item.path.split('/').pop() || item.kind)}</strong><small>${esc(item.mime || item.kind)} · ${formatBytes(item.fileSize)} · ${formatMediaDate(item.createdAt)}</small></a></li>` : '').join('')}</ul></section>
+			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2><div class="media-upload-group cover-upload"><label><strong>${esc(tr('Cover image'))}</strong><input data-cover-file type="file" accept="image/*"></label><small>${esc(tr('The uploaded image becomes the recipe cover after saving.'))}</small></div><div class="media-upload-group"><label><strong>${esc(tr('Additional attachment'))}</strong><input data-media-file type="file"></label><button class="secondary" data-upload-media type="button">${esc(tr('Upload attachment'))}</button></div><ul class="media-list">${recipe.media.map(item => item.id ? `<li><a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener"><strong>${esc(item.altText || item.path.split('/').pop() || item.kind)}</strong><small>${esc(item.mime || item.kind)} · ${formatBytes(item.fileSize)} · ${formatMediaDate(item.createdAt)}</small></a><button class="icon-button danger" data-delete-media="${attr(item.id)}" type="button" aria-label="${attr(tr('Delete'))}">x</button></li>` : '').join('')}</ul></section>
 			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with placeholder="${attr(tr('User or group ID'))}"><input data-share-password type="password" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
 			<section class="panel form-section" data-history-section><p class="eyebrow">${esc(tr('Audit trail'))}</p><h2>${esc(tr('Version history'))}</h2><div class="version-list" data-version-list></div></section>
 			<section class="panel form-section danger-zone"><h2>${esc(tr('Danger zone'))}</h2><button class="danger secondary" data-delete-recipe type="button">${esc(tr('Delete recipe'))}</button></section>` : `<section class="panel empty-state"><h2>${esc(tr('Save first'))}</h2><p>${esc(tr('Attachments, sharing, exports and version history become available after the first save.'))}</p></section>`}
@@ -467,9 +659,14 @@ function editorForm(recipe) {
 }
 async function renderEditor(view, id) {
     let recipe = id ? (await working(() => request(`/recipes/${id}`))).recipe : emptyRecipe();
+	const [taxonomy, recipeResponse] = await working(() => Promise.all([request('/taxonomy'), request('/recipes?sort=title&direction=ASC')]));
+	['cuisine', 'course', 'mealType', 'cookingMethod', 'origin'].forEach(field => {
+		taxonomy[field] = [...new Map((recipeResponse.recipes || []).map(item => String(item[field] || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()];
+	});
     const paint = async () => {
-        view.innerHTML = editorForm(recipe);
+        view.innerHTML = editorForm(recipe, taxonomy);
         bindRowRemoval(view);
+		['tags', 'categories', 'tools', 'cuisine', 'course', 'mealType', 'cookingMethod', 'origin'].forEach(name => bindChipPicker(view, name));
         view.querySelector('[data-add-ingredient]')?.addEventListener('click', () => {
             const holder = view.querySelector('[data-ingredients]');
             holder.insertAdjacentHTML('beforeend', ingredientRow());
@@ -529,6 +726,14 @@ async function renderEditor(view, id) {
             showNotice(tr('Attachment uploaded'));
             await paint();
         });
+        view.querySelectorAll('[data-delete-media]').forEach(button => button.addEventListener('click', async () => {
+            if (!recipe.id || !window.confirm(tr('Remove attachment?')))
+                return;
+            await working(() => request(`/recipes/${recipe.id}/media/${asNumber(button.dataset.deleteMedia)}`, { method: 'DELETE' }));
+            recipe = (await request(`/recipes/${recipe.id}`)).recipe;
+            showNotice(tr('Attachment removed'));
+            await paint();
+        }));
         if (recipe.id) {
             await Promise.all([loadShares(view, recipe.id), loadVersions(view, recipe.id)]);
             const shareType = view.querySelector('[data-share-type]');
@@ -602,7 +807,7 @@ async function renderImport(view) {
         }
     };
     const paint = () => {
-        view.innerHTML = `<section class="import-hero panel"><div><p class="eyebrow">${esc(tr('Smart import'))}</p><h2>${esc(tr('Turn almost any source into a structured recipe'))}</h2><p>${esc(tr('SmartCook checks Schema.org data first, then deterministic parsing, and uses AI only when requested.'))}</p></div><div class="pipeline"><span>URL / Text / PDF</span><b>-&gt;</b><span>${esc(tr('Parser'))}</span><b>-&gt;</b><span>${esc(tr('Review'))}</span><b>-&gt;</b><span>${esc(tr('Recipe'))}</span></div></section>
+        view.innerHTML = `<section class="import-hero panel"><div><p class="eyebrow">${esc(tr('Smart import'))}</p><h2>${esc(tr('Turn almost any source into a structured recipe'))}</h2><p>${esc(tr('SmartCook checks Schema.org data first, then deterministic parsing, and uses AI only when requested.'))}</p></div></section>
 		<section class="two-column import-layout"><article class="panel form-section">
 			<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>
             ${kind === 'url' ? `<label>${esc(tr('Recipe URL'))}<input data-import-url type="url" placeholder="https://example.com/recipe"></label>` : kind === 'file' ? `<label>${esc(tr('PDF, image, Markdown, HTML or JSON'))}<input data-import-file type="file" multiple accept="image/*,.pdf,.txt,.md,.markdown,.html,.htm,.json"><small>${esc(tr('Select one or more files. Images and PDFs require a configured OCR/document extractor.'))}</small></label>` : `<label>${esc(tr('Source content'))}<textarea data-import-text rows="18" placeholder="${attr(tr('Paste the recipe, including ingredients and procedure...'))}"></textarea></label>`}
@@ -740,6 +945,60 @@ function startOfWeek(date) {
     copy.setHours(0, 0, 0, 0);
     return copy;
 }
+function recipeSearchPicker(recipes) {
+	return `<div class="recipe-search-picker" data-recipe-search-picker><input data-meal-recipe-search type="search" autocomplete="off" placeholder="${attr(tr('Search recipes...'))}" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="smartcook-recipe-options"><input data-meal-recipe type="hidden"><div id="smartcook-recipe-options" class="recipe-search-options" data-meal-recipe-options role="listbox" hidden>${recipes.map(recipe => `<button data-recipe-id="${attr(recipe.id)}" data-recipe-title="${attr(recipe.title)}" type="button" role="option">${esc(recipe.title)}</button>`).join('')}<p data-no-recipe-results hidden>${esc(tr('No recipes found'))}</p></div></div>`;
+}
+function bindRecipeSearchPicker(view) {
+	const picker = view.querySelector('[data-recipe-search-picker]');
+	const search = view.querySelector('[data-meal-recipe-search]');
+	const selected = view.querySelector('[data-meal-recipe]');
+	const options = view.querySelector('[data-meal-recipe-options]');
+	if (!picker || !search || !selected || !options)
+		return;
+	const buttons = [...options.querySelectorAll('[data-recipe-id]')];
+	const noResults = options.querySelector('[data-no-recipe-results]');
+	const filter = (term = search.value) => {
+		const query = term.trim().toLocaleLowerCase();
+		let count = 0;
+		buttons.forEach(button => {
+			const visible = !query || (button.dataset.recipeTitle || '').toLocaleLowerCase().includes(query);
+			button.hidden = !visible;
+			count += visible ? 1 : 0;
+		});
+		if (noResults)
+			noResults.hidden = count > 0;
+	};
+	const close = () => {
+		options.hidden = true;
+		search.setAttribute('aria-expanded', 'false');
+	};
+	const open = () => {
+		options.hidden = false;
+		search.setAttribute('aria-expanded', 'true');
+	};
+	const choose = (button) => {
+		selected.value = button.dataset.recipeId || '';
+		search.value = button.dataset.recipeTitle || '';
+		close();
+	};
+	search.addEventListener('focus', () => { open(); filter(''); search.select(); });
+	search.addEventListener('input', () => { selected.value = ''; open(); filter(); });
+	search.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			close();
+			return;
+		}
+		if (event.key === 'ArrowDown') {
+			const first = buttons.find(button => !button.hidden);
+			if (first) {
+				event.preventDefault();
+				first.focus();
+			}
+		}
+	});
+	buttons.forEach(button => button.addEventListener('click', () => choose(button)));
+	view.addEventListener('click', (event) => { if (!picker.contains(event.target)) close(); });
+}
 async function renderPlanner(view) {
     let weekStart = startOfWeek(new Date());
     let recipes = [];
@@ -755,13 +1014,20 @@ async function renderPlanner(view) {
         paint(days);
     };
     const paint = (days) => {
-		view.innerHTML = `<section class="toolbar panel planner-toolbar"><button class="secondary" data-week-back type="button">&larr;</button><div><p class="eyebrow">${esc(tr('Week'))}</p><h2>${esc(days[0].toLocaleDateString())} - ${esc(days[6].toLocaleDateString())}</h2></div><button class="secondary" data-week-forward type="button">&rarr;</button><button class="ghost" data-week-today type="button">${esc(tr('Today'))}</button></section>
+		view.innerHTML = `<section class="toolbar panel planner-toolbar"><button class="secondary" data-week-back type="button">&larr;</button><div><p class="eyebrow">${esc(tr('Week'))}</p><h2>${esc(days[0].toLocaleDateString())} - ${esc(days[6].toLocaleDateString())}</h2></div><button class="secondary" data-week-forward type="button">&rarr;</button><div class="planner-toolbar-actions"><button class="ghost" data-week-today type="button">${esc(tr('Today'))}</button><button class="secondary" data-clear-week type="button"${meals.length ? '' : ' disabled'}>${esc(tr('Empty week'))}</button></div></section>
 		<section class="panel form-section planner-ai"><div class="section-heading"><div><p class="eyebrow">${esc(tr('AI meal planner'))}</p><h2>${esc(tr('Generate with AI'))}</h2></div></div><div class="form-grid"><label class="span-2">${esc(tr('Weekly instruction (optional)'))}<textarea data-planner-instruction rows="2" placeholder="${attr(tr('Example: use more legumes and prepare leftovers for lunch'))}"></textarea></label></div><button class="primary" data-generate-plan type="button">${esc(tr('Generate with AI'))}</button></section>
 		<section class="planner-grid">${days.map(day => `<article class="day-column panel ${dateIso(day) === dateIso(new Date()) ? 'today' : ''}"><header><span>${esc(day.toLocaleDateString(undefined, { weekday: 'short' }))}</span><strong>${day.getDate()}</strong></header>${meals.filter(meal => meal.date === dateIso(day)).map(meal => `<div class="meal-card"><small>${esc(mealLabel(meal.slot))}</small><a href="#/recipes/${meal.recipeId}">${esc(meal.recipeTitle)}</a><span>${meal.servings} ${esc(tr('servings'))}</span><button data-delete-meal="${meal.id}" type="button">x</button></div>`).join('')}<button class="add-meal" data-select-date="${dateIso(day)}" type="button">+</button></article>`).join('')}</section>
-		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Plan'))}</p><h2>${esc(tr('Add a meal'))}</h2></div></div><div class="form-grid four"><label>${esc(tr('Date'))}<input data-meal-date type="date" value="${dateIso(new Date())}"></label><label>${esc(tr('Recipe'))}<select data-meal-recipe>${recipes.map(recipe => `<option value="${recipe.id}">${esc(recipe.title)}</option>`).join('')}</select></label><label>${esc(tr('Meal'))}<select data-meal-slot><option value="breakfast">${esc(tr('Breakfast'))}</option><option value="lunch">${esc(tr('Lunch'))}</option><option value="dinner" selected>${esc(tr('Dinner'))}</option><option value="snack">${esc(tr('Snack'))}</option></select></label><label>${esc(tr('Servings'))}<input data-meal-servings type="number" min="1" value="2"></label></div><button class="primary" data-add-meal type="button">${esc(tr('Add to plan'))}</button></section>`;
+		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Plan'))}</p><h2>${esc(tr('Add a meal'))}</h2></div></div><div class="form-grid four"><label>${esc(tr('Date'))}<input data-meal-date type="date" value="${dateIso(new Date())}"></label><label>${esc(tr('Recipe'))}${recipeSearchPicker(recipes)}</label><label>${esc(tr('Meal'))}<select data-meal-slot><option value="breakfast">${esc(tr('Breakfast'))}</option><option value="lunch">${esc(tr('Lunch'))}</option><option value="dinner" selected>${esc(tr('Dinner'))}</option><option value="snack">${esc(tr('Snack'))}</option></select></label><label>${esc(tr('Servings'))}<input data-meal-servings type="number" min="1" value="2"></label></div><button class="primary" data-add-meal type="button">${esc(tr('Add to plan'))}</button></section>`;
         view.querySelector('[data-week-back]')?.addEventListener('click', () => { weekStart.setDate(weekStart.getDate() - 7); void load(); });
         view.querySelector('[data-week-forward]')?.addEventListener('click', () => { weekStart.setDate(weekStart.getDate() + 7); void load(); });
         view.querySelector('[data-week-today]')?.addEventListener('click', () => { weekStart = startOfWeek(new Date()); void load(); });
+		bindRecipeSearchPicker(view);
+		view.querySelector('[data-clear-week]')?.addEventListener('click', async () => {
+			if (!window.confirm(tr('Clear all meals from this week?')))
+				return;
+			await working(() => Promise.all(meals.map(meal => request(`/planner/${meal.id}`, { method: 'DELETE' }))));
+			await load();
+		});
 		view.querySelector('[data-generate-plan]')?.addEventListener('click', async () => {
 			const instruction = view.querySelector('[data-planner-instruction]')?.value || '';
 			await working(() => request('/planner', { method: 'POST', json: { plan: { from: dateIso(days[0]), to: dateIso(days[6]), instruction } } }));
@@ -811,7 +1077,7 @@ async function renderShopping(view) {
     const open = async (id) => { selected = (await working(() => request(`/shopping/${id}`))).list; paint(); };
     const paint = () => {
         view.innerHTML = `<div class="shopping-layout"><aside class="panel list-sidebar"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Saved'))}</p><h2>${esc(tr('Shopping lists'))}</h2></div></div>${lists.map(list => `<button class="${selected?.id === list.id ? 'active' : ''}" data-open-list="${list.id}" type="button"><span><strong>${esc(list.name)}</strong><small>${esc(new Date(list.updatedAt * 1000).toLocaleDateString())}</small></span><b>&rsaquo;</b></button>`).join('') || `<p>${esc(tr('No lists yet'))}</p>`}</aside>
-		<main class="view-stack"><section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Generate'))}</p><h2>${esc(tr('From recipes'))}</h2></div></div><label>${esc(tr('List name'))}<input data-list-name value="${attr(tr('Weekly shopping'))}"></label><div class="recipe-selector">${recipes.map(recipe => `<label><input data-list-recipe="${recipe.id}" type="checkbox"><span>${esc(recipe.title)}</span><input data-list-servings="${recipe.id}" type="number" min="1" value="${recipe.servings || 1}" aria-label="${attr(tr('Servings'))}"></label>`).join('')}</div><button class="primary" data-create-list type="button">${esc(tr('Generate shopping list'))}</button></section>
+		<main class="view-stack"><section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Generate'))}</p><h2>${esc(tr('From recipes'))}</h2></div></div><label>${esc(tr('List name'))}<input data-list-name value="${attr(tr('Weekly shopping'))}"></label><p class="recipe-selector-heading">${esc(tr('Servings per recipe'))}</p><div class="recipe-selector">${recipes.map(recipe => `<label><input data-list-recipe="${recipe.id}" type="checkbox"><span>${esc(recipe.title)}</span><input data-list-servings="${recipe.id}" type="number" min="1" value="${recipe.servings || 1}" aria-label="${attr(tr('Servings'))}"></label>`).join('')}</div><button class="primary" data-create-list type="button">${esc(tr('Generate shopping list'))}</button></section>
 		${selected ? `<section class="panel shopping-sheet"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Active list'))}</p><h2>${esc(selected.name)}</h2></div><button class="danger ghost" data-delete-list type="button">${esc(tr('Delete'))}</button></div><div class="add-item"><input data-new-item placeholder="${attr(tr('Add an item...'))}"><button class="secondary" data-add-item type="button">+</button></div><div class="shopping-items">${(selected.items || []).map(item => `<label class="${item.checked ? 'checked' : ''}"><input data-toggle-item="${item.id}" type="checkbox"${item.checked ? ' checked' : ''}><span><strong>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</strong> ${esc(item.name)}<small>${esc([item.category, item.notes].filter(Boolean).join(' - '))}</small></span></label>`).join('')}</div></section>` : `<section class="panel empty-state"><h2>${esc(tr('Select or create a list'))}</h2><p>${esc(tr('Quantities with compatible units are summed automatically.'))}</p></section>`}</main></div>`;
         view.querySelectorAll('[data-open-list]').forEach(button => button.addEventListener('click', () => { void open(asNumber(button.dataset.openList)); }));
         view.querySelector('[data-create-list]')?.addEventListener('click', async () => {
@@ -860,8 +1126,10 @@ async function renderSettings(view) {
 			<label>${esc(tr('Model'))}<input data-setting="aiModel" value="${attr(settings.aiModel)}"></label><label class="span-2">${esc(tr('Endpoint'))}<input data-setting="aiEndpoint" type="url" value="${attr(settings.aiEndpoint)}" placeholder="https://..."><small>${esc(tr('Leave empty for the provider default. Ollama and LocalAI use local defaults.'))}</small></label>
 			<label>${esc(tr('API key'))}<input data-setting="aiApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasAiApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="aiApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label><label>${esc(tr('Temperature'))}<input data-setting="aiTemperature" type="number" min="0" max="2" step="0.1" value="${settings.aiTemperature}"></label><label>${esc(tr('Timeout'))}<input data-setting="aiTimeout" type="number" min="10" max="300" value="${settings.aiTimeout}"><small>${esc(tr('seconds'))}</small></label>
 		</div><div class="info-box"><b>Nextcloud Assistant</b><p>${esc(tr('Uses the language-model provider already configured by the instance administrator and requires no duplicate API key.'))}</p></div></section>
+		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Cover image'))}</p><h2>${esc(tr('Image search provider'))}</h2></div></div><div class="form-grid"><label>${esc(tr('Image search provider'))}<select data-setting="coverImageProvider"><option value="google">Google</option><option value="pexels">Pexels</option><option value="unsplash">Unsplash</option></select></label><label class="span-2">${esc(tr('Programmable Search engine ID'))}<input data-setting="googleImageSearchEngineId" value="${attr(settings.googleImageSearchEngineId)}"></label><label>${esc(tr('Google API key'))}<input data-setting="googleImageSearchApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasGoogleImageSearchApiKey ? tr('Key already stored; leave blank to keep it') : tr('Google API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="googleImageSearchApiKey" type="checkbox"> ${esc(tr('Remove stored Google key'))}</label><label>${esc(tr('Pexels API key'))}<input data-setting="pexelsApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasPexelsApiKey ? tr('Key already stored; leave blank to keep it') : tr('Pexels API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="pexelsApiKey" type="checkbox"> ${esc(tr('Remove stored Pexels key'))}</label><label>${esc(tr('Unsplash access key'))}<input data-setting="unsplashAccessKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasUnsplashAccessKey ? tr('Key already stored; leave blank to keep it') : tr('Unsplash access key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="unsplashAccessKey" type="checkbox"> ${esc(tr('Remove stored Unsplash key'))}</label></div><p class="section-help">${esc(tr('Uses the selected provider with the recipe title and saves the first suitable result as the cover.'))}</p></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('AI meal planner'))}</p><h2>${esc(tr('Planner prompt'))}</h2></div></div><div class="form-grid"><label class="span-2">${esc(tr('Planner prompt'))}<textarea data-setting="aiPlannerPrompt" rows="3">${esc(settings.aiPlannerPrompt)}</textarea></label><label class="span-2">${esc(tr('Dietary preferences and constraints'))}<textarea data-setting="plannerPreferences" rows="3" placeholder="${attr(tr('Example: vegetarian, no peanuts, low salt'))}">${esc(settings.plannerPreferences)}</textarea></label><label>${esc(tr('Maximum cooking time per meal'))}<input data-setting="plannerCookingTime" type="number" min="5" max="600" value="${settings.plannerCookingTime}"><small>${esc(tr('minutes'))}</small></label><label>${esc(tr('Default servings'))}<input data-setting="plannerServings" type="number" min="1" max="30" value="${settings.plannerServings}"></label></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Documents'))}</p><h2>${esc(tr('OCR and PDF extraction'))}</h2></div><span class="status-pill ${settings.ocrProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.ocrProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid"><label>${esc(tr('Extractor'))}<select data-setting="ocrProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="local">${esc(tr('Local Tesseract / pdftotext'))}</option><option value="external">${esc(tr('External HTTP service'))}</option></select></label><label>${esc(tr('OCR languages'))}<input data-setting="ocrLanguage" value="${attr(settings.ocrLanguage)}"></label><label>${esc(tr('Tesseract executable'))}<input data-setting="tesseractPath" value="${attr(settings.tesseractPath)}"></label><label>${esc(tr('pdftotext executable'))}<input data-setting="pdfToTextPath" value="${attr(settings.pdfToTextPath)}"></label><label class="span-2">${esc(tr('External endpoint'))}<input data-setting="ocrEndpoint" type="url" value="${attr(settings.ocrEndpoint)}"></label><label>${esc(tr('API key'))}<input data-setting="ocrApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasOcrApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="ocrApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label></div></section>
+		<section class="panel form-section danger-zone"><p class="eyebrow">${esc(tr('Danger zone'))}</p><h2>${esc(tr('Cover image'))}</h2><p>${esc(tr('Uses the selected provider with the recipe title and saves the first suitable result as the cover.'))}</p><button class="danger secondary full" data-fill-missing-covers type="button">${esc(tr('Find covers for all missing recipes'))}</button></section>
 		</main>
 		<aside class="panel privacy-card"><p class="eyebrow">${esc(tr('Privacy'))}</p><h2>${esc(tr('You control every processor'))}</h2><p>${esc(tr('Deterministic URL and text parsing stays in your Nextcloud. Content is sent to an AI or external OCR service only when you enable and invoke it.'))}</p><ul><li>${esc(tr('API keys are encrypted with the Nextcloud server secret.'))}</li><li>${esc(tr('Imported data is always shown as an editable preview.'))}</li><li>${esc(tr('URL imports reject private and reserved network addresses.'))}</li></ul></aside></div>`;
     const aiProvider = view.querySelector('[data-setting="aiProvider"]');
@@ -870,6 +1138,9 @@ async function renderSettings(view) {
     const ocrProvider = view.querySelector('[data-setting="ocrProvider"]');
     if (ocrProvider)
         ocrProvider.value = settings.ocrProvider;
+    const coverImageProvider = view.querySelector('[data-setting="coverImageProvider"]');
+    if (coverImageProvider)
+        coverImageProvider.value = settings.coverImageProvider || 'google';
     view.querySelector('[data-save-settings]')?.addEventListener('click', async () => {
         const payload = {};
         view.querySelectorAll('[data-setting]').forEach(field => {
@@ -880,9 +1151,27 @@ async function renderSettings(view) {
         });
         payload.clearAiApiKey = view.querySelector('[data-setting-clear="aiApiKey"]')?.checked || false;
         payload.clearOcrApiKey = view.querySelector('[data-setting-clear="ocrApiKey"]')?.checked || false;
+        payload.clearGoogleImageSearchApiKey = view.querySelector('[data-setting-clear="googleImageSearchApiKey"]')?.checked || false;
+        payload.clearPexelsApiKey = view.querySelector('[data-setting-clear="pexelsApiKey"]')?.checked || false;
+        payload.clearUnsplashAccessKey = view.querySelector('[data-setting-clear="unsplashAccessKey"]')?.checked || false;
         await working(() => request('/settings', { method: 'PUT', json: { settings: payload } }));
         showNotice(tr('Settings saved'));
         await renderSettings(view);
+    });
+    view.querySelector('[data-fill-missing-covers]')?.addEventListener('click', async () => {
+        if (!window.confirm(tr('This will search for and download covers for all your recipes without an image. Continue?')))
+            return;
+        let remaining = 1;
+        let succeeded = 0;
+        let failed = 0;
+        while (remaining > 0) {
+            const response = await working(() => request('/settings/fill-missing-covers', { method: 'POST', json: {} }));
+            const result = response.result || {};
+            succeeded += asNumber(result.succeeded);
+            failed += asNumber(result.failed);
+            remaining = asNumber(result.remaining);
+        }
+        showNotice(`${tr('Cover search completed')}: ${succeeded} ✓${failed ? ` · ${failed} ${tr('failed')}` : ''}`);
     });
 }
 async function renderPublic(rootNode) {
