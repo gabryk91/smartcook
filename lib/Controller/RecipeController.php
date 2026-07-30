@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace OCA\SmartCook\Controller;
 
+use OCA\SmartCook\Service\CoverImageSearchService;
 use OCA\SmartCook\Service\DuplicateService;
 use OCA\SmartCook\Service\RecipeService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 final class RecipeController extends BaseController {
-    public function __construct(IRequest $request, LoggerInterface $logger, private RecipeService $recipes, private DuplicateService $duplicates) {
+    public function __construct(IRequest $request, LoggerInterface $logger, private RecipeService $recipes, private DuplicateService $duplicates, private CoverImageSearchService $coverImages) {
         parent::__construct($request, $logger);
     }
 
@@ -91,6 +93,38 @@ final class RecipeController extends BaseController {
             $this->recipes->markCooked($id);
             return ['ok' => true];
         });
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/recipes/{id}/cover/search')]
+    public function searchCover(int $id): JSONResponse {
+        return $this->respond(fn (): array => ['candidates' => $this->coverImages->findCandidates($id)]);
+    }
+
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[FrontpageRoute(verb: 'GET', url: '/recipes/{id}/cover/preview')]
+    public function previewCover(int $id): DataDisplayResponse|JSONResponse {
+        try {
+            $preview = $this->coverImages->previewCandidate($id, (string)$this->request->getParam('url', ''));
+            return new DataDisplayResponse($preview['content'], 200, [
+                'Content-Type' => $preview['mime'],
+                'Cache-Control' => 'private, max-age=300',
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
+        } catch (\Throwable $e) {
+            return $this->respond(static fn () => throw $e);
+        }
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/recipes/{id}/cover')]
+    public function setCover(int $id): JSONResponse {
+        return $this->respond(fn (): array => ['media' => $this->coverImages->storeCandidate(
+            $id,
+            (string)$this->request->getParam('url', ''),
+            (string)$this->request->getParam('downloadUrl', ''),
+        )]);
     }
 
     #[NoAdminRequired]

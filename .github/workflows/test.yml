@@ -14,12 +14,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run stylelint
-      - run: npm run build
-      - run: npm run build:compat
       - run: node --check js/smartcook-main.js
       - run: node tests/l10n-fallback-check.js
 

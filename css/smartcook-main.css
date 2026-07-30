@@ -528,21 +528,76 @@ button:disabled,
 	padding: 14px;
 }
 
-.toolbar > label {
+.toolbar > label,
+.toolbar > .taxonomy-filter {
 	min-width: 150px;
 }
 
 .toolbar .taxonomy-filter {
 	min-width: 180px;
+	display: grid;
+	gap: 6px;
 }
 
-.taxonomy-filter select[multiple] {
+.taxonomy-picker {
+	position: relative;
+}
+
+.taxonomy-picker-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
 	min-height: 40px;
-	padding: 6px 11px;
+	padding: 8px 11px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 10px;
+	background: var(--smartcook-surface);
+	color: var(--smartcook-text);
+	text-align: start;
 }
 
-.taxonomy-filter select[multiple] option {
-	padding: 3px 0;
+.taxonomy-picker-menu {
+	position: absolute;
+	z-index: 20;
+	top: calc(100% + 4px);
+	inline-size: 100%;
+	padding: 10px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 10px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 12px 28px rgb(0 0 0 / 16%);
+}
+
+.taxonomy-picker-options {
+	max-block-size: 230px;
+	margin-block-start: 8px;
+	overflow-y: auto;
+	padding: 4px;
+}
+
+.taxonomy-picker-options label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 34px;
+	padding: 6px 8px;
+	border-radius: 7px;
+}
+
+.taxonomy-picker-options label:hover {
+	background: var(--smartcook-surface-soft);
+}
+
+.taxonomy-picker-options input {
+	width: 18px;
+	min-height: 18px;
+	margin: 0;
+}
+
+.taxonomy-picker-options p {
+	margin: 8px;
+	color: var(--smartcook-muted);
 }
 
 .search-field {
@@ -609,6 +664,46 @@ select:focus {
 
 .form-grid select {
 	max-width: 18rem;
+}
+
+.recipe-search-picker {
+	position: relative;
+}
+
+.recipe-search-options {
+	position: absolute;
+	z-index: 20;
+	top: calc(100% + 4px);
+	inline-size: 100%;
+	max-block-size: 240px;
+	overflow-y: auto;
+	padding: 4px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 9px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 12px 28px rgba(15, 23, 42, .16);
+}
+
+.recipe-search-options button {
+	display: block;
+	inline-size: 100%;
+	min-height: 36px;
+	padding: 7px 9px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: inherit;
+	text-align: start;
+}
+
+.recipe-search-options button:hover,
+.recipe-search-options button:focus-visible {
+	background: var(--smartcook-surface-soft);
+}
+
+.recipe-search-options p {
+	margin: 8px;
+	color: var(--smartcook-muted);
 }
 
 .check-inline {
@@ -824,6 +919,115 @@ select:focus {
 
 .form-grid.four {
 	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.planning-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.planning-grid input[type='number'],
+.planning-grid input[type='text'] {
+	width: 100%;
+}
+
+.planning-cost span {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 5.5ch;
+	gap: 8px;
+}
+
+.section-help {
+	display: block;
+	margin: 6px 0 0;
+	color: var(--smartcook-muted);
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.45;
+}
+
+.chip-picker {
+	position: relative;
+}
+
+.chip-picker-input {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	min-height: 42px;
+	padding: 5px 8px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 10px;
+	background: var(--smartcook-surface);
+}
+
+.chip-picker-input:focus-within {
+	border-color: var(--smartcook-accent);
+	outline: 2px solid color-mix(in srgb, var(--smartcook-accent) 45%, transparent);
+	outline-offset: 1px;
+}
+
+.chip-picker-input input {
+	flex: 1 1 14ch;
+	width: auto;
+	min-width: 10ch;
+	min-height: 30px;
+	padding: 2px 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+}
+
+.chip-picker-value {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 5px 8px;
+	border: 0;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--smartcook-accent) 82%, #fff);
+	color: #fff;
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.chip-picker-options {
+	position: absolute;
+	z-index: 25;
+	top: calc(100% + 4px);
+	inline-size: 100%;
+	max-block-size: 220px;
+	overflow-y: auto;
+	padding: 4px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 9px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 12px 28px rgba(15, 23, 42, .16);
+}
+
+.chip-picker-options button {
+	display: block;
+	inline-size: 100%;
+	min-height: 36px;
+	padding: 7px 9px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: inherit;
+	text-align: start;
+}
+
+.chip-picker-options button:hover,
+.chip-picker-options button:focus-visible {
+	background: var(--smartcook-surface-soft);
+}
+
+.chip-picker-options p {
+	margin: 8px;
+	color: var(--smartcook-muted);
 }
 
 .span-2 {
@@ -1135,7 +1339,7 @@ select:focus {
 }
 
 .import-hero {
-	display: flex;
+	display: block;
 	align-items: center;
 	justify-content: space-between;
 	gap: 30px;
@@ -1281,7 +1485,7 @@ select:focus {
 }
 
 .planner-toolbar {
-	align-items: center;
+	align-items: flex-end;
 	justify-content: flex-start;
 }
 
@@ -1289,8 +1493,12 @@ select:focus {
 	margin: 0;
 }
 
-.planner-toolbar .ghost {
+
+.planner-toolbar-actions {
 	margin-inline-start: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .planner-grid {
@@ -1419,6 +1627,11 @@ select:focus {
 	gap: 8px;
 	max-height: 250px;
 	overflow: auto;
+}
+
+.recipe-selector-heading {
+	margin: 4px 0 -2px;
+	font-weight: 650;
 }
 
 .recipe-selector label {
@@ -1566,6 +1779,94 @@ select:focus {
 	height: 220px;
 	border-radius: 16px;
 	object-fit: cover;
+}
+
+.recipe-view-image-wrap {
+	position: relative;
+}
+
+.cover-search-button {
+	position: absolute;
+	inset-inline-end: 10px;
+	inset-block-end: 10px;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--smartcook-accent);
+	color: #fff;
+	box-shadow: 0 3px 10px rgb(0 0 0 / 24%);
+	cursor: pointer;
+	font-size: 17px;
+}
+
+.cover-search-button:hover,
+.cover-search-button:focus-visible {
+	filter: brightness(1.08);
+	outline: 3px solid color-mix(in srgb, var(--smartcook-accent) 30%, transparent);
+	outline-offset: 2px;
+}
+
+.cover-picker-modal {
+	position: fixed;
+	z-index: 1000;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: rgb(15 23 42 / 55%);
+}
+
+.cover-picker-card {
+	width: min(860px, 100%);
+	max-height: min(760px, 100%);
+	overflow: auto;
+	padding: 22px;
+	border-radius: 16px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 24px 60px rgb(0 0 0 / 30%);
+}
+
+.cover-picker-card .section-heading {
+	align-items: center;
+}
+
+.cover-picker-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+	margin: 16px 0;
+}
+
+.cover-picker-grid button {
+	overflow: hidden;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 10px;
+	background: var(--smartcook-surface-soft);
+	color: var(--smartcook-text);
+	text-align: start;
+	cursor: pointer;
+}
+
+.cover-picker-grid button:hover,
+.cover-picker-grid button:focus-visible {
+	border-color: var(--smartcook-accent);
+}
+
+.cover-picker-grid img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+}
+
+.cover-picker-grid span {
+	display: block;
+	padding: 8px;
+	font-size: 13px;
+	line-height: 1.3;
 }
 
 .recipe-view-heading h2 {
@@ -1799,6 +2100,10 @@ select:focus {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
+	.planning-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.settings-layout {
 		grid-template-columns: 1fr;
 	}
@@ -1970,6 +2275,7 @@ select:focus {
 	}
 
 	.toolbar > label,
+	.toolbar > .taxonomy-filter,
 	.toolbar .taxonomy-filter {
 		min-width: 0;
 	}
@@ -2029,10 +2335,15 @@ select:focus {
 		align-items: center;
 	}
 
-	.planner-toolbar .ghost {
+	.planner-toolbar-actions {
 		grid-column: 1 / -1;
-		width: 100%;
 		margin: 2px 0 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.planner-toolbar-actions button {
+		width: 100%;
 	}
 
 	.planner-grid {
@@ -2130,6 +2441,7 @@ select:focus {
 	.skeleton-grid,
 	.form-grid,
 	.form-grid.four,
+	.planning-grid,
 	.preview-metrics,
 	.metrics {
 		grid-template-columns: 1fr;
