@@ -64,6 +64,27 @@ final class ImportController extends BaseController {
         }, Http::STATUS_ACCEPTED);
     }
 
+    /**
+     * Endpoint for trusted external clients, such as the SmartCook Android connector.
+     * Authentication is still enforced by Nextcloud; the CSRF exemption is required
+     * because native clients do not have a browser request token.
+     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/external/import/queue')]
+    public function externalEnqueue(): JSONResponse {
+        return $this->respond(function (): array {
+            $kind = (string)$this->request->getParam('kind', 'url');
+            if (!in_array($kind, ['url', 'text'], true)) {
+                throw new ValidationException('External imports support URL or text content only', ['kind' => 'Unsupported']);
+            }
+            $payload = $this->payload('payload');
+            $useAi = filter_var($this->request->getParam('useAi', false), FILTER_VALIDATE_BOOLEAN);
+            $provider = $this->request->getParam('provider', null);
+            return ['job' => $this->imports->enqueue($this->userContext->userId(), $kind, $payload, $useAi, is_string($provider) ? $provider : null)];
+        }, Http::STATUS_ACCEPTED);
+    }
+
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[FrontpageRoute(verb: 'GET', url: '/import/jobs')]

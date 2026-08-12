@@ -6,7 +6,9 @@ param(
     [string]$GitHubRepository = 'gabryk91/smartcook',
     [switch]$ConfigureGitHubReleaseSecrets,
     [securestring]$AppStoreToken,
-    [string]$GitHubEnvironment = 'release'
+    [string]$GitHubEnvironment = 'release',
+    [switch]$PublishGitHubRelease,
+    [string]$ReleaseNotes = ''
 )
 
 Set-StrictMode -Version Latest
@@ -28,6 +30,10 @@ if ([string]::IsNullOrWhiteSpace($version)) {
 
 if (-not (Test-Path -LiteralPath $CertificateKeyPath -PathType Leaf)) {
     throw "Chiave privata per la firma non trovata: $CertificateKeyPath"
+}
+
+if ($ConfigureGitHubReleaseSecrets -and $PublishGitHubRelease) {
+    throw 'Usa ConfigureGitHubReleaseSecrets e PublishGitHubRelease in esecuzioni separate.'
 }
 
 if ($ConfigureGitHubReleaseSecrets) {
@@ -61,6 +67,27 @@ if ($ConfigureGitHubReleaseSecrets) {
 
     Write-Host "Segreti GitHub configurati nell'environment '$GitHubEnvironment' del repository $GitHubRepository."
     return
+}
+
+if ($PublishGitHubRelease) {
+    $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+    $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
+    if ($null -eq $gitCommand -or $null -eq $ghCommand) {
+        throw 'Per pubblicare la release sono richiesti Git e GitHub CLI, con "gh auth login" già completato.'
+    }
+
+    $pendingChanges = (& $gitCommand.Source -C $projectRoot status --porcelain)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Impossibile verificare lo stato Git del progetto.'
+    }
+    if (-not [string]::IsNullOrWhiteSpace(($pendingChanges -join [Environment]::NewLine))) {
+        throw 'La pubblicazione automatica richiede una cartella di lavoro pulita. Committa o archivia prima le modifiche correnti.'
+    }
+
+    $releaseBranch = (& $gitCommand.Source -C $projectRoot branch --show-current).Trim()
+    if ([string]::IsNullOrWhiteSpace($releaseBranch)) {
+        throw 'Non è possibile pubblicare una release da un HEAD detached.'
+    }
 }
 
 if (-not (Test-Path -LiteralPath $OpenSslPath -PathType Leaf)) {
@@ -171,6 +198,31 @@ try {
     $sourceInfo = [regex]::Replace($sourceInfo, '(<version>)[^<]+(</version>)', ('${1}' + $nextVersion + '${2}'), 1)
     [IO.File]::WriteAllText($infoPath, $sourceInfo, [Text.UTF8Encoding]::new($false))
 
+    if ($PublishGitHubRelease) {
+        & $gitCommand.Source -C $projectRoot add -- appinfo/info.xml
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile aggiungere appinfo/info.xml al commit di release.'
+        }
+
+        & $gitCommand.Source -C $projectRoot commit -m ("Release SmartCook {0}" -f $nextVersion)
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile creare il commit di release.'
+        }
+
+        & $gitCommand.Source -C $projectRoot push origin $releaseBranch
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile inviare il commit di release a GitHub.'
+        }
+
+        $releaseTag = 'v{0}' -f $nextVersion
+        $releaseTitle = 'SmartCook {0}' -f $nextVersion
+        $releaseBody = if ([string]::IsNullOrWhiteSpace($ReleaseNotes)) { 'Official Nextcloud App Store release.' } else { $ReleaseNotes }
+        & $ghCommand.Source release create $releaseTag --repo $GitHubRepository --target $releaseBranch --title $releaseTitle --notes $releaseBody
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile creare la GitHub Release. Il commit della versione è già stato inviato; crea manualmente il tag della release.'
+        }
+    }
+
     $instructions = @"
 docker exec -u www-data Nextcloud php occ app:disable smartcook
 docker exec -u www-data Nextcloud php occ maintenance:mode --on
@@ -187,11 +239,14 @@ docker exec -u www-data Nextcloud php occ maintenance:mode --off
 
 --- PUBBLICAZIONE APP STORE NEXTCLOUD ---
 
-1. Committa e invia al repository la versione $nextVersion aggiornata da questo script.
-2. Crea e pubblica una GitHub Release con tag v$nextVersion nel repository $GitHubRepository.
-3. Il workflow GitHub "Publish Nextcloud App Store release" allega automaticamente
+Per pubblicare automaticamente anche su GitHub e App Store Nextcloud esegui:
+  .\New-SmartCookPackage.ps1 -PublishGitHubRelease
+
+Lo script richiede una cartella di lavoro pulita, crea il commit della versione
+$nextVersion, lo invia a GitHub e pubblica la release v$nextVersion.
+Il workflow GitHub "Publish Nextcloud App Store release" allega automaticamente
    $storeArchiveName alla release e lo pubblica nell'App Store Nextcloud.
-4. Verifica l'esito del workflow GitHub e la pubblicazione su:
+Verifica l'esito del workflow GitHub e la pubblicazione su:
    https://apps.nextcloud.com/apps/$appName
 
 Configurazione iniziale (una sola volta): esegui lo script con
