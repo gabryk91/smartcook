@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\SmartCook\AppInfo;
 
 use OCA\SmartCook\BackgroundJob\CleanupImportsJob;
+use OCA\SmartCook\Dashboard\SmartCookWidget;
 use OCA\SmartCook\Notification\Notifier;
 use OCA\SmartCook\Search\RecipeSearchProvider;
 use OCP\AppFramework\App;
@@ -21,6 +22,7 @@ final class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
+        $context->registerDashboardWidget(SmartCookWidget::class);
         $context->registerSearchProvider(RecipeSearchProvider::class);
         $context->registerNotifierService(Notifier::class);
     }
