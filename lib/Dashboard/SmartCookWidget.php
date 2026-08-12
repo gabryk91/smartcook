@@ -63,8 +63,8 @@ final class SmartCookWidget implements IAPIWidgetV2, IButtonWidget, IIconWidget 
             return new WidgetItem(
                 (string)$recipe['title'],
                 $subtitle,
-                $this->dashboardUrl() . '#/recipe/' . (int)$recipe['id'],
-                $this->getIconUrl(),
+                $this->dashboardUrl() . '#/recipes/' . (int)$recipe['id'],
+                $this->recipeIconUrl($recipe),
                 (string)($recipe['updatedAt'] ?? $recipe['id']),
             );
         }, $recipes);
@@ -87,5 +87,25 @@ final class SmartCookWidget implements IAPIWidgetV2, IButtonWidget, IIconWidget 
 
     private function dashboardUrl(): string {
         return $this->urlGenerator->linkToRouteAbsolute('smartcook.page.index');
+    }
+
+    /** @param array<string, mixed> $recipe */
+    private function recipeIconUrl(array $recipe): string {
+        $imagePath = trim((string)($recipe['imagePath'] ?? ''));
+        if (preg_match('/^media:(\d+)$/', $imagePath, $matches) === 1) {
+            return $this->urlGenerator->linkToRouteAbsolute('smartcook.media.display', ['id' => (int)$matches[1]]);
+        }
+        if (preg_match('#^https?://#i', $imagePath) === 1) {
+            return $imagePath;
+        }
+
+        $title = trim((string)($recipe['title'] ?? ''));
+        $initial = mb_strtoupper(mb_substr($title !== '' ? $title : '?', 0, 1));
+        $colors = ['#4f8fc0', '#b8644d', '#6f8f4e', '#8b6ea9', '#c28b36'];
+        $color = $colors[abs((int)crc32($title)) % count($colors)];
+        $label = htmlspecialchars($initial, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="8" fill="' . $color . '"/><text x="32" y="41" fill="#fff" font-family="sans-serif" font-size="32" font-weight="600" text-anchor="middle">' . $label . '</text></svg>';
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 }

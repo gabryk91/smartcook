@@ -147,11 +147,7 @@ try {
 
     $signProcess = [Diagnostics.Process]::new()
     $signProcess.StartInfo.FileName = $OpenSslPath
-    $signProcess.StartInfo.ArgumentList.Add('dgst')
-    $signProcess.StartInfo.ArgumentList.Add('-sha512')
-    $signProcess.StartInfo.ArgumentList.Add('-sign')
-    $signProcess.StartInfo.ArgumentList.Add($CertificateKeyPath)
-    $signProcess.StartInfo.ArgumentList.Add($storeArchivePath)
+    $signProcess.StartInfo.Arguments = 'dgst -sha512 -sign "{0}" "{1}"' -f $CertificateKeyPath, $storeArchivePath
     $signProcess.StartInfo.UseShellExecute = $false
     $signProcess.StartInfo.RedirectStandardOutput = $true
     $signProcess.StartInfo.RedirectStandardError = $true
