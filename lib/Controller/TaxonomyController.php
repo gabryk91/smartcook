@@ -29,7 +29,10 @@ final class TaxonomyController extends BaseController {
     #[NoCSRFRequired]
     #[FrontpageRoute(verb: 'GET', url: '/taxonomy/manage')]
     public function managed(): JSONResponse {
-        return $this->respond(fn (): array => ['taxonomy' => $this->taxonomy->listManagedForUser($this->userContext->userId())]);
+        return $this->respond(fn (): array => [
+            'taxonomy' => $this->taxonomy->listManagedForUser($this->userContext->userId()),
+            'recipes' => $this->taxonomy->listRecipeChoicesForUser($this->userContext->userId()),
+        ]);
     }
 
     #[NoAdminRequired]
@@ -41,20 +44,30 @@ final class TaxonomyController extends BaseController {
     }
 
     #[NoAdminRequired]
-    #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}/{id}/apply')]
-    public function apply(string $kind, int $id): JSONResponse {
-        return $this->respond(fn (): array => ['changed' => $this->taxonomy->applyManagedToAll($this->userContext->userId(), $kind, $id)]);
+    #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}/{id}/assign')]
+    public function assign(string $kind, int $id): JSONResponse {
+        return $this->respond(fn (): array => ['changed' => $this->taxonomy->applyManagedToRecipes(
+            $this->userContext->userId(), $kind, $id, $this->recipeIds()
+        )]);
     }
 
     #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}/{id}/remove')]
     public function remove(string $kind, int $id): JSONResponse {
-        return $this->respond(fn (): array => ['changed' => $this->taxonomy->removeManagedFromAll($this->userContext->userId(), $kind, $id)]);
+        return $this->respond(fn (): array => ['changed' => $this->taxonomy->removeManagedFromRecipes(
+            $this->userContext->userId(), $kind, $id, $this->recipeIds()
+        )]);
     }
 
     #[NoAdminRequired]
     #[FrontpageRoute(verb: 'DELETE', url: '/taxonomy/{kind}/{id}')]
     public function delete(string $kind, int $id): JSONResponse {
         return $this->respond(fn (): array => ['changed' => $this->taxonomy->deleteManaged($this->userContext->userId(), $kind, $id)]);
+    }
+
+    /** @return list<int> */
+    private function recipeIds(): array {
+        $value = $this->request->getParam('recipeIds', []);
+        return is_array($value) ? array_map('intval', $value) : [];
     }
 }

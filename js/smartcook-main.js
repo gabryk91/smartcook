@@ -57,6 +57,18 @@ const fallbackTranslations = {
         'Assign to all': 'Assegna a tutte',
         'Remove from all': 'Rimuovi da tutte',
         'No values yet': 'Nessun valore',
+        'Bulk editing': 'Modifica massiva',
+        'Select recipes': 'Seleziona ricette',
+        'recipes selected': 'ricette selezionate',
+        'Filter recipes...': 'Filtra ricette...',
+        'Select filtered recipes': 'Seleziona ricette filtrate',
+        'No recipes found': 'Nessuna ricetta trovata',
+        'Select recipes, then assign or remove values from the lists below. Deleting a value removes it from every recipe.': 'Seleziona le ricette, quindi assegna o rimuovi i valori dagli elenchi sottostanti. Eliminando un valore viene rimosso da ogni ricetta.',
+        'Assign to selected': 'Assegna alle selezionate',
+        'Remove from selected': 'Rimuovi dalle selezionate',
+        'recipes updated': 'ricette aggiornate',
+        'Assign this value to the selected recipes?': 'Assegnare questo valore alle ricette selezionate?',
+        'Remove this value from the selected recipes?': 'Rimuovere questo valore dalle ricette selezionate?',
         'Value added': 'Valore aggiunto',
         'Value assigned to all recipes': 'Valore assegnato a tutte le ricette',
         'Value removed from all recipes': 'Valore rimosso da tutte le ricette',
@@ -260,7 +272,7 @@ function emptyRecipe() {
         title: '', subtitle: null, description: null, language: document.documentElement.lang || 'en', author: null,
         sourceName: null, sourceUrl: null, license: null, status: 'draft', visibility: 'private', favorite: false, excludeFromPlanner: false,
         servings: 4, yieldText: null, prepTime: 0, restTime: 0, cookTime: 0, totalTime: 0, difficulty: null,
-        costCents: null, currency: 'EUR', cuisine: null, course: null, mealType: null, cookingMethod: null,
+        costCents: null, currency: 'EUR', cuisine: null, mealType: null, cookingMethod: null,
         season: null, origin: null, calories: null, nutrition: {}, notes: null, imagePath: null,
         ingredients: [{ name: '', quantity: null, unit: null }], steps: [{ text: '' }], tools: [], tags: [], categories: [], media: [],
     };
@@ -382,7 +394,7 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const selectedTags = [...new Set(routeParams.getAll('tags'))];
     const selectedCategories = [...new Set(routeParams.getAll('categories'))];
     view.innerHTML = `<section class="toolbar panel">
-		<label class="search-field"><span>&#9906;</span><input data-search placeholder="${attr(tr('Search recipes, cuisine or course...'))}"></label>
+		<label class="search-field"><span>&#9906;</span><input data-search placeholder="${attr(tr('Search recipes or cuisine...'))}"></label>
 		<div class="taxonomy-filter"><span>${esc(tr('Categories'))}</span>${taxonomyPicker('categories', taxonomy.categories || [], selectedCategories)}</div>
 		<div class="taxonomy-filter"><span>${esc(tr('Tags'))}</span>${taxonomyPicker('tags', taxonomy.tags || [], selectedTags)}</div>
 		<label class="check-inline"><input data-favorites type="checkbox"> ${esc(tr('Favorites only'))}</label>
@@ -396,7 +408,7 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const ingredients = routeParams.getAll('ingredients');
     const filterLabel = [...selectedCategories, ...selectedTags.map(name => `#${name}`), ...ingredients].join(', ');
     if (filterLabel) {
-        search.setAttribute('aria-label', `${tr('Search recipes, cuisine or course...')}: ${filterLabel}`);
+        search.setAttribute('aria-label', `${tr('Search recipes or cuisine...')}: ${filterLabel}`);
         search.title = filterLabel;
     }
     const recipeSortKey = 'smartcook.recipe-sort';
@@ -420,7 +432,7 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
         results.innerHTML = recipes.length ? `<div class="recipe-grid">${recipes.map(recipe => {
             const image = recipeImageUrl(recipe.imagePath);
             return `<article class="recipe-card"><a class="recipe-image" href="#/recipes/${recipe.id}">${image ? `<img src="${attr(image)}" alt="">` : `<div class="image-placeholder"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div>`}<span class="time-pill">${asNumber(recipe.totalTime || recipe.prepTime + recipe.cookTime)} min</span></a>
-			<div class="recipe-card-body"><div class="card-title"><div><p>${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><a href="#/recipes/${recipe.id}"><h2>${esc(recipe.title)}</h2></a></div><button class="icon-button" data-favorite-id="${recipe.id}" data-favorite="${recipe.favorite ? '1' : '0'}" aria-label="${attr(tr('Toggle favorite'))}">${recipe.favorite ? '&#9733;' : '&#9734;'}</button></div><p>${esc(recipe.description || tr('No description'))}</p><div class="card-meta"><span>${asNumber(recipe.prepTime)} + ${asNumber(recipe.cookTime)} min</span><span>${asNumber(recipe.servings)}</span>${recipe.difficulty ? `<span>${esc(recipe.difficulty)}</span>` : ''}</div></div></article>`;
+			<div class="recipe-card-body"><div class="card-title"><div><p>${esc(recipe.cuisine || tr('Recipe'))}</p><a href="#/recipes/${recipe.id}"><h2>${esc(recipe.title)}</h2></a></div><button class="icon-button" data-favorite-id="${recipe.id}" data-favorite="${recipe.favorite ? '1' : '0'}" aria-label="${attr(tr('Toggle favorite'))}">${recipe.favorite ? '&#9733;' : '&#9734;'}</button></div><p>${esc(recipe.description || tr('No description'))}</p><div class="card-meta"><span>${asNumber(recipe.prepTime)} + ${asNumber(recipe.cookTime)} min</span><span>${asNumber(recipe.servings)}</span>${recipe.difficulty ? `<span>${esc(recipe.difficulty)}</span>` : ''}</div></div></article>`;
         }).join('')}</div>` : `<section class="panel empty-state"><h2>${esc(tr('No recipes found'))}</h2><p>${esc(tr('Change the filters, create a recipe, or import one from a URL.'))}</p><div><a class="primary" href="#/import">${esc(tr('Import recipe'))}</a> <a class="secondary" href="#/new">${esc(tr('Create manually'))}</a></div></section>`;
         results.querySelectorAll('[data-favorite-id]').forEach(button => button.addEventListener('click', async () => {
             const id = asNumber(button.dataset.favoriteId);
@@ -506,7 +518,7 @@ function recipeViewer(recipe) {
         return `<li><span class="recipe-step-number">${index + 1}</span><div><p>${esc(step.text)}</p>${details.length ? `<small>${esc(details.join(' · '))}</small>` : ''}</div></li>`;
     }).join('');
     return `<article class="recipe-view panel">
-        <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || recipe.course || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
+        <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(recipe.cuisine || tr('Recipe'))}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
         <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span><span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
     </article>`;
@@ -588,7 +600,7 @@ function collectRecipe(view, existing) {
         servings: Math.max(1, numeric('servings')), yieldText: value('yieldText').trim() || null,
         prepTime, restTime, cookTime, totalTime: prepTime + restTime + cookTime,
         difficulty: value('difficulty').trim() || null, costCents: Math.round(Math.max(0, numeric('costAmount')) * 100) || null, currency: value('currency').trim().toUpperCase() || null,
-        cuisine: value('cuisine').trim() || null, course: value('course').trim() || null, mealType: value('mealType').trim() || null,
+        cuisine: value('cuisine').trim() || null, mealType: value('mealType').trim() || null,
         cookingMethod: value('cookingMethod').trim() || null, season: value('season').trim() || null, origin: value('origin').trim() || null,
         calories: numeric('calories') || null, notes: value('notes').trim() || null,
         ingredients, steps, tags: splitNames(value('tags')), categories: splitNames(value('categories')), tools: splitNames(value('tools')),
@@ -679,7 +691,7 @@ function editorForm(recipe, taxonomy = {}) {
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Yield and timing'))}</p><h2>${esc(tr('Planning data'))}</h2><p class="section-help">${esc(tr('Planning details help'))}</p></div></div><div class="planning-grid">${textInput(tr('Servings'), 'servings', recipe.servings, { type: 'number', min: 1 })}${textInput(tr('Yield'), 'yieldText', recipe.yieldText)}${textInput(tr('Preparation (min)'), 'prepTime', recipe.prepTime, { type: 'number', min: 0 })}${textInput(tr('Rest (min)'), 'restTime', recipe.restTime, { type: 'number', min: 0 })}${textInput(tr('Cooking (min)'), 'cookTime', recipe.cookTime, { type: 'number', min: 0 })}${textInput(tr('Difficulty'), 'difficulty', recipe.difficulty)}${textInput(tr('Calories'), 'calories', recipe.calories, { type: 'number', min: 0 })}<label class="planning-cost">${esc(tr('Cost and currency'))}<span><input data-field="costAmount" type="number" min="0" step="0.01" inputmode="decimal" value="${attr(costAmount)}" placeholder="0.00"><input data-field="currency" value="${attr(recipe.currency || 'EUR')}" maxlength="3" aria-label="${attr(tr('Currency'))}"></span></label><label class="check-inline"><input data-field="excludeFromPlanner" type="checkbox"${recipe.excludeFromPlanner ? ' checked' : ''}> ${esc(tr('Exclude from meal planner'))}</label></div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Structured list'))}</p><h2>${esc(tr('Ingredients'))}</h2></div><button class="secondary" data-add-ingredient type="button">+ ${esc(tr('Ingredient'))}</button></div><div data-ingredients>${(recipe.ingredients.length ? recipe.ingredients : [{ name: '' }]).map(item => ingredientRow(item)).join('')}</div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Method'))}</p><h2>${esc(tr('Procedure'))}</h2></div><button class="secondary" data-add-step type="button">+ ${esc(tr('Step'))}</button></div><div data-steps>${(recipe.steps.length ? recipe.steps : [{ text: '' }]).map((item, index) => stepRow(item, index)).join('')}</div></section>
-			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Classification'))}</p><h2>${esc(tr('Organization'))}</h2><p class="section-help">${esc(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}</p></div></div><div class="form-grid">${labelInput(tr('Tags'), chipPicker('tags', recipe.tags || [], taxonomy.tags || []), 'span-2')}${labelInput(tr('Categories'), chipPicker('categories', recipe.categories || [], taxonomy.categories || []), 'span-2')}${labelInput(tr('Tools'), chipPicker('tools', recipe.tools || [], taxonomy.tools || []), 'span-2')}${labelInput(tr('Cuisine'), chipPicker('cuisine', [recipe.cuisine].filter(Boolean), taxonomy.cuisine || [], true))}${labelInput(tr('Course'), chipPicker('course', [recipe.course].filter(Boolean), taxonomy.course || [], true))}${labelInput(tr('Meal type'), chipPicker('mealType', [recipe.mealType].filter(Boolean), taxonomy.mealType || [], true))}${labelInput(tr('Cooking method'), chipPicker('cookingMethod', [recipe.cookingMethod].filter(Boolean), taxonomy.cookingMethod || [], true))}${selectInput(tr('Season'), 'season', recipe.season, predefinedOptions(recipe.season, [['', tr('Select an option')], ['Primavera', tr('Spring')], ['Estate', tr('Summer')], ['Autunno', tr('Autumn')], ['Inverno', tr('Winter')]]))}${labelInput(tr('Origin'), chipPicker('origin', [recipe.origin].filter(Boolean), taxonomy.origin || [], true))}${textareaInput(tr('Personal notes'), 'notes', recipe.notes, 5, 'span-2')}</div></section>
+			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Classification'))}</p><h2>${esc(tr('Organization'))}</h2><p class="section-help">${esc(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}</p></div></div><div class="form-grid">${labelInput(tr('Tags'), chipPicker('tags', recipe.tags || [], taxonomy.tags || []), 'span-2')}${labelInput(tr('Categories'), chipPicker('categories', recipe.categories || [], taxonomy.categories || []), 'span-2')}${labelInput(tr('Tools'), chipPicker('tools', recipe.tools || [], taxonomy.tools || []), 'span-2')}${labelInput(tr('Cuisine'), chipPicker('cuisine', [recipe.cuisine].filter(Boolean), taxonomy.cuisine || [], true))}${labelInput(tr('Meal type'), chipPicker('mealType', [recipe.mealType].filter(Boolean), taxonomy.mealType || [], true))}${labelInput(tr('Cooking method'), chipPicker('cookingMethod', [recipe.cookingMethod].filter(Boolean), taxonomy.cookingMethod || [], true))}${selectInput(tr('Season'), 'season', recipe.season, predefinedOptions(recipe.season, [['', tr('Select an option')], ['Primavera', tr('Spring')], ['Estate', tr('Summer')], ['Autunno', tr('Autumn')], ['Inverno', tr('Winter')]]))}${labelInput(tr('Origin'), chipPicker('origin', [recipe.origin].filter(Boolean), taxonomy.origin || [], true))}${textareaInput(tr('Personal notes'), 'notes', recipe.notes, 5, 'span-2')}</div></section>
 		</main>
 		<aside class="view-stack editor-aside">
 			${recipe.id ? `<section class="panel form-section"><p class="eyebrow">${esc(tr('Exports'))}</p><h2>${esc(tr('Download'))}</h2><div class="export-buttons"><a class="secondary" href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a class="secondary" href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></section>
@@ -693,13 +705,13 @@ function editorForm(recipe, taxonomy = {}) {
 async function renderEditor(view, id) {
     let recipe = id ? (await working(() => request(`/recipes/${id}`))).recipe : emptyRecipe();
 	const [taxonomy, recipeResponse] = await working(() => Promise.all([request('/taxonomy'), request('/recipes?sort=title&direction=ASC')]));
-	['cuisine', 'course', 'mealType', 'cookingMethod', 'origin'].forEach(field => {
+	['cuisine', 'mealType', 'cookingMethod', 'origin'].forEach(field => {
 		taxonomy[field] = [...new Map((recipeResponse.recipes || []).map(item => String(item[field] || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()];
 	});
     const paint = async () => {
         view.innerHTML = editorForm(recipe, taxonomy);
         bindRowRemoval(view);
-		['tags', 'categories', 'tools', 'cuisine', 'course', 'mealType', 'cookingMethod', 'origin'].forEach(name => bindChipPicker(view, name));
+		['tags', 'categories', 'tools', 'cuisine', 'mealType', 'cookingMethod', 'origin'].forEach(name => bindChipPicker(view, name));
         view.querySelector('[data-add-ingredient]')?.addEventListener('click', () => {
             const holder = view.querySelector('[data-ingredients]');
             holder.insertAdjacentHTML('beforeend', ingredientRow());
@@ -1221,12 +1233,34 @@ async function renderShopping(view) {
 async function renderAdministration(view) {
     const labels = {
         tags: tr('Tags'), categories: tr('Categories'), tools: tr('Tools'), cuisine: tr('Cuisine'),
-        course: tr('Course'), mealType: tr('Meal type'), cookingMethod: tr('Cooking method'), season: tr('Season'), origin: tr('Origin'),
+        mealType: tr('Meal type'), cookingMethod: tr('Cooking method'), season: tr('Season'), origin: tr('Origin'),
     };
-    const load = async () => {
-        const response = await working(() => request('/taxonomy/manage'));
-        const taxonomy = response.taxonomy || {};
-        view.innerHTML = `<section class="panel form-section taxonomy-admin-intro"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Administration'))}</p><h2>${esc(tr('Manage recipe lists'))}</h2><p class="section-help">${esc(tr('Add values to your lists, then assign or remove each value from all your recipes. Deleting a value also removes it from every recipe.'))}</p></div></div></section><div class="taxonomy-admin-grid">${Object.entries(labels).map(([kind, label]) => `<section class="panel taxonomy-admin-card"><div class="section-heading"><div><p class="eyebrow">${esc(label)}</p><h2>${esc(tr('Manage list'))}</h2></div></div><form data-taxonomy-add="${attr(kind)}" class="taxonomy-admin-add"><input name="name" required maxlength="255" placeholder="${attr(tr('New value...'))}"><button class="primary" type="submit">${esc(tr('Add'))}</button></form><div class="taxonomy-admin-items">${(taxonomy[kind] || []).map(item => `<article><div><strong>${esc(item.name)}</strong><small>${asNumber(item.usageCount)} ${esc(tr('recipes'))}</small></div><div class="taxonomy-admin-actions"><button class="secondary" data-taxonomy-apply="${attr(kind)}:${item.id}" type="button">${esc(tr('Assign to all'))}</button><button class="ghost" data-taxonomy-remove="${attr(kind)}:${item.id}" type="button">${esc(tr('Remove from all'))}</button><button class="danger ghost" data-taxonomy-delete="${attr(kind)}:${item.id}" type="button" aria-label="${attr(tr('Delete'))}">&times;</button></div></article>`).join('') || `<p class="section-help">${esc(tr('No values yet'))}</p>`}</div></section>`).join('')}</div>`;
+    let taxonomy = {};
+    let recipes = [];
+    let recipeFilter = '';
+    const selectedRecipeIds = new Set();
+    const render = () => {
+        const normalizedFilter = recipeFilter.trim().toLocaleLowerCase();
+        const visibleRecipes = recipes.filter(recipe => `${recipe.title} ${recipe.cuisine || ''}`.toLocaleLowerCase().includes(normalizedFilter));
+        const selectedCount = selectedRecipeIds.size;
+        const selectedLabel = `${selectedCount} ${tr('recipes selected')}`;
+        view.innerHTML = `<section class="panel form-section taxonomy-admin-intro"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Administration'))}</p><h2>${esc(tr('Manage recipe lists'))}</h2><p class="section-help">${esc(tr('Select recipes, then assign or remove values from the lists below. Deleting a value removes it from every recipe.'))}</p></div></div></section><section class="panel taxonomy-recipe-selector"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Bulk editing'))}</p><h2>${esc(tr('Select recipes'))}</h2></div><strong data-selected-recipe-count>${esc(selectedLabel)}</strong></div><label class="search-field"><span>&#9906;</span><input data-admin-recipe-search value="${attr(recipeFilter)}" placeholder="${attr(tr('Filter recipes...'))}"></label><label class="check-inline taxonomy-select-all"><input data-admin-select-all type="checkbox"${visibleRecipes.length > 0 && visibleRecipes.every(recipe => selectedRecipeIds.has(recipe.id)) ? ' checked' : ''}> ${esc(tr('Select filtered recipes'))}</label><div class="taxonomy-recipe-list">${visibleRecipes.map(recipe => `<label><input data-admin-recipe-id="${recipe.id}" type="checkbox"${selectedRecipeIds.has(recipe.id) ? ' checked' : ''}><span><strong>${esc(recipe.title)}</strong>${recipe.cuisine ? `<small>${esc(recipe.cuisine)}</small>` : ''}</span></label>`).join('') || `<p class="section-help">${esc(tr('No recipes found'))}</p>`}</div></section><div class="taxonomy-admin-grid">${Object.entries(labels).map(([kind, label]) => `<section class="panel taxonomy-admin-card"><div class="section-heading"><div><p class="eyebrow">${esc(label)}</p><h2>${esc(tr('Manage list'))}</h2></div></div><form data-taxonomy-add="${attr(kind)}" class="taxonomy-admin-add"><input name="name" required maxlength="255" placeholder="${attr(tr('New value...'))}"><button class="primary" type="submit">${esc(tr('Add'))}</button></form><div class="taxonomy-admin-items">${(taxonomy[kind] || []).map(item => `<article><div><strong>${esc(item.name)}</strong><small>${asNumber(item.usageCount)} ${esc(tr('recipes'))}</small></div><div class="taxonomy-admin-actions"><button class="secondary" data-taxonomy-assign="${attr(kind)}:${item.id}" type="button"${selectedCount ? '' : ' disabled'}>${esc(tr('Assign to selected'))}</button><button class="ghost" data-taxonomy-remove="${attr(kind)}:${item.id}" type="button"${selectedCount ? '' : ' disabled'}>${esc(tr('Remove from selected'))}</button><button class="danger ghost" data-taxonomy-delete="${attr(kind)}:${item.id}" type="button" aria-label="${attr(tr('Delete'))}">&times;</button></div></article>`).join('') || `<p class="section-help">${esc(tr('No values yet'))}</p>`}</div></section>`).join('')}</div>`;
+        view.querySelector('[data-admin-recipe-search]')?.addEventListener('input', event => {
+            recipeFilter = event.target.value;
+            render();
+            const input = view.querySelector('[data-admin-recipe-search]');
+            input?.focus();
+            input?.setSelectionRange(recipeFilter.length, recipeFilter.length);
+        });
+        view.querySelectorAll('[data-admin-recipe-id]').forEach(input => input.addEventListener('change', () => {
+            const id = asNumber(input.dataset.adminRecipeId);
+            input.checked ? selectedRecipeIds.add(id) : selectedRecipeIds.delete(id);
+            render();
+        }));
+        view.querySelector('[data-admin-select-all]')?.addEventListener('change', event => {
+            visibleRecipes.forEach(recipe => event.target.checked ? selectedRecipeIds.add(recipe.id) : selectedRecipeIds.delete(recipe.id));
+            render();
+        });
         view.querySelectorAll('[data-taxonomy-add]').forEach(form => form.addEventListener('submit', async event => {
             event.preventDefault();
             const input = form.querySelector('input[name="name"]');
@@ -1234,17 +1268,31 @@ async function renderAdministration(view) {
             showNotice(tr('Value added'));
             await load();
         }));
-        const bindAction = (selector, action, confirmMessage) => view.querySelectorAll(selector).forEach(button => button.addEventListener('click', async () => {
+        const selectedIds = () => [...selectedRecipeIds];
+        const bindSelectionAction = (selector, action, message) => view.querySelectorAll(selector).forEach(button => button.addEventListener('click', async () => {
             const [kind, id] = String(button.getAttribute(selector.slice(1, -1)) || '').split(':');
-            if (confirmMessage && !window.confirm(confirmMessage)) return;
-            const method = action === 'delete' ? 'DELETE' : 'POST';
-            await working(() => request(`/taxonomy/${encodeURIComponent(kind)}/${encodeURIComponent(id)}${action === 'delete' ? '' : `/${action}`}`, { method, json: {} }));
-            showNotice(action === 'apply' ? tr('Value assigned to all recipes') : action === 'remove' ? tr('Value removed from all recipes') : tr('Value deleted'));
+            if (!selectedIds().length || !window.confirm(message)) return;
+            const response = await working(() => request(`/taxonomy/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/${action}`, { method: 'POST', json: { recipeIds: selectedIds() } }));
+            showNotice(`${asNumber(response.changed)} ${tr('recipes updated')}`);
             await load();
         }));
-        bindAction('[data-taxonomy-apply]', 'apply', tr('Assign this value to all your recipes?'));
-        bindAction('[data-taxonomy-remove]', 'remove', tr('Remove this value from all your recipes?'));
-        bindAction('[data-taxonomy-delete]', 'delete', tr('Delete this value and remove it from all your recipes?'));
+        bindSelectionAction('[data-taxonomy-assign]', 'assign', tr('Assign this value to the selected recipes?'));
+        bindSelectionAction('[data-taxonomy-remove]', 'remove', tr('Remove this value from the selected recipes?'));
+        view.querySelectorAll('[data-taxonomy-delete]').forEach(button => button.addEventListener('click', async () => {
+            const [kind, id] = String(button.getAttribute('data-taxonomy-delete') || '').split(':');
+            if (!window.confirm(tr('Delete this value and remove it from all your recipes?'))) return;
+            await working(() => request(`/taxonomy/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`, { method: 'DELETE' }));
+            showNotice(tr('Value deleted'));
+            await load();
+        }));
+    };
+    const load = async () => {
+        const response = await working(() => request('/taxonomy/manage'));
+        taxonomy = response.taxonomy || {};
+        recipes = response.recipes || [];
+        const validIds = new Set(recipes.map(recipe => asNumber(recipe.id)));
+        [...selectedRecipeIds].forEach(id => { if (!validIds.has(id)) selectedRecipeIds.delete(id); });
+        render();
     };
     await load();
 }
@@ -1313,7 +1361,7 @@ async function renderPublic(rootNode) {
             const payload = await request(`/public/${encodeURIComponent(token)}/data`, { method: 'POST', json: { password } });
             const recipe = payload.recipe;
             const image = recipeImageUrl(recipe.imagePath);
-            rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appIconUrl)}" alt=""><strong>SmartCook</strong></div><article class="public-recipe">${image ? `<img class="hero" src="${attr(image)}" alt="">` : ''}<p class="eyebrow">${esc(recipe.cuisine)}${recipe.course ? ` - ${esc(recipe.course)}` : ''}</p><h1>${esc(recipe.title)}</h1><p class="lead">${esc(recipe.description)}</p><div class="metrics"><div><strong>${recipe.servings}</strong><span>${esc(tr('Servings'))}</span></div><div><strong>${recipe.prepTime} min</strong><span>${esc(tr('Preparation'))}</span></div><div><strong>${recipe.cookTime} min</strong><span>${esc(tr('Cooking'))}</span></div><div><strong>${recipe.totalTime} min</strong><span>${esc(tr('Total'))}</span></div></div><div class="public-grid"><section><h2>${esc(tr('Ingredients'))}</h2><ul>${recipe.ingredients.map(item => `<li><b>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</b> ${esc(item.name)} <small>${esc(item.notes)}</small></li>`).join('')}</ul></section><section><h2>${esc(tr('Method'))}</h2><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></section></div></article></main>`;
+            rootNode.innerHTML = `<main class="public-page"><div class="public-brand"><img src="${attr(appIconUrl)}" alt=""><strong>SmartCook</strong></div><article class="public-recipe">${image ? `<img class="hero" src="${attr(image)}" alt="">` : ''}<p class="eyebrow">${esc(recipe.cuisine)}</p><h1>${esc(recipe.title)}</h1><p class="lead">${esc(recipe.description)}</p><div class="metrics"><div><strong>${recipe.servings}</strong><span>${esc(tr('Servings'))}</span></div><div><strong>${recipe.prepTime} min</strong><span>${esc(tr('Preparation'))}</span></div><div><strong>${recipe.cookTime} min</strong><span>${esc(tr('Cooking'))}</span></div><div><strong>${recipe.totalTime} min</strong><span>${esc(tr('Total'))}</span></div></div><div class="public-grid"><section><h2>${esc(tr('Ingredients'))}</h2><ul>${recipe.ingredients.map(item => `<li><b>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</b> ${esc(item.name)} <small>${esc(item.notes)}</small></li>`).join('')}</ul></section><section><h2>${esc(tr('Method'))}</h2><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></section></div></article></main>`;
         }
         catch (error) {
             const message = error instanceof Error ? error.message : tr('Could not load the shared recipe');

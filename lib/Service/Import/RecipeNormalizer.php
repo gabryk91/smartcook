@@ -73,7 +73,6 @@ final class RecipeNormalizer {
             'costCents' => isset($data['costCents']) ? (int)$data['costCents'] : null,
             'currency' => $this->nullable($data['currency'] ?? null),
             'cuisine' => $this->first($data['recipeCuisine'] ?? $data['cuisine'] ?? null),
-            'course' => $this->first($data['course'] ?? null),
             'mealType' => $this->first($data['mealType'] ?? null),
             'cookingMethod' => $this->first($data['cookingMethod'] ?? $data['cookMethod'] ?? null),
             'season' => $this->first($data['season'] ?? null),

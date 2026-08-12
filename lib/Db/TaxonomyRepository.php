@@ -15,7 +15,7 @@ final class TaxonomyRepository extends AbstractRepository {
         'tools' => ['smartcook_tools', 'smartcook_r_tools', 'tool_id'],
     ];
     private const VALUE_KINDS = [
-        'cuisine' => 'cuisine', 'course' => 'course', 'mealType' => 'meal_type',
+        'cuisine' => 'cuisine', 'mealType' => 'meal_type',
         'cookingMethod' => 'cook_method', 'season' => 'season', 'origin' => 'origin',
     ];
     public function __construct(IDBConnection $db, private TextNormalizer $normalizer) {
@@ -181,11 +181,12 @@ final class TaxonomyRepository extends AbstractRepository {
         return ['id' => (int)$row['id'], 'name' => (string)$row['name'], 'normalizedName' => (string)$row['norm_name']];
     }
 
-    public function applyManagedToAll(string $userId, string $kind, int $id): int {
+    /** @param list<int> $recipeIds */
+    public function applyManagedToRecipes(string $userId, string $kind, int $id, array $recipeIds): int {
+        $recipeIds = $this->selectedRecipeIdsForUser($userId, $recipeIds);
         if (isset(self::NAMED_KINDS[$kind])) {
             [$table, $relationTable, $relationColumn] = self::NAMED_KINDS[$kind];
             $this->requireNamedForUser($table, $userId, $id);
-            $recipeIds = $this->recipeIdsForUser($userId);
             $added = 0;
             foreach ($recipeIds as $recipeId) {
                 if (!$this->relationExists($relationTable, $relationColumn, $recipeId, $id)) {
@@ -200,25 +201,27 @@ final class TaxonomyRepository extends AbstractRepository {
             throw new \InvalidArgumentException('Unknown taxonomy type');
         }
         $item = $this->requireValueForUser($userId, $kind, $id);
-        return $this->setRecipeValueForUser($userId, $column, (string)$item['name']);
+        return $this->setRecipeValueForRecipes($recipeIds, $column, (string)$item['name']);
     }
 
-    public function removeManagedFromAll(string $userId, string $kind, int $id): int {
+    /** @param list<int> $recipeIds */
+    public function removeManagedFromRecipes(string $userId, string $kind, int $id, array $recipeIds): int {
+        $recipeIds = $this->selectedRecipeIdsForUser($userId, $recipeIds);
         if (isset(self::NAMED_KINDS[$kind])) {
             [$table, $relationTable, $relationColumn] = self::NAMED_KINDS[$kind];
             $this->requireNamedForUser($table, $userId, $id);
-            return $this->deleteNamedRelationsForUser($userId, $relationTable, $relationColumn, $id);
+            return $this->deleteNamedRelationsForRecipes($recipeIds, $relationTable, $relationColumn, $id);
         }
         $column = self::VALUE_KINDS[$kind] ?? null;
         if ($column === null) {
             throw new \InvalidArgumentException('Unknown taxonomy type');
         }
         $item = $this->requireValueForUser($userId, $kind, $id);
-        return $this->clearRecipeValueForUser($userId, $column, (string)$item['norm_name']);
+        return $this->clearRecipeValueForRecipes($recipeIds, $column, (string)$item['norm_name']);
     }
 
     public function deleteManaged(string $userId, string $kind, int $id): int {
-        $removed = $this->removeManagedFromAll($userId, $kind, $id);
+        $removed = $this->removeManagedFromRecipes($userId, $kind, $id, $this->recipeIdsForUser($userId));
         if (isset(self::NAMED_KINDS[$kind])) {
             [$table] = self::NAMED_KINDS[$kind];
             $this->deleteBy($table, 'id', $id);
@@ -349,6 +352,30 @@ final class TaxonomyRepository extends AbstractRepository {
         return array_map(static fn (array $row): int => (int)$row['id'], $this->fetchAll($qb));
     }
 
+    /** @return list<array{id: int, title: string, cuisine: string|null}> */
+    public function listRecipeChoicesForUser(string $userId): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('id', 'title', 'cuisine')->from('smartcook_recipes')
+            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+            ->orderBy('title', 'ASC');
+        return array_map(static fn (array $row): array => ['id' => (int)$row['id'], 'title' => (string)$row['title'], 'cuisine' => $row['cuisine']], $this->fetchAll($qb));
+    }
+
+    /** @param list<int> $recipeIds @return list<int> */
+    private function selectedRecipeIdsForUser(string $userId, array $recipeIds): array {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $recipeIds), static fn (int $id): bool => $id > 0)));
+        if ($ids === []) {
+            throw new \InvalidArgumentException('Select at least one recipe');
+        }
+        $owned = array_flip($this->recipeIdsForUser($userId));
+        foreach ($ids as $id) {
+            if (!isset($owned[$id])) {
+                throw new \InvalidArgumentException('A selected recipe is not owned by the current user');
+            }
+        }
+        return $ids;
+    }
+
     private function relationExists(string $table, string $column, int $recipeId, int $entityId): bool {
         $qb = $this->db->getQueryBuilder();
         $qb->select('id')->from($table)
@@ -358,9 +385,10 @@ final class TaxonomyRepository extends AbstractRepository {
         return $this->fetchOne($qb) !== null;
     }
 
-    private function deleteNamedRelationsForUser(string $userId, string $relationTable, string $relationColumn, int $entityId): int {
+    /** @param list<int> $recipeIds */
+    private function deleteNamedRelationsForRecipes(array $recipeIds, string $relationTable, string $relationColumn, int $entityId): int {
         $removed = 0;
-        foreach ($this->recipeIdsForUser($userId) as $recipeId) {
+        foreach ($recipeIds as $recipeId) {
             $qb = $this->db->getQueryBuilder();
             $removed += $qb->delete($relationTable)
                 ->where($qb->expr()->eq('recipe_id', $qb->createNamedParameter($recipeId, IQueryBuilder::PARAM_INT)))
@@ -396,16 +424,22 @@ final class TaxonomyRepository extends AbstractRepository {
         return $this->fetchOne($qb) ?? throw new \InvalidArgumentException('Taxonomy item not found');
     }
 
-    private function setRecipeValueForUser(string $userId, string $column, string $name): int {
-        $qb = $this->db->getQueryBuilder();
-        return $qb->update('smartcook_recipes')->set($column, $qb->createNamedParameter($name))
-            ->set('updated_at', $qb->createNamedParameter(time(), IQueryBuilder::PARAM_INT))
-            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))->executeStatement();
+    /** @param list<int> $recipeIds */
+    private function setRecipeValueForRecipes(array $recipeIds, string $column, string $name): int {
+        $changed = 0;
+        foreach ($recipeIds as $recipeId) {
+            $qb = $this->db->getQueryBuilder();
+            $changed += $qb->update('smartcook_recipes')->set($column, $qb->createNamedParameter($name))
+                ->set('updated_at', $qb->createNamedParameter(time(), IQueryBuilder::PARAM_INT))
+                ->where($qb->expr()->eq('id', $qb->createNamedParameter($recipeId, IQueryBuilder::PARAM_INT)))->executeStatement();
+        }
+        return $changed;
     }
 
-    private function clearRecipeValueForUser(string $userId, string $column, string $normalizedName): int {
+    /** @param list<int> $recipeIds */
+    private function clearRecipeValueForRecipes(array $recipeIds, string $column, string $normalizedName): int {
         $removed = 0;
-        foreach ($this->recipeIdsForUser($userId) as $recipeId) {
+        foreach ($recipeIds as $recipeId) {
             $qb = $this->db->getQueryBuilder();
             $qb->select($column)->from('smartcook_recipes')->where($qb->expr()->eq('id', $qb->createNamedParameter($recipeId, IQueryBuilder::PARAM_INT)))->setMaxResults(1);
             $row = $this->fetchOne($qb);

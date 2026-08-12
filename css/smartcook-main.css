@@ -923,6 +923,58 @@ select:focus {
 	gap: 16px;
 }
 
+.taxonomy-recipe-selector {
+	display: grid;
+	gap: 14px;
+	padding: 20px;
+}
+
+.taxonomy-recipe-selector .section-heading {
+	display: flex;
+	align-items: start;
+	justify-content: space-between;
+	gap: 12px;
+	padding-block-end: 10px;
+	border-block-end: 1px solid var(--smartcook-border);
+}
+
+.taxonomy-recipe-selector .section-heading strong {
+	color: var(--smartcook-accent);
+	white-space: nowrap;
+}
+
+.taxonomy-select-all {
+	font-weight: 650;
+}
+
+.taxonomy-recipe-list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+	max-height: 260px;
+	overflow: auto;
+}
+
+.taxonomy-recipe-list label {
+	display: flex;
+	align-items: start;
+	gap: 8px;
+	padding: 10px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.taxonomy-recipe-list strong,
+.taxonomy-recipe-list small {
+	display: block;
+}
+
+.taxonomy-recipe-list small {
+	margin-top: 2px;
+	color: var(--smartcook-muted);
+}
+
 .taxonomy-admin-card {
 	display: grid;
 	gap: 14px;
@@ -978,6 +1030,10 @@ select:focus {
 
 @media (max-width: 720px) {
 	.taxonomy-admin-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.taxonomy-recipe-list {
 		grid-template-columns: 1fr;
 	}
 

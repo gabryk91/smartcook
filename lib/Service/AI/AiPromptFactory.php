@@ -23,7 +23,6 @@ final class AiPromptFactory {
   "totalTime": 0,
   "difficulty": "string|null",
   "cuisine": "string|null",
-  "course": "string|null",
   "mealType": "string|null",
   "cookingMethod": "string|null",
   "season": "string|null",

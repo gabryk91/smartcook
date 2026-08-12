@@ -39,7 +39,6 @@ final class RecipeRepository extends AbstractRepository {
                 $qb->expr()->iLike('r.title', $qb->createNamedParameter($pattern)),
                 $qb->expr()->iLike('r.description', $qb->createNamedParameter($pattern)),
                 $qb->expr()->iLike('r.cuisine', $qb->createNamedParameter($pattern)),
-                $qb->expr()->iLike('r.course', $qb->createNamedParameter($pattern)),
             ));
         }
         if (isset($filters['favorite'])) {
@@ -312,7 +311,6 @@ final class RecipeRepository extends AbstractRepository {
             'cost_cents' => $this->nullableInt($data['costCents'] ?? $data['cost_cents'] ?? null),
             'currency' => $this->nullString($data['currency'] ?? null),
             'cuisine' => $this->nullString($data['cuisine'] ?? null),
-            'course' => $this->nullString($data['course'] ?? null),
             'meal_type' => $this->nullString($data['mealType'] ?? $data['meal_type'] ?? null),
             'cook_method' => $this->nullString($data['cookingMethod'] ?? $data['cook_method'] ?? null),
             'season' => $this->nullString($data['season'] ?? null),
@@ -483,7 +481,6 @@ final class RecipeRepository extends AbstractRepository {
             'costCents' => $row['cost_cents'] !== null ? (int)$row['cost_cents'] : null,
             'currency' => $row['currency'],
             'cuisine' => $row['cuisine'],
-            'course' => $row['course'],
             'mealType' => $row['meal_type'],
             'cookingMethod' => $row['cook_method'],
             'season' => $row['season'],
