@@ -145,7 +145,27 @@ try {
         throw 'Impossibile creare l''archivio tar.gz per l''App Store.'
     }
 
-    $storeSignature = (& $OpenSslPath dgst -sha512 -sign $CertificateKeyPath $storeArchivePath | & $OpenSslPath base64 -A).Trim()
+    $signProcess = [Diagnostics.Process]::new()
+    $signProcess.StartInfo.FileName = $OpenSslPath
+    $signProcess.StartInfo.ArgumentList.Add('dgst')
+    $signProcess.StartInfo.ArgumentList.Add('-sha512')
+    $signProcess.StartInfo.ArgumentList.Add('-sign')
+    $signProcess.StartInfo.ArgumentList.Add($CertificateKeyPath)
+    $signProcess.StartInfo.ArgumentList.Add($storeArchivePath)
+    $signProcess.StartInfo.UseShellExecute = $false
+    $signProcess.StartInfo.RedirectStandardOutput = $true
+    $signProcess.StartInfo.RedirectStandardError = $true
+
+    [void]$signProcess.Start()
+    $signatureStream = [IO.MemoryStream]::new()
+    $signProcess.StandardOutput.BaseStream.CopyTo($signatureStream)
+    $signError = $signProcess.StandardError.ReadToEnd()
+    $signProcess.WaitForExit()
+    if ($signProcess.ExitCode -ne 0) {
+        throw "Impossibile firmare l'archivio per l'App Store: $signError"
+    }
+
+    $storeSignature = [Convert]::ToBase64String($signatureStream.ToArray())
     if ([string]::IsNullOrWhiteSpace($storeSignature)) {
         throw 'La firma dell''archivio per l''App Store non è stata generata.'
     }
