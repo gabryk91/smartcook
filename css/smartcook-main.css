@@ -2483,6 +2483,31 @@ select:focus {
 		flex-direction: column;
 	}
 
+	[data-external-import-inbox] {
+		padding: 16px;
+	}
+
+	[data-external-import-inbox] .version-item {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	[data-external-import-inbox] .version-item strong {
+		overflow-wrap: anywhere;
+		word-break: break-word;
+	}
+
+	[data-external-import-inbox] .button-row {
+		justify-content: stretch;
+		width: 100%;
+	}
+
+	[data-external-import-inbox] .button-row > button {
+		flex: 1 1 140px;
+		min-width: 0;
+		text-align: center;
+	}
+
 	.step-editor {
 		grid-template-columns: 34px 1fr;
 	}

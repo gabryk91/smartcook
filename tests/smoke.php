@@ -6,6 +6,7 @@ require __DIR__ . '/bootstrap.php';
 
 use OCA\SmartCook\Service\AI\AiJsonParser;
 use OCA\SmartCook\Service\Import\IngredientParser;
+use OCA\SmartCook\Service\Import\FacebookDescriptionExtractor;
 use OCA\SmartCook\Service\Import\JsonLdRecipeExtractor;
 use OCA\SmartCook\Service\Import\RecipeNormalizer;
 use OCA\SmartCook\Service\Import\TextRecipeParser;
@@ -108,6 +109,19 @@ $expectSame(6, $normalized['servings'], 'JSON-LD servings');
 $expectSame(50, $normalized['totalTime'], 'JSON-LD total time fallback');
 $expectSame(2, count($normalized['ingredients']), 'JSON-LD ingredients');
 $expectSame(2, count($normalized['steps']), 'JSON-LD steps');
+
+$facebookSource = (new FacebookDescriptionExtractor())->extract(<<<'HTML'
+<!doctype html><html><head>
+<meta property="og:title" content="Pasta cremosa">
+<meta property="og:description" content="Pasta cremosa&#10;&#10;Ingredienti:&#10;- 320 g pasta&#10;- 200 ml panna&#10;&#10;Procedimento:&#10;1. Cuocere la pasta.&#10;2. Mantecare con la panna.">
+<meta property="og:image" content="https://cdn.example.test/pasta.jpg">
+</head></html>
+HTML);
+$expectSame('Pasta cremosa', $facebookSource['title'], 'Facebook title extraction');
+$expectSame('https://cdn.example.test/pasta.jpg', $facebookSource['image'], 'Facebook image extraction');
+$facebookRecipe = $recipeParser->parse($facebookSource['title'] . "\n\n" . $facebookSource['description'], ['title' => $facebookSource['title'], 'language' => 'it']);
+$expectSame(2, count($facebookRecipe['ingredients']), 'Facebook description ingredients');
+$expectSame(2, count($facebookRecipe['steps']), 'Facebook description steps');
 
 $ai = (new AiJsonParser())->parse("```json\n{\"title\":\"Torta\",\"ingredients\":[]}\n```");
 $expectSame('Torta', $ai['title'], 'AI fenced JSON parsing');
