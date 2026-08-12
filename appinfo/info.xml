@@ -7,7 +7,7 @@
     <description><![CDATA[
 SmartCook is a self-hosted recipe manager with structured ingredients, tags, automatic import from URLs or text, optional AI extraction, OCR adapters, meal planning, shopping lists, sharing, history and exports.
     ]]></description>
-    <version>1.0.73</version>
+    <version>1.0.74</version>
     <licence>MIT</licence>
     <author>SmartCook contributors</author>
     <website>https://github.com/gabryk91/smartcook</website>
