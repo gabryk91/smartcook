@@ -7,7 +7,7 @@ namespace OCA\SmartCook\Service\Import;
 use OCA\SmartCook\Exception\ImportException;
 
 final class UrlImporter implements ImporterInterface {
-    public function __construct(private UrlFetcher $fetcher, private HtmlImporter $html, private JsonImporter $json, private TextImporter $text) {
+    public function __construct(private UrlFetcher $fetcher, private HtmlImporter $html, private JsonImporter $json, private TextImporter $text, private YoutubeImporter $youtube) {
     }
 
     public function supports(string $kind): bool {
@@ -18,6 +18,9 @@ final class UrlImporter implements ImporterInterface {
         $url = trim((string)($payload['url'] ?? ''));
         if ($url === '') {
             throw new ImportException('No URL was provided');
+        }
+        if ($this->youtube->supports($url)) {
+            return $this->youtube->import($payload);
         }
         $download = $this->fetcher->fetch($url, (int)($payload['maxBytes'] ?? 3000000));
         $context = array_merge($payload, ['sourceUrl' => $download['finalUrl']]);

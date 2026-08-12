@@ -1793,6 +1793,13 @@ select:focus {
 	flex-wrap: wrap;
 }
 
+.import-preview-card,
+.import-preview-card textarea,
+.preview-columns li {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
 .recipe-view-image-wrap {
 	position: relative;
 }
