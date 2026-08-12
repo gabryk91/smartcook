@@ -25,6 +25,8 @@ const fallbackTranslations = {
         'Search recipes...': 'Cerca ricette...',
         'Search categories...': 'Cerca categorie...',
         'Search tags...': 'Cerca tag...',
+        'Top categories': 'Categorie più usate',
+        'No categories yet': 'Nessuna categoria',
         'Selected items': 'Elementi selezionati',
         'Additional attachment': 'Allegato aggiuntivo',
         'Generate with AI': 'Genera con AI',
@@ -297,6 +299,7 @@ async function renderDashboard(view) {
 			${stats.recentRecipes.length ? `<div class="compact-list">${stats.recentRecipes.map(recipe => `<a href="#/recipes/${recipe.id}"><div class="recipe-thumb">${recipeThumb(recipe)}</div><div><strong>${esc(recipe.title)}</strong><small>${esc(recipe.cuisine || tr('Uncategorized'))} - ${asNumber(recipe.totalTime)} min</small></div><span>&rsaquo;</span></a>`).join('')}</div>` : `<div class="empty-state"><h3>${esc(tr('Your cookbook is ready'))}</h3><p>${esc(tr('Create a recipe or import one from a webpage or text.'))}</p><a class="primary" href="#/import">${esc(tr('Import a recipe'))}</a></div>`}
 		</article>
 		<div class="view-stack">
+			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Organization'))}</p><h2>${esc(tr('Top categories'))}</h2><div class="tag-cloud">${(stats.topCategories || []).map(item => `<a href="#/recipes?categories=${encodeURIComponent(item.name)}">${esc(item.name)} <b>${item.count}</b></a>`).join('') || `<small>${esc(tr('No categories yet'))}</small>`}</div></article>
 			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Most used'))}</p><h2>${esc(tr('Ingredients'))}</h2><div class="tag-cloud">${stats.topIngredients.map(item => `<a href="#/recipes?ingredients=${encodeURIComponent(item.name)}">${esc(item.name)} <b>${item.count}</b></a>`).join('') || `<small>${esc(tr('No data yet'))}</small>`}</div></article>
 			<article class="panel dashboard-cloud"><p class="eyebrow">${esc(tr('Organization'))}</p><h2>${esc(tr('Top tags'))}</h2><div class="tag-cloud">${stats.topTags.map(item => `<a href="#/recipes?tags=${encodeURIComponent(item.name)}">#${esc(item.name)} <b>${item.count}</b></a>`).join('') || `<small>${esc(tr('No tags yet'))}</small>`}</div></article>
 		</div>

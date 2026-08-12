@@ -1,0 +1,63 @@
+name: Publish Nextcloud App Store release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Build and publish SmartCook
+    runs-on: ubuntu-latest
+    environment: release
+
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify the release version
+        id: version
+        shell: bash
+        run: |
+          version="$(php -r '$info = simplexml_load_file("appinfo/info.xml"); echo (string) $info->version;')"
+          tag="${{ github.event.release.tag_name }}"
+          if [ "v${version}" != "${tag}" ]; then
+            echo "The tag ${tag} does not match appinfo/info.xml version ${version}." >&2
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "asset_name=smartcook-${version}.tar.gz" >> "$GITHUB_OUTPUT"
+
+      - name: Create App Store archive
+        id: package
+        shell: bash
+        run: |
+          staging_directory="build/appstore/smartcook"
+          rm -rf "build/appstore"
+          mkdir -p "${staging_directory}"
+          for entry in appinfo css img js l10n lib templates LICENSE README.md; do
+            cp -R "${entry}" "${staging_directory}/${entry}"
+          done
+          archive="build/${{ steps.version.outputs.asset_name }}"
+          tar -C "build/appstore" -czf "${archive}" smartcook
+          echo "archive=${archive}" >> "$GITHUB_OUTPUT"
+
+      - name: Attach App Store archive to the GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" "${{ steps.package.outputs.archive }}" --clobber
+
+      - name: Publish to the Nextcloud App Store
+        uses: R0Wi/nextcloud-appstore-push-action@a011fe619bcf6e77ddebc96f9908e1af4071b9c1 # v1.0.5
+        with:
+          app_name: smartcook
+          appstore_token: ${{ secrets.APPSTORE_TOKEN }}
+          download_url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${{ steps.version.outputs.asset_name }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          nightly: ${{ github.event.release.prerelease }}

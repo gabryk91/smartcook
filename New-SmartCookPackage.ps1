@@ -3,7 +3,10 @@ param(
     [string]$OutputDirectory = (Join-Path $PSScriptRoot 'build'),
     [string]$CertificateKeyPath = (Join-Path $env:USERPROFILE '.nextcloud\certificates\smartcook.key'),
     [string]$OpenSslPath = 'C:\Program Files\OpenSSL-Win64\bin\openssl.exe',
-    [string]$GitHubRepository = 'gabryk91/smartcook'
+    [string]$GitHubRepository = 'gabryk91/smartcook',
+    [switch]$ConfigureGitHubReleaseSecrets,
+    [securestring]$AppStoreToken,
+    [string]$GitHubEnvironment = 'release'
 )
 
 Set-StrictMode -Version Latest
@@ -25,6 +28,39 @@ if ([string]::IsNullOrWhiteSpace($version)) {
 
 if (-not (Test-Path -LiteralPath $CertificateKeyPath -PathType Leaf)) {
     throw "Chiave privata per la firma non trovata: $CertificateKeyPath"
+}
+
+if ($ConfigureGitHubReleaseSecrets) {
+    $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
+    if ($null -eq $ghCommand) {
+        throw 'GitHub CLI non trovato. Installa GitHub CLI e completa "gh auth login" prima di configurare i segreti.'
+    }
+
+    if ($null -eq $AppStoreToken) {
+        $AppStoreToken = Read-Host -AsSecureString 'Incolla il token API di apps.nextcloud.com'
+    }
+
+    $tokenBstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($AppStoreToken)
+    try {
+        $tokenValue = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($tokenBstr)
+        $keyValue = Get-Content -LiteralPath $CertificateKeyPath -Raw
+
+        $keyValue | & $ghCommand.Source secret set APP_PRIVATE_KEY --env $GitHubEnvironment --repo $GitHubRepository
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile salvare APP_PRIVATE_KEY nei segreti GitHub.'
+        }
+
+        $tokenValue | & $ghCommand.Source secret set APPSTORE_TOKEN --env $GitHubEnvironment --repo $GitHubRepository
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Impossibile salvare APPSTORE_TOKEN nei segreti GitHub.'
+        }
+    }
+    finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($tokenBstr)
+    }
+
+    Write-Host "Segreti GitHub configurati nell'environment '$GitHubEnvironment' del repository $GitHubRepository."
+    return
 }
 
 if (-not (Test-Path -LiteralPath $OpenSslPath -PathType Leaf)) {
@@ -135,25 +171,20 @@ docker exec -u www-data Nextcloud php occ maintenance:mode --off
 
 --- PUBBLICAZIONE APP STORE NEXTCLOUD ---
 
-1. Crea una GitHub Release con tag v$nextVersion nel repository $GitHubRepository.
-2. Carica come asset della release il file:
-   $storeArchiveName
-3. Apri https://apps.nextcloud.com/developer/apps/releases/new
-4. Lascia disattivata l'opzione "Notturna" e inserisci:
-
-   Download (tar.gz):
-   $releaseDownloadUrl
-
-   Firma:
-   $storeSignature
-
-5. Seleziona "Carica" e verifica la pubblicazione su:
+1. Committa e invia al repository la versione $nextVersion aggiornata da questo script.
+2. Crea e pubblica una GitHub Release con tag v$nextVersion nel repository $GitHubRepository.
+3. Il workflow GitHub "Publish Nextcloud App Store release" allega automaticamente
+   $storeArchiveName alla release e lo pubblica nell'App Store Nextcloud.
+4. Verifica l'esito del workflow GitHub e la pubblicazione su:
    https://apps.nextcloud.com/apps/$appName
 
-Il certificato e la chiave esistenti vengono riutilizzati: non registrarne uno nuovo
-per gli aggiornamenti ordinari. Non caricare o committare mai il file .key.
+Configurazione iniziale (una sola volta): esegui lo script con
+  .\New-SmartCookPackage.ps1 -ConfigureGitHubReleaseSecrets
+e incolla il token da https://apps.nextcloud.com/account/token quando richiesto.
+Lo script salva APPSTORE_TOKEN e APP_PRIVATE_KEY nell'environment GitHub "release"
+senza scrivere la chiave privata nel repository.
 
-File generati per l'App Store:
+File generati per l'App Store (fallback manuale):
    Archivio: $storeArchivePath
    Firma:    $storeSignaturePath
 "@

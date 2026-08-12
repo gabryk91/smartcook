@@ -16,6 +16,8 @@ final class StatsService {
         $cookCount = 0;
         $tagLabels = [];
         $recipeTags = [];
+        $categoryLabels = [];
+        $recipeCategories = [];
         $ingredientLabels = [];
         $recipeIngredients = [];
         foreach ($recipes as $summary) {
@@ -34,6 +36,16 @@ final class StatsService {
             }
             $recipeTags[] = array_keys($names);
             $names = [];
+            foreach ((array)($detail['categories'] ?? []) as $category) {
+                $name = trim((string)($category['name'] ?? ''));
+                $normalizedName = mb_strtolower($name);
+                if ($normalizedName !== '') {
+                    $names[$normalizedName] = true;
+                    $categoryLabels[$normalizedName] ??= $name;
+                }
+            }
+            $recipeCategories[] = array_keys($names);
+            $names = [];
             foreach ((array)($detail['ingredients'] ?? []) as $ingredient) {
                 $name = trim((string)($ingredient['name'] ?? ''));
                 $normalizedName = mb_strtolower($name);
@@ -45,8 +57,10 @@ final class StatsService {
             $recipeIngredients[] = array_keys($names);
         }
         $tags = $this->matchingRecipeCounts($tagLabels, $recipeTags);
+        $categories = $this->matchingRecipeCounts($categoryLabels, $recipeCategories);
         $ingredients = $this->matchingRecipeCounts($ingredientLabels, $recipeIngredients);
         arsort($tags);
+        arsort($categories);
         arsort($ingredients);
         return [
             'recipeCount' => count($recipes),
@@ -54,6 +68,7 @@ final class StatsService {
             'cookCount' => $cookCount,
             'averageTotalTime' => count($recipes) > 0 ? (int)round($totalTime / count($recipes)) : 0,
             'topTags' => array_slice($this->counts($tags), 0, 10),
+            'topCategories' => array_slice($this->counts($categories), 0, 10),
             'topIngredients' => array_slice($this->counts($ingredients), 0, 10),
             'recentRecipes' => array_slice($recipes, 0, 8),
         ];
