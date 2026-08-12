@@ -48,6 +48,22 @@ const fallbackTranslations = {
         'Processing import': 'Importazione in elaborazione',
         'Import failed': 'Importazione non riuscita',
         'No received imports yet': 'Nessuna importazione ricevuta',
+        Administration: 'Amministrazione',
+        'Manage recipe lists': 'Gestisci gli elenchi delle ricette',
+        'Manage list': 'Gestisci elenco',
+        'Add values to your lists, then assign or remove each value from all your recipes. Deleting a value also removes it from every recipe.': 'Aggiungi valori agli elenchi, quindi assegnali o rimuovili da tutte le ricette. Eliminando un valore viene rimosso da ogni ricetta.',
+        'New value...': 'Nuovo valore...',
+        recipes: 'ricette',
+        'Assign to all': 'Assegna a tutte',
+        'Remove from all': 'Rimuovi da tutte',
+        'No values yet': 'Nessun valore',
+        'Value added': 'Valore aggiunto',
+        'Value assigned to all recipes': 'Valore assegnato a tutte le ricette',
+        'Value removed from all recipes': 'Valore rimosso da tutte le ricette',
+        'Value deleted': 'Valore eliminato',
+        'Assign this value to all your recipes?': 'Assegnare questo valore a tutte le tue ricette?',
+        'Remove this value from all your recipes?': 'Rimuovere questo valore da tutte le tue ricette?',
+        'Delete this value and remove it from all your recipes?': 'Eliminare questo valore e rimuoverlo da tutte le tue ricette?',
         'Loading...': 'Caricamento...',
         'Select import': 'Seleziona importazione',
         'Delete import': 'Elimina',
@@ -255,7 +271,7 @@ function splitNames(value) {
 function shellTitle(section, id) {
     const titles = {
         dashboard: tr('Dashboard'), recipes: tr('Recipes'), recipe: tr('Recipe overview'), editor: id ? tr('Edit recipe') : tr('New recipe'),
-        import: tr('Import'), planner: tr('Meal planner'), shopping: tr('Shopping lists'), settings: tr('Settings'),
+        import: tr('Import'), planner: tr('Meal planner'), shopping: tr('Shopping lists'), administration: tr('Administration'), settings: tr('Settings'),
     };
     return titles[section] || 'SmartCook';
 }
@@ -276,7 +292,7 @@ function renderShell(section, id) {
         throw new Error('SmartCook root was not found');
     const nav = [
         ['dashboard', tr('Dashboard')], ['recipes', tr('Recipes')], ['import', tr('Import')],
-        ['planner', tr('Meal planner')], ['shopping', tr('Shopping lists')], ['settings', tr('Settings')],
+        ['planner', tr('Meal planner')], ['shopping', tr('Shopping lists')], ['administration', tr('Administration')], ['settings', tr('Settings')],
     ];
     root.innerHTML = `<div class="smartcook-shell">
 		<aside class="smartcook-sidebar" aria-label="SmartCook">
@@ -1202,6 +1218,36 @@ async function renderShopping(view) {
     };
     await load();
 }
+async function renderAdministration(view) {
+    const labels = {
+        tags: tr('Tags'), categories: tr('Categories'), tools: tr('Tools'), cuisine: tr('Cuisine'),
+        course: tr('Course'), mealType: tr('Meal type'), cookingMethod: tr('Cooking method'), season: tr('Season'), origin: tr('Origin'),
+    };
+    const load = async () => {
+        const response = await working(() => request('/taxonomy/manage'));
+        const taxonomy = response.taxonomy || {};
+        view.innerHTML = `<section class="panel form-section taxonomy-admin-intro"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Administration'))}</p><h2>${esc(tr('Manage recipe lists'))}</h2><p class="section-help">${esc(tr('Add values to your lists, then assign or remove each value from all your recipes. Deleting a value also removes it from every recipe.'))}</p></div></div></section><div class="taxonomy-admin-grid">${Object.entries(labels).map(([kind, label]) => `<section class="panel taxonomy-admin-card"><div class="section-heading"><div><p class="eyebrow">${esc(label)}</p><h2>${esc(tr('Manage list'))}</h2></div></div><form data-taxonomy-add="${attr(kind)}" class="taxonomy-admin-add"><input name="name" required maxlength="255" placeholder="${attr(tr('New value...'))}"><button class="primary" type="submit">${esc(tr('Add'))}</button></form><div class="taxonomy-admin-items">${(taxonomy[kind] || []).map(item => `<article><div><strong>${esc(item.name)}</strong><small>${asNumber(item.usageCount)} ${esc(tr('recipes'))}</small></div><div class="taxonomy-admin-actions"><button class="secondary" data-taxonomy-apply="${attr(kind)}:${item.id}" type="button">${esc(tr('Assign to all'))}</button><button class="ghost" data-taxonomy-remove="${attr(kind)}:${item.id}" type="button">${esc(tr('Remove from all'))}</button><button class="danger ghost" data-taxonomy-delete="${attr(kind)}:${item.id}" type="button" aria-label="${attr(tr('Delete'))}">&times;</button></div></article>`).join('') || `<p class="section-help">${esc(tr('No values yet'))}</p>`}</div></section>`).join('')}</div>`;
+        view.querySelectorAll('[data-taxonomy-add]').forEach(form => form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const input = form.querySelector('input[name="name"]');
+            await working(() => request(`/taxonomy/${encodeURIComponent(form.dataset.taxonomyAdd || '')}`, { method: 'POST', json: { name: input?.value || '' } }));
+            showNotice(tr('Value added'));
+            await load();
+        }));
+        const bindAction = (selector, action, confirmMessage) => view.querySelectorAll(selector).forEach(button => button.addEventListener('click', async () => {
+            const [kind, id] = String(button.getAttribute(selector.slice(1, -1)) || '').split(':');
+            if (confirmMessage && !window.confirm(confirmMessage)) return;
+            const method = action === 'delete' ? 'DELETE' : 'POST';
+            await working(() => request(`/taxonomy/${encodeURIComponent(kind)}/${encodeURIComponent(id)}${action === 'delete' ? '' : `/${action}`}`, { method, json: {} }));
+            showNotice(action === 'apply' ? tr('Value assigned to all recipes') : action === 'remove' ? tr('Value removed from all recipes') : tr('Value deleted'));
+            await load();
+        }));
+        bindAction('[data-taxonomy-apply]', 'apply', tr('Assign this value to all your recipes?'));
+        bindAction('[data-taxonomy-remove]', 'remove', tr('Remove this value from all your recipes?'));
+        bindAction('[data-taxonomy-delete]', 'delete', tr('Delete this value and remove it from all your recipes?'));
+    };
+    await load();
+}
 async function renderSettings(view) {
     const settings = (await working(() => request('/settings'))).settings;
 	view.innerHTML = `<div class="settings-layout"><main class="view-stack"><div class="editor-actions settings-actions"><div><button class="primary" data-save-settings type="button">${esc(tr('Save settings'))}</button></div></div>
@@ -1304,6 +1350,9 @@ async function route() {
                 break;
             case 'shopping':
                 await renderShopping(view);
+                break;
+            case 'administration':
+                await renderAdministration(view);
                 break;
             case 'settings':
                 await renderSettings(view);

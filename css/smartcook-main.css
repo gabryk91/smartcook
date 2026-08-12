@@ -917,6 +917,80 @@ select:focus {
 	gap: 16px;
 }
 
+.taxonomy-admin-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.taxonomy-admin-card {
+	display: grid;
+	gap: 14px;
+	padding: 20px;
+}
+
+.taxonomy-admin-card .section-heading {
+	padding-block-end: 10px;
+	border-block-end: 1px solid var(--smartcook-border);
+}
+
+.taxonomy-admin-add,
+.taxonomy-admin-items article,
+.taxonomy-admin-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.taxonomy-admin-add input {
+	min-width: 0;
+	flex: 1;
+}
+
+.taxonomy-admin-items {
+	display: grid;
+	gap: 8px;
+	max-height: 330px;
+	overflow: auto;
+}
+
+.taxonomy-admin-items article {
+	justify-content: space-between;
+	padding: 10px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: 10px;
+}
+
+.taxonomy-admin-items strong,
+.taxonomy-admin-items small {
+	display: block;
+}
+
+.taxonomy-admin-items small {
+	color: var(--smartcook-muted);
+	margin-top: 2px;
+}
+
+.taxonomy-admin-actions {
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+	.taxonomy-admin-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.taxonomy-admin-items article {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.taxonomy-admin-actions {
+		justify-content: flex-start;
+	}
+}
+
 .form-grid.four {
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 }

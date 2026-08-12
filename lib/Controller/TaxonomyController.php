@@ -24,4 +24,37 @@ final class TaxonomyController extends BaseController {
     public function list(): JSONResponse {
         return $this->respond(fn (): array => $this->taxonomy->listForUser($this->userContext->userId()));
     }
+
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[FrontpageRoute(verb: 'GET', url: '/taxonomy/manage')]
+    public function managed(): JSONResponse {
+        return $this->respond(fn (): array => ['taxonomy' => $this->taxonomy->listManagedForUser($this->userContext->userId())]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}')]
+    public function add(string $kind): JSONResponse {
+        return $this->respond(fn (): array => ['item' => $this->taxonomy->addManaged(
+            $this->userContext->userId(), $kind, (string)$this->request->getParam('name', '')
+        )]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}/{id}/apply')]
+    public function apply(string $kind, int $id): JSONResponse {
+        return $this->respond(fn (): array => ['changed' => $this->taxonomy->applyManagedToAll($this->userContext->userId(), $kind, $id)]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/taxonomy/{kind}/{id}/remove')]
+    public function remove(string $kind, int $id): JSONResponse {
+        return $this->respond(fn (): array => ['changed' => $this->taxonomy->removeManagedFromAll($this->userContext->userId(), $kind, $id)]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'DELETE', url: '/taxonomy/{kind}/{id}')]
+    public function delete(string $kind, int $id): JSONResponse {
+        return $this->respond(fn (): array => ['changed' => $this->taxonomy->deleteManaged($this->userContext->userId(), $kind, $id)]);
+    }
 }
