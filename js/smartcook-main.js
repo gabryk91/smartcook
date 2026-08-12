@@ -40,6 +40,15 @@ const fallbackTranslations = {
         'Example: use more legumes and prepare leftovers for lunch': 'Esempio: usa più legumi e prepara gli avanzi per il pranzo',
         'Example: vegetarian, no peanuts, low salt': 'Esempio: vegetariana, senza arachidi, poco sale',
         'Import previews': 'Anteprime di importazione',
+        'Received imports': 'Importazioni ricevute',
+        'Imports sent from SmartCook Connector appear here.': 'Qui compaiono le importazioni inviate da SmartCook Connector.',
+        'Refresh': 'Aggiorna',
+        'Open preview': 'Apri anteprima',
+        'Waiting for processing': 'In attesa di elaborazione',
+        'Processing import': 'Importazione in elaborazione',
+        'Import failed': 'Importazione non riuscita',
+        'No received imports yet': 'Nessuna importazione ricevuta',
+        'Loading...': 'Caricamento...',
         'Imported recipes saved': 'Ricette importate salvate',
         'Importing file': 'Importazione file',
         'Importing recipe': 'Importazione ricetta',
@@ -811,6 +820,7 @@ async function renderImport(view) {
     };
     const paint = () => {
         view.innerHTML = `<section class="import-hero panel"><div><p class="eyebrow">${esc(tr('Smart import'))}</p><h2>${esc(tr('Turn almost any source into a structured recipe'))}</h2><p>${esc(tr('SmartCook checks Schema.org data first, then deterministic parsing, and uses AI only when requested.'))}</p></div></section>
+		<section class="panel" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p><h2>${esc(tr('Received imports'))}</h2><p>${esc(tr('Imports sent from SmartCook Connector appear here.'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></section>
 		<section class="two-column import-layout"><article class="panel form-section">
 			<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>
             ${kind === 'url' ? `<label>${esc(tr('Recipe URL'))}<input data-import-url type="url" placeholder="https://example.com/recipe"></label>` : kind === 'file' ? `<label>${esc(tr('PDF, image, Markdown, HTML or JSON'))}<input data-import-file type="file" multiple accept="image/*,.pdf,.txt,.md,.markdown,.html,.htm,.json"><small>${esc(tr('Select one or more files. Images and PDFs require a configured OCR/document extractor.'))}</small></label>` : `<label>${esc(tr('Source content'))}<textarea data-import-text rows="18" placeholder="${attr(tr('Paste the recipe, including ingredients and procedure...'))}"></textarea></label>`}
@@ -820,6 +830,34 @@ async function renderImport(view) {
         </article><article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews)}</article></section>
 		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
         view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); paint(); }));
+        const loadInbox = async () => {
+            const inbox = view.querySelector('[data-external-import-inbox]');
+            if (!inbox)
+                return;
+            try {
+                const jobs = (await request('/import/jobs?limit=50')).jobs || [];
+                inbox.innerHTML = externalImportInboxHtml(jobs);
+                inbox.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
+                inbox.querySelectorAll('[data-open-external-import]').forEach(button => button.addEventListener('click', () => {
+                    const job = jobs.find(item => String(item.id) === String(button.dataset.openExternalImport));
+                    if (!job?.result?.recipe) {
+                        showNotice(tr('Waiting for processing'), 'error');
+                        return;
+                    }
+                    previews = [job.result];
+                    savedPreviews = new Set();
+                    const previewHolder = view.querySelector('[data-import-preview]');
+                    previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+                    bindImportSave(previewHolder);
+                    previewHolder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }));
+            }
+            catch (error) {
+                inbox.innerHTML = `<div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p><h2>${esc(tr('Received imports'))}</h2></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(error instanceof Error ? error.message : tr('Unexpected error'))}</p>`;
+                inbox.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
+            }
+        };
+        view.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
         view.querySelector('[data-extract]')?.addEventListener('click', async () => {
             const language = view.querySelector('[data-import-language]')?.value || 'en';
             const useAi = view.querySelector('[data-import-ai]')?.checked || false;
@@ -881,6 +919,7 @@ async function renderImport(view) {
         });
         if (previews.length)
             bindImportSave(view.querySelector('[data-import-preview]'));
+        loadInbox();
     };
     const bindImportSave = (holder) => {
         holder.querySelector('[data-save-all-import]')?.addEventListener('click', async (event) => {
@@ -925,6 +964,15 @@ async function renderImport(view) {
         });
     };
     paint();
+}
+function externalImportInboxHtml(jobs) {
+    const entries = jobs.filter(job => ['url', 'text'].includes(job.kind));
+    return `<div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p><h2>${esc(tr('Received imports'))}</h2><p>${esc(tr('Imports sent from SmartCook Connector appear here.'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div>${entries.length ? `<div class="version-list">${entries.map(job => {
+        const status = job.status === 'complete' ? tr('Open preview') : job.status === 'failed' ? tr('Import failed') : job.status === 'running' ? tr('Processing import') : tr('Waiting for processing');
+        const source = String(job.sourceRef || job.payload?.text || job.payload?.url || job.kind).slice(0, 180);
+        const error = job.status === 'failed' && job.error ? `<small>${esc(job.error)}</small>` : '';
+        return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${error}</div>${job.status === 'complete' && job.result?.recipe ? `<button class="primary" data-open-external-import="${attr(job.id)}" type="button">${esc(tr('Open preview'))}</button>` : ''}</div>`;
+    }).join('')}</div>` : `<p>${esc(tr('No received imports yet'))}</p>`}`;
 }
 function importPreviewsHtml(previews, savedPreviews) {
     if (!previews.length)

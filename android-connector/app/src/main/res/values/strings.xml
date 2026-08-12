@@ -19,7 +19,7 @@
     <string name="sending_import">Sending import…</string>
     <string name="operation_failed">Operation failed.</string>
     <string name="connection_verified">Configuration verified: SmartCook is reachable and the credentials are valid.</string>
-    <string name="import_sent">Import sent. Open SmartCook to review the preview.</string>
+    <string name="import_sent">Import sent. In SmartCook, open Import then Received imports to review the preview.</string>
     <string name="invalid_credentials">Invalid credentials or no permission for SmartCook.</string>
     <string name="external_receiver_unavailable">The Android receiver is not available on this SmartCook yet. Update SmartCook in Nextcloud and try again.</string>
     <string name="smartcook_not_found">SmartCook is not installed or the Nextcloud URL is incorrect.</string>
