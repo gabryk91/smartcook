@@ -1,7 +1,7 @@
 {
   "name": "smartcook/smartcook",
   "description": "Intelligent, multilingual recipe management for Nextcloud",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "type": "project",
   "autoload": {
     "psr-4": {

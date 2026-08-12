@@ -84,4 +84,4 @@ Contributions, testing reports and recipe-import edge cases are welcome. Please 
 
 ## 📄 License
 
-SmartCook is released under the [AGPL-3.0-or-later](LICENSE) license.
+SmartCook is released under the [MIT](LICENSE) license.
