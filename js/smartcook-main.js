@@ -65,6 +65,7 @@ const fallbackTranslations = {
 		'Cost': 'Costo',
 		'Cost and currency': 'Costo e valuta',
 		'Planning details help': 'Indica porzioni e resa per ricalcolare la ricetta; i tempi sono espressi in minuti e vengono sommati automaticamente.',
+		'Exclude from meal planner': 'Escludi dal pianificatore pasti',
 		'Choose existing values or type a new one. Press Enter or comma to add it.': 'Scegli un valore esistente oppure scrivine uno nuovo. Premi Invio o virgola per aggiungerlo.',
 		'Select an option': 'Seleziona un’opzione',
 		'Spring': 'Primavera',
@@ -241,7 +242,7 @@ function clearNotice(type) {
 function emptyRecipe() {
     return {
         title: '', subtitle: null, description: null, language: document.documentElement.lang || 'en', author: null,
-        sourceName: null, sourceUrl: null, license: null, status: 'draft', visibility: 'private', favorite: false,
+        sourceName: null, sourceUrl: null, license: null, status: 'draft', visibility: 'private', favorite: false, excludeFromPlanner: false,
         servings: 4, yieldText: null, prepTime: 0, restTime: 0, cookTime: 0, totalTime: 0, difficulty: null,
         costCents: null, currency: 'EUR', cuisine: null, course: null, mealType: null, cookingMethod: null,
         season: null, origin: null, calories: null, nutrition: {}, notes: null, imagePath: null,
@@ -567,6 +568,7 @@ function collectRecipe(view, existing) {
         language: value('language').trim() || 'en', author: value('author').trim() || null, sourceName: value('sourceName').trim() || null,
         sourceUrl: value('sourceUrl').trim() || null, license: value('license').trim() || null,
         status: value('status'), visibility: value('visibility'),
+        excludeFromPlanner: view.querySelector('[data-field="excludeFromPlanner"]')?.checked || false,
         servings: Math.max(1, numeric('servings')), yieldText: value('yieldText').trim() || null,
         prepTime, restTime, cookTime, totalTime: prepTime + restTime + cookTime,
         difficulty: value('difficulty').trim() || null, costCents: Math.round(Math.max(0, numeric('costAmount')) * 100) || null, currency: value('currency').trim().toUpperCase() || null,
@@ -658,7 +660,7 @@ function editorForm(recipe, taxonomy = {}) {
 				${textInput(tr('Author'), 'author', recipe.author)}${textInput(tr('Language'), 'language', recipe.language)}${textInput(tr('Source name'), 'sourceName', recipe.sourceName)}${textInput(tr('Source URL'), 'sourceUrl', recipe.sourceUrl, { type: 'url' })}${textInput(tr('License'), 'license', recipe.license)}
 				${selectInput(tr('Status'), 'status', recipe.status, [['draft', tr('Draft')], ['published', tr('Published')]])}${selectInput(tr('Visibility'), 'visibility', recipe.visibility, [['private', tr('Private')], ['shared', tr('Shared')], ['public', tr('Public')]])}</div>
 			</section>
-			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Yield and timing'))}</p><h2>${esc(tr('Planning data'))}</h2><p class="section-help">${esc(tr('Planning details help'))}</p></div></div><div class="planning-grid">${textInput(tr('Servings'), 'servings', recipe.servings, { type: 'number', min: 1 })}${textInput(tr('Yield'), 'yieldText', recipe.yieldText)}${textInput(tr('Preparation (min)'), 'prepTime', recipe.prepTime, { type: 'number', min: 0 })}${textInput(tr('Rest (min)'), 'restTime', recipe.restTime, { type: 'number', min: 0 })}${textInput(tr('Cooking (min)'), 'cookTime', recipe.cookTime, { type: 'number', min: 0 })}${textInput(tr('Difficulty'), 'difficulty', recipe.difficulty)}${textInput(tr('Calories'), 'calories', recipe.calories, { type: 'number', min: 0 })}<label class="planning-cost">${esc(tr('Cost and currency'))}<span><input data-field="costAmount" type="number" min="0" step="0.01" inputmode="decimal" value="${attr(costAmount)}" placeholder="0.00"><input data-field="currency" value="${attr(recipe.currency || 'EUR')}" maxlength="3" aria-label="${attr(tr('Currency'))}"></span></label></div></section>
+			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Yield and timing'))}</p><h2>${esc(tr('Planning data'))}</h2><p class="section-help">${esc(tr('Planning details help'))}</p></div></div><div class="planning-grid">${textInput(tr('Servings'), 'servings', recipe.servings, { type: 'number', min: 1 })}${textInput(tr('Yield'), 'yieldText', recipe.yieldText)}${textInput(tr('Preparation (min)'), 'prepTime', recipe.prepTime, { type: 'number', min: 0 })}${textInput(tr('Rest (min)'), 'restTime', recipe.restTime, { type: 'number', min: 0 })}${textInput(tr('Cooking (min)'), 'cookTime', recipe.cookTime, { type: 'number', min: 0 })}${textInput(tr('Difficulty'), 'difficulty', recipe.difficulty)}${textInput(tr('Calories'), 'calories', recipe.calories, { type: 'number', min: 0 })}<label class="planning-cost">${esc(tr('Cost and currency'))}<span><input data-field="costAmount" type="number" min="0" step="0.01" inputmode="decimal" value="${attr(costAmount)}" placeholder="0.00"><input data-field="currency" value="${attr(recipe.currency || 'EUR')}" maxlength="3" aria-label="${attr(tr('Currency'))}"></span></label><label class="check-inline"><input data-field="excludeFromPlanner" type="checkbox"${recipe.excludeFromPlanner ? ' checked' : ''}> ${esc(tr('Exclude from meal planner'))}</label></div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Structured list'))}</p><h2>${esc(tr('Ingredients'))}</h2></div><button class="secondary" data-add-ingredient type="button">+ ${esc(tr('Ingredient'))}</button></div><div data-ingredients>${(recipe.ingredients.length ? recipe.ingredients : [{ name: '' }]).map(item => ingredientRow(item)).join('')}</div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Method'))}</p><h2>${esc(tr('Procedure'))}</h2></div><button class="secondary" data-add-step type="button">+ ${esc(tr('Step'))}</button></div><div data-steps>${(recipe.steps.length ? recipe.steps : [{ text: '' }]).map((item, index) => stepRow(item, index)).join('')}</div></section>
 			<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Classification'))}</p><h2>${esc(tr('Organization'))}</h2><p class="section-help">${esc(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}</p></div></div><div class="form-grid">${labelInput(tr('Tags'), chipPicker('tags', recipe.tags || [], taxonomy.tags || []), 'span-2')}${labelInput(tr('Categories'), chipPicker('categories', recipe.categories || [], taxonomy.categories || []), 'span-2')}${labelInput(tr('Tools'), chipPicker('tools', recipe.tools || [], taxonomy.tools || []), 'span-2')}${labelInput(tr('Cuisine'), chipPicker('cuisine', [recipe.cuisine].filter(Boolean), taxonomy.cuisine || [], true))}${labelInput(tr('Course'), chipPicker('course', [recipe.course].filter(Boolean), taxonomy.course || [], true))}${labelInput(tr('Meal type'), chipPicker('mealType', [recipe.mealType].filter(Boolean), taxonomy.mealType || [], true))}${labelInput(tr('Cooking method'), chipPicker('cookingMethod', [recipe.cookingMethod].filter(Boolean), taxonomy.cookingMethod || [], true))}${selectInput(tr('Season'), 'season', recipe.season, predefinedOptions(recipe.season, [['', tr('Select an option')], ['Primavera', tr('Spring')], ['Estate', tr('Summer')], ['Autunno', tr('Autumn')], ['Inverno', tr('Winter')]]))}${labelInput(tr('Origin'), chipPicker('origin', [recipe.origin].filter(Boolean), taxonomy.origin || [], true))}${textareaInput(tr('Personal notes'), 'notes', recipe.notes, 5, 'span-2')}</div></section>
@@ -1092,7 +1094,7 @@ async function renderPlanner(view) {
             request('/recipes?sort=title&direction=ASC'),
             request(`/planner?from=${dateIso(days[0])}&to=${dateIso(days[6])}`),
         ]));
-        recipes = recipeResponse.recipes;
+        recipes = recipeResponse.recipes.filter(recipe => !recipe.excludeFromPlanner);
         meals = mealResponse.meals;
         paint(days);
     };

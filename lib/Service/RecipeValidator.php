@@ -32,6 +32,7 @@ final class RecipeValidator {
         }
 
         $data['language'] = $this->language((string)($data['language'] ?? 'en'));
+        $data['excludeFromPlanner'] = (bool)($data['excludeFromPlanner'] ?? false);
         $data['servings'] = max(1, min(10000, (int)($data['servings'] ?? 1)));
         foreach (['prepTime', 'restTime', 'cookTime', 'totalTime'] as $field) {
             if (array_key_exists($field, $data)) {

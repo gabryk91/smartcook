@@ -27,7 +27,8 @@ final class PlannerService {
 
     /** @return array<string, mixed> */
     public function create(array $data): array {
-        $this->access->readable((int)($data['recipeId'] ?? 0));
+        $recipe = $this->access->readable((int)($data['recipeId'] ?? 0));
+        $this->ensureRecipeCanBePlanned($recipe);
         $this->validateDate((string)($data['date'] ?? ''));
         return $this->planner->createMeal($this->userContext->userId(), $data);
     }
@@ -56,7 +57,10 @@ final class PlannerService {
         if ($days < 1 || $days > 14) {
             throw new \OCA\SmartCook\Exception\ValidationException('Invalid planning range', ['to' => 'Use a range between 1 and 14 days']);
         }
-        $available = $this->recipes->list([], 200);
+        $available = array_values(array_filter(
+            $this->recipes->list([], 200),
+            static fn (array $recipe): bool => !(bool)($recipe['excludeFromPlanner'] ?? false),
+        ));
         $catalog = array_map(function (array $recipe): array {
             $detail = $this->access->readable((int)$recipe['id']);
             return [
@@ -113,6 +117,13 @@ final class PlannerService {
         $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
         if ($parsed === false || $parsed->format('Y-m-d') !== $date) {
             throw new \OCA\SmartCook\Exception\ValidationException('Invalid date', ['date' => 'Use YYYY-MM-DD']);
+        }
+    }
+
+    /** @param array<string, mixed> $recipe */
+    private function ensureRecipeCanBePlanned(array $recipe): void {
+        if ((bool)($recipe['excludeFromPlanner'] ?? false)) {
+            throw new \OCA\SmartCook\Exception\ValidationException('Recipe excluded from meal planner', ['recipeId' => 'This recipe is excluded from the meal planner']);
         }
     }
 }
