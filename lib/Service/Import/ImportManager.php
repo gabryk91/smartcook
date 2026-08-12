@@ -36,7 +36,7 @@ final class ImportManager {
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */
-    public function preview(string $userId, string $kind, array $payload, bool $useAi = false, ?string $provider = null): array {
+    public function preview(string $userId, string $kind, array $payload, bool $useAi = false, ?string $provider = null, bool $includeDuplicates = true): array {
         $payload['userId'] = $userId;
         $settings = $this->settings->get($userId);
         $payload['maxBytes'] ??= $settings['maxImportBytes'];
@@ -66,7 +66,9 @@ final class ImportManager {
             'recipe' => $recipe,
             'strategy' => $strategy,
             'warnings' => array_values(array_unique($warnings)),
-            'duplicates' => $this->duplicates->find($recipe),
+            // Duplicate lookup relies on the active web session. Background jobs
+            // run without one, so they intentionally defer this optional hint.
+            'duplicates' => $includeDuplicates ? $this->duplicates->find($recipe) : [],
         ];
     }
 
@@ -92,7 +94,7 @@ final class ImportManager {
         }
         $this->jobs->markRunning($jobId);
         try {
-            $result = $this->preview($job['userId'], $job['kind'], $job['payload'], $job['useAi'], $job['provider']);
+            $result = $this->preview($job['userId'], $job['kind'], $job['payload'], $job['useAi'], $job['provider'], false);
             $this->jobs->markComplete($jobId, $result);
             return $result;
         } catch (\Throwable $e) {
