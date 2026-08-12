@@ -49,6 +49,9 @@ const fallbackTranslations = {
         'Import failed': 'Importazione non riuscita',
         'No received imports yet': 'Nessuna importazione ricevuta',
         'Loading...': 'Caricamento...',
+        'Start acquisition': 'Avvia acquisizione',
+        'Delete import': 'Elimina',
+        'Delete this received import?': 'Eliminare questa importazione ricevuta?',
         'Imported recipes saved': 'Ricette importate salvate',
         'Importing file': 'Importazione file',
         'Importing recipe': 'Importazione ricetta',
@@ -806,6 +809,7 @@ async function renderImport(view) {
     let kind = 'url';
     let previews = [];
     let savedPreviews = new Set();
+    let activeExternalJobId = null;
     const setImportBusy = (active, title = tr('Importing recipe'), detail = tr('Please wait while the source is analyzed.')) => {
         const modal = view.querySelector('[data-import-loading]');
         if (modal) {
@@ -829,7 +833,7 @@ async function renderImport(view) {
 			<button class="primary" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
         </article><article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews)}</article></section>
 		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
-        view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); paint(); }));
+        view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); activeExternalJobId = null; paint(); }));
         const loadInbox = async () => {
             const inbox = view.querySelector('[data-external-import-inbox]');
             if (!inbox)
@@ -838,6 +842,42 @@ async function renderImport(view) {
                 const jobs = (await request('/import/jobs?limit=50')).jobs || [];
                 inbox.innerHTML = externalImportInboxHtml(jobs);
                 inbox.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
+                inbox.querySelectorAll('[data-delete-external-import]').forEach(button => button.addEventListener('click', async () => {
+                    if (!window.confirm(tr('Delete this received import?')))
+                        return;
+                    await working(() => request(`/import/jobs/${button.dataset.deleteExternalImport}`, { method: 'DELETE' }));
+                    await loadInbox();
+                }));
+                inbox.querySelectorAll('[data-process-external-import]').forEach(button => button.addEventListener('click', async () => {
+                    const job = jobs.find(item => String(item.id) === String(button.dataset.processExternalImport));
+                    if (!job)
+                        return;
+                    kind = job.kind === 'text' ? 'text' : 'url';
+                    paint();
+                    const source = job.payload?.[kind] || job.sourceRef || '';
+                    const sourceInput = kind === 'url' ? view.querySelector('[data-import-url]') : view.querySelector('[data-import-text]');
+                    if (sourceInput)
+                        sourceInput.value = source;
+                    setImportBusy(true);
+                    try {
+                        const processed = await request(`/import/jobs/${job.id}/process`, { method: 'POST', json: {} });
+                        previews = [processed.job.result];
+                        savedPreviews = new Set();
+                        activeExternalJobId = job.id;
+                        const previewHolder = view.querySelector('[data-import-preview]');
+                        previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+                        bindImportSave(previewHolder);
+                        previewHolder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        await loadInbox();
+                    }
+                    catch (error) {
+                        showNotice(error instanceof Error ? error.message : tr('Import failed'), 'error');
+                        await loadInbox();
+                    }
+                    finally {
+                        setImportBusy(false);
+                    }
+                }));
                 inbox.querySelectorAll('[data-open-external-import]').forEach(button => button.addEventListener('click', () => {
                     const job = jobs.find(item => String(item.id) === String(button.dataset.openExternalImport));
                     if (!job?.result?.recipe) {
@@ -846,6 +886,7 @@ async function renderImport(view) {
                     }
                     previews = [job.result];
                     savedPreviews = new Set();
+                    activeExternalJobId = job.id;
                     const previewHolder = view.querySelector('[data-import-preview]');
                     previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews);
                     bindImportSave(previewHolder);
@@ -860,6 +901,7 @@ async function renderImport(view) {
         view.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
         view.querySelector('[data-extract]')?.addEventListener('click', async () => {
             const language = view.querySelector('[data-import-language]')?.value || 'en';
+            activeExternalJobId = null;
             const useAi = view.querySelector('[data-import-ai]')?.checked || false;
             const provider = view.querySelector('[data-import-provider]')?.value || '';
             if (kind === 'file') {
@@ -960,18 +1002,25 @@ async function renderImport(view) {
                 return;
             }
             showNotice(tr('Imported recipes saved'));
+            if (activeExternalJobId !== null) {
+                await request(`/import/jobs/${activeExternalJobId}`, { method: 'DELETE' });
+                activeExternalJobId = null;
+            }
             location.hash = '#/recipes';
         });
     };
     paint();
 }
 function externalImportInboxHtml(jobs) {
-    const entries = jobs.filter(job => ['url', 'text'].includes(job.kind));
+    const entries = jobs.filter(job => job.payload?.external === true);
     return `<div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p><h2>${esc(tr('Received imports'))}</h2><p>${esc(tr('Imports sent from SmartCook Connector appear here.'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div>${entries.length ? `<div class="version-list">${entries.map(job => {
         const status = job.status === 'complete' ? tr('Open preview') : job.status === 'failed' ? tr('Import failed') : job.status === 'running' ? tr('Processing import') : tr('Waiting for processing');
         const source = String(job.sourceRef || job.payload?.text || job.payload?.url || job.kind).slice(0, 180);
         const error = job.status === 'failed' && job.error ? `<small>${esc(job.error)}</small>` : '';
-        return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${error}</div>${job.status === 'complete' && job.result?.recipe ? `<button class="primary" data-open-external-import="${attr(job.id)}" type="button">${esc(tr('Open preview'))}</button>` : ''}</div>`;
+        const mainAction = job.status === 'complete' && job.result?.recipe
+            ? `<button class="primary" data-open-external-import="${attr(job.id)}" type="button">${esc(tr('Open preview'))}</button>`
+            : job.status !== 'running' ? `<button class="primary" data-process-external-import="${attr(job.id)}" type="button">${esc(tr('Start acquisition'))}</button>` : '';
+        return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${error}</div><div class="button-row">${mainAction}<button class="ghost danger" data-delete-external-import="${attr(job.id)}" type="button">${esc(tr('Delete import'))}</button></div></div>`;
     }).join('')}</div>` : `<p>${esc(tr('No received imports yet'))}</p>`}`;
 }
 function importPreviewsHtml(previews, savedPreviews) {

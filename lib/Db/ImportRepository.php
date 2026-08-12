@@ -73,6 +73,14 @@ final class ImportRepository extends AbstractRepository {
         ]);
     }
 
+    public function deleteForUser(int $id, string $userId): bool {
+        $qb = $this->db->getQueryBuilder();
+        return $qb->delete('smartcook_imports')
+            ->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+            ->executeStatement() > 0;
+    }
+
     public function deleteOlderThan(int $timestamp): int {
         $qb = $this->db->getQueryBuilder();
         return $qb->delete('smartcook_imports')

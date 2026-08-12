@@ -73,13 +73,15 @@ final class ImportManager {
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */
-    public function enqueue(string $userId, string $kind, array $payload, bool $useAi = false, ?string $provider = null): array {
+    public function enqueue(string $userId, string $kind, array $payload, bool $useAi = false, ?string $provider = null, bool $schedule = true): array {
         if ($kind === 'file') {
             throw new ImportException('File imports must be processed synchronously');
         }
         $sourceRef = isset($payload['url']) ? (string)$payload['url'] : null;
         $job = $this->jobs->createJob($userId, $kind, $sourceRef, $useAi, $provider, $payload);
-        $this->jobList->add(ProcessImportJob::class, ['jobId' => $job['id']]);
+        if ($schedule) {
+            $this->jobList->add(ProcessImportJob::class, ['jobId' => $job['id']]);
+        }
         return $job;
     }
 
@@ -111,6 +113,17 @@ final class ImportManager {
     /** @return array<string, mixed> */
     public function job(string $userId, int $id): array {
         return $this->jobs->getJob($id, $userId) ?? throw new ImportException('Import job not found');
+    }
+
+    /** @return array<string, mixed> */
+    public function processForUser(string $userId, int $id): array {
+        $this->job($userId, $id);
+        return $this->processJob($id);
+    }
+
+    public function deleteForUser(string $userId, int $id): void {
+        $this->job($userId, $id);
+        $this->jobs->deleteForUser($id, $userId);
     }
 
     private function importer(string $kind): ImporterInterface {

@@ -64,6 +64,21 @@ final class ImportController extends BaseController {
         }, Http::STATUS_ACCEPTED);
     }
 
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/import/jobs/{id}/process')]
+    public function process(int $id): JSONResponse {
+        return $this->respond(fn (): array => ['job' => $this->imports->processForUser($this->userContext->userId(), $id)]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'DELETE', url: '/import/jobs/{id}')]
+    public function delete(int $id): JSONResponse {
+        return $this->respond(function () use ($id): array {
+            $this->imports->deleteForUser($this->userContext->userId(), $id);
+            return ['ok' => true];
+        });
+    }
+
     /**
      * Endpoint for trusted external clients, such as the SmartCook Android connector.
      * Authentication is still enforced by Nextcloud; the CSRF exemption is required
@@ -79,9 +94,10 @@ final class ImportController extends BaseController {
                 throw new ValidationException('External imports support URL or text content only', ['kind' => 'Unsupported']);
             }
             $payload = $this->payload('payload');
+            $payload['external'] = true;
             $useAi = filter_var($this->request->getParam('useAi', false), FILTER_VALIDATE_BOOLEAN);
             $provider = $this->request->getParam('provider', null);
-            return ['job' => $this->imports->enqueue($this->userContext->userId(), $kind, $payload, $useAi, is_string($provider) ? $provider : null)];
+            return ['job' => $this->imports->enqueue($this->userContext->userId(), $kind, $payload, $useAi, is_string($provider) ? $provider : null, false)];
         }, Http::STATUS_ACCEPTED);
     }
 

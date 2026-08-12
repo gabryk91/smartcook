@@ -1781,6 +1781,18 @@ select:focus {
 	object-fit: cover;
 }
 
+[data-external-import-inbox] {
+	padding: 22px 24px;
+}
+
+.button-row {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
 .recipe-view-image-wrap {
 	position: relative;
 }
