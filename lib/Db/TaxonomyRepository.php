@@ -335,7 +335,7 @@ final class TaxonomyRepository extends AbstractRepository {
     private function namedUsageCount(string $kind, int $id, string $userId): int {
         [, $relationTable, $relationColumn] = self::NAMED_KINDS[$kind];
         $qb = $this->db->getQueryBuilder();
-        $qb->select('COUNT(*) AS count')->from($relationTable, 'rel')
+        $qb->select($qb->func()->count('*', 'count'))->from($relationTable, 'rel')
             ->innerJoin('rel', 'smartcook_recipes', 'recipe', $qb->expr()->eq('rel.recipe_id', 'recipe.id'))
             ->where($qb->expr()->eq('rel.' . $relationColumn, $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
             ->andWhere($qb->expr()->eq('recipe.user_id', $qb->createNamedParameter($userId)));
