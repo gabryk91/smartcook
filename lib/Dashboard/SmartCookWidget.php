@@ -41,7 +41,7 @@ final class SmartCookWidget implements IAPIWidgetV2, IButtonWidget, IIconWidget 
 
     public function getIconUrl(): string {
         return $this->urlGenerator->getAbsoluteURL(
-            $this->urlGenerator->imagePath(Application::APP_ID, 'app-1.0.40.svg'),
+            $this->urlGenerator->imagePath(Application::APP_ID, 'dashboard.svg'),
         );
     }
 
