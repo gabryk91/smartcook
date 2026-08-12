@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets
 
 data class ConnectionConfig(val serverUrl: String, val username: String, val appPassword: String)
 
-class SmartCookClient(private val config: ConnectionConfig) {
+class SmartCookClient(private val config: ConnectionConfig, private val string: (Int, Array<out Any>) -> String) {
     private fun endpoint(path: String) = config.serverUrl.trimEnd('/') + "/index.php/apps/smartcook" + path
 
     private fun open(path: String, method: String) = (URI(endpoint(path)).toURL().openConnection() as HttpURLConnection).apply {
@@ -21,7 +21,7 @@ class SmartCookClient(private val config: ConnectionConfig) {
     }
 
     fun test() = request("/import/jobs?limit=1", "GET", "")
-        .map { "Configurazione verificata: SmartCook è raggiungibile e le credenziali sono valide." }
+        .map { string(R.string.connection_verified, emptyArray()) }
 
     fun enqueue(content: String, useAi: Boolean): Result<String> {
         val value = content.trim()
@@ -30,7 +30,7 @@ class SmartCookClient(private val config: ConnectionConfig) {
         val body = mapOf("kind" to kind, kind to value, "useAi" to useAi.toString())
             .entries.joinToString("&") { "${encode(it.key)}=${encode(it.value)}" }
         return request("/external/import/queue", "POST", body)
-            .map { "Importazione inviata. Apri SmartCook per rivedere l'anteprima." }
+            .map { string(R.string.import_sent, emptyArray()) }
     }
 
     private fun request(path: String, method: String, body: String): Result<String> = runCatching {
@@ -44,16 +44,20 @@ class SmartCookClient(private val config: ConnectionConfig) {
             val code = connection.responseCode
             if (code !in 200..299) {
                 when (code) {
-                    401, 403 -> error("Credenziali non valide o senza permesso per SmartCook.")
-                    404 -> error("SmartCook non è installato oppure l'URL Nextcloud non è corretto.")
-                    else -> error("SmartCook ha risposto con errore $code.")
+                    401, 403 -> error(string(R.string.invalid_credentials, emptyArray()))
+                    404 -> if (path.startsWith("/external/")) {
+                    error(string(R.string.external_receiver_unavailable, emptyArray()))
+                } else {
+                    error(string(R.string.smartcook_not_found, emptyArray()))
+                }
+                    else -> error(string(R.string.server_error, arrayOf(code)))
                 }
             }
             connection.inputStream.bufferedReader().use { it.readText() }
         } finally { connection.disconnect() }
     }.recoverCatching { error ->
         if (error.message?.startsWith("SmartCook") == true || error.message?.startsWith("Credenziali") == true) throw error
-        error("Impossibile raggiungere SmartCook: controlla URL, rete e certificato HTTPS.")
+        error(string(R.string.connection_failed, emptyArray()))
     }
 
     private fun encode(value: String) = URLEncoder.encode(value, StandardCharsets.UTF_8.name())

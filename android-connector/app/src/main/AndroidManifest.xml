@@ -4,6 +4,7 @@
 
     <application
         android:allowBackup="false"
+        android:icon="@drawable/smartcook_icon"
         android:label="SmartCook Connector"
         android:theme="@style/Theme.SmartCookConnector"
         android:usesCleartextTraffic="false">

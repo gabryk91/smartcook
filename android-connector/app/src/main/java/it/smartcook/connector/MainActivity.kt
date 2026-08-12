@@ -19,11 +19,11 @@ class MainActivity : Activity() {
         restore()
         receive(intent)
         view.saveConfiguration.setOnClickListener { save() }
-        view.testConnection.setOnClickListener { config()?.let { client -> runRequest("Verifica della configurazione in corso…") { client.test() } } }
+        view.testConnection.setOnClickListener { config()?.let { client -> runRequest(getString(R.string.testing_configuration)) { client.test() } } }
         view.sendImport.setOnClickListener {
             val content = view.sharedContent.text.toString().trim()
-            if (content.isBlank()) status("Inserisci o condividi un URL o del testo da importare.")
-            else config()?.let { client -> runRequest("Invio dell'importazione in corso…") { client.enqueue(content, view.useAi.isChecked) } }
+            if (content.isBlank()) status(getString(R.string.empty_content))
+            else config()?.let { client -> runRequest(getString(R.string.sending_import)) { client.enqueue(content, view.useAi.isChecked) } }
         }
     }
 
@@ -32,7 +32,7 @@ class MainActivity : Activity() {
     private fun receive(intent: Intent) {
         if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             view.sharedContent.setText(intent.getStringExtra(Intent.EXTRA_TEXT).orEmpty())
-            status("Contenuto ricevuto. Verifica e invia a SmartCook.")
+            status(getString(R.string.shared_content_received))
         }
     }
 
@@ -42,14 +42,17 @@ class MainActivity : Activity() {
     }
     private fun save(): Boolean {
         val serverUrl = view.serverUrl.text.toString().trim().trimEnd('/'); val username = view.username.text.toString().trim(); val password = view.appPassword.text.toString()
-        if (!serverUrl.startsWith("https://") || username.isBlank() || password.isBlank()) { status("Inserisci URL HTTPS, nome utente e password per app Nextcloud."); return false }
+        if (!serverUrl.startsWith("https://") || username.isBlank() || password.isBlank()) { status(getString(R.string.missing_configuration)); return false }
         preferences.put("serverUrl", serverUrl); preferences.put("username", username); preferences.putSecret("appPassword", password); preferences.put("useAi", view.useAi.isChecked.toString())
-        status("Configurazione salvata sul dispositivo."); return true
+        status(getString(R.string.configuration_saved)); return true
     }
-    private fun config(): SmartCookClient? { if (!save()) return null; return SmartCookClient(ConnectionConfig(preferences.get("serverUrl"), preferences.get("username"), preferences.getSecret("appPassword"))) }
+    private fun config(): SmartCookClient? {
+        if (!save()) return null
+        return SmartCookClient(ConnectionConfig(preferences.get("serverUrl"), preferences.get("username"), preferences.getSecret("appPassword"))) { id, args -> getString(id, *args) }
+    }
     private fun runRequest(progress: String, request: () -> Result<String>) {
         status(progress); view.testConnection.isEnabled = false; view.sendImport.isEnabled = false
-        executor.execute { val result = request(); runOnUiThread { view.testConnection.isEnabled = true; view.sendImport.isEnabled = true; status(result.getOrElse { it.message ?: "Operazione non riuscita." }) } }
+        executor.execute { val result = request(); runOnUiThread { view.testConnection.isEnabled = true; view.sendImport.isEnabled = true; status(result.getOrElse { it.message ?: getString(R.string.operation_failed) }) } }
     }
     private fun status(message: String) { view.status.text = message }
 }

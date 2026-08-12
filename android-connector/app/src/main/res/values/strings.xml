@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">SmartCook Connector</string>
+    <string name="title">SmartCook Connector</string>
+    <string name="intro">Connect your SmartCook and send recipes from Android’s Share menu.</string>
+    <string name="server_url_hint">Nextcloud URL (https://cloud.example.com)</string>
+    <string name="username_hint">Nextcloud username</string>
+    <string name="app_password_hint">Nextcloud app password</string>
+    <string name="use_ai">Use AI during import</string>
+    <string name="test_connection">Test configuration</string>
+    <string name="save_configuration">Save configuration</string>
+    <string name="content_title">Content to import</string>
+    <string name="content_hint">Share a URL or text from another app, or paste it here.</string>
+    <string name="send_import">Send to SmartCook</string>
+    <string name="shared_content_received">Content received. Review it and send it to SmartCook.</string>
+    <string name="empty_content">Enter or share a URL or text to import.</string>
+    <string name="missing_configuration">Enter an HTTPS URL, Nextcloud username, and app password.</string>
+    <string name="configuration_saved">Configuration saved on this device.</string>
+    <string name="testing_configuration">Testing configuration…</string>
+    <string name="sending_import">Sending import…</string>
+    <string name="operation_failed">Operation failed.</string>
+    <string name="connection_verified">Configuration verified: SmartCook is reachable and the credentials are valid.</string>
+    <string name="import_sent">Import sent. Open SmartCook to review the preview.</string>
+    <string name="invalid_credentials">Invalid credentials or no permission for SmartCook.</string>
+    <string name="external_receiver_unavailable">The Android receiver is not available on this SmartCook yet. Update SmartCook in Nextcloud and try again.</string>
+    <string name="smartcook_not_found">SmartCook is not installed or the Nextcloud URL is incorrect.</string>
+    <string name="server_error">SmartCook returned error %1$d.</string>
+    <string name="connection_failed">Cannot reach SmartCook: check the URL, network, and HTTPS certificate.</string>
 </resources>

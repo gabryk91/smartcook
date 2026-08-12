@@ -1,7 +1,5 @@
 [CmdletBinding()]
-param(
-    [string]$ReleaseNotes
-)
+param()
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -11,9 +9,9 @@ if (-not (Test-Path -LiteralPath $packageScriptPath -PathType Leaf)) {
     throw "Script di packaging non trovato: $packageScriptPath"
 }
 
-if ($null -eq $ReleaseNotes) {
-    $ReleaseNotes = Read-Host 'Note di rilascio (lascia vuoto per la descrizione predefinita)'
-}
+Write-Host ''
+Write-Host 'Inserisci le note della release per GitHub e Nextcloud App Store.'
+$ReleaseNotes = Read-Host 'Note di rilascio (lascia vuoto per la descrizione predefinita)'
 
 & $packageScriptPath -PublishGitHubRelease -ReleaseNotes $ReleaseNotes
 if ($LASTEXITCODE -ne 0) {

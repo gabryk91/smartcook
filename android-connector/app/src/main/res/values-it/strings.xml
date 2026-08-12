@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">SmartCook Connector</string>
+    <string name="title">SmartCook Connector</string>
+    <string name="intro">Collega il tuo SmartCook e invia ricette dal menu Condividi di Android.</string>
+    <string name="server_url_hint">URL Nextcloud (https://cloud.example.it)</string>
+    <string name="username_hint">Nome utente Nextcloud</string>
+    <string name="app_password_hint">Password per app Nextcloud</string>
+    <string name="use_ai">Usa l\'AI durante l\'importazione</string>
+    <string name="test_connection">Verifica configurazione</string>
+    <string name="save_configuration">Salva configurazione</string>
+    <string name="content_title">Contenuto da importare</string>
+    <string name="content_hint">Condividi un URL o del testo da un\'altra app, oppure incollalo qui.</string>
+    <string name="send_import">Invia a SmartCook</string>
+    <string name="shared_content_received">Contenuto ricevuto. Verifica e invia a SmartCook.</string>
+    <string name="empty_content">Inserisci o condividi un URL o del testo da importare.</string>
+    <string name="missing_configuration">Inserisci URL HTTPS, nome utente e password per app Nextcloud.</string>
+    <string name="configuration_saved">Configurazione salvata sul dispositivo.</string>
+    <string name="testing_configuration">Verifica della configurazione in corso…</string>
+    <string name="sending_import">Invio dell\'importazione in corso…</string>
+    <string name="operation_failed">Operazione non riuscita.</string>
+    <string name="connection_verified">Configurazione verificata: SmartCook è raggiungibile e le credenziali sono valide.</string>
+    <string name="import_sent">Importazione inviata. Apri SmartCook per rivedere l\'anteprima.</string>
+    <string name="invalid_credentials">Credenziali non valide o senza permesso per SmartCook.</string>
+    <string name="external_receiver_unavailable">Il ricevitore Android non è ancora disponibile su questo SmartCook. Aggiorna l\'app SmartCook su Nextcloud e riprova.</string>
+    <string name="smartcook_not_found">SmartCook non è installato oppure l\'URL Nextcloud non è corretto.</string>
+    <string name="server_error">SmartCook ha risposto con errore %1$d.</string>
+    <string name="connection_failed">Impossibile raggiungere SmartCook: controlla URL, rete e certificato HTTPS.</string>
+</resources>
