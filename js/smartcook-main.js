@@ -23,6 +23,7 @@ const fallbackTranslations = {
         'Empty week': 'Svuota settimana',
         'Clear all meals from this week?': 'Rimuovere tutti i pasti assegnati a questa settimana?',
         'Search recipes...': 'Cerca ricette...',
+        'Search recipes or cuisine...': 'Cerca ricette o cucina...',
         'Search categories...': 'Cerca categorie...',
         'Search tags...': 'Cerca tag...',
         'Top categories': 'Categorie più usate',
@@ -609,7 +610,7 @@ function collectRecipe(view, existing) {
 function chipPicker(name, selected, suggestions, single = false) {
 	const values = [...new Map(selected.map(item => String(item?.name || item).trim()).filter(Boolean).map(item => [item.toLocaleLowerCase(), item])).values()].slice(0, single ? 1 : undefined);
 	const options = [...new Map(suggestions.map(item => String(item?.name || item).trim()).filter(Boolean).map(item => [item.toLocaleLowerCase(), item])).values()];
-	return `<div class="chip-picker" data-chip-picker="${attr(name)}"${single ? ' data-chip-single="true"' : ''}><input data-field="${attr(name)}" type="hidden" value="${attr(values.join(', '))}"><div class="chip-picker-input" data-chip-input-wrap><span data-chip-values>${values.map(value => `<button class="chip-picker-value" data-chip-remove="${attr(value)}" type="button">${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</span><input data-chip-input type="text" autocomplete="off" placeholder="${attr(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}" role="combobox" aria-autocomplete="list" aria-expanded="false"></div><div class="chip-picker-options" data-chip-options role="listbox" hidden>${options.map(value => `<button data-chip-option="${attr(value)}" type="button" role="option">${esc(value)}</button>`).join('')}<p data-chip-empty hidden>${esc(tr('No data yet'))}</p></div></div>`;
+	return `<div class="chip-picker" data-chip-picker="${attr(name)}"${single ? ' data-chip-single="true"' : ''}><input data-field="${attr(name)}" type="hidden" value="${attr(values.join(', '))}"><div class="chip-picker-input" data-chip-input-wrap><span data-chip-values>${values.map(value => `<button class="chip-picker-value" data-chip-remove="${attr(value)}" type="button">${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</span><input data-chip-input name="smartcook-taxonomy-${attr(name)}" type="text" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" placeholder="${attr(tr('Choose existing values or type a new one. Press Enter or comma to add it.'))}" role="combobox" aria-autocomplete="list" aria-expanded="false"></div><div class="chip-picker-options" data-chip-options role="listbox" hidden>${options.map(value => `<button data-chip-option="${attr(value)}" type="button" role="option">${esc(value)}</button>`).join('')}<p data-chip-empty hidden>${esc(tr('No data yet'))}</p></div></div>`;
 }
 function bindChipPicker(view, name) {
 	const picker = view.querySelector(`[data-chip-picker="${name}"]`);

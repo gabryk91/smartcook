@@ -3,6 +3,7 @@
 ## Regole di lavoro
 
 - Mantieni le terminazioni di riga Windows (CRLF), l'encoding e il whitespace esistenti, salvo richiesta esplicita.
+- Leggi sempre `docs/AGENT_WORKFLOW.md` prima di modificare codice, migration, asset o file di rilascio; contiene le regole tecniche e gli errori già riscontrati nel progetto.
 - Leggi `Progetto.md` solo quando il task richiede requisiti, architettura, API, deploy, sicurezza o decisioni di prodotto.
 - Limita la scansione alle cartelle e ai file direttamente pertinenti al task. Non analizzare l'intero repository, `node_modules`, `vendor`, build, ZIP o asset generati se non necessario.
 - Prima di modificare file, controlla lo stato Git e preserva le modifiche già presenti che non appartengono al task.
