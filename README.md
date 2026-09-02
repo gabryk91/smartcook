@@ -3,77 +3,103 @@
 > [!WARNING]
 > **Vibe-coded project.** SmartCook is built through a fast, AI-assisted and experimentation-driven workflow. It is actively evolving: please review changes carefully and avoid using it as the only copy of important data until you have tested it in your own Nextcloud environment.
 
-**SmartCook** turns your Nextcloud into a private home for recipes, meal planning and shopping lists. Keep your cooking knowledge self-hosted, organised and available alongside the files and people you already use in Nextcloud.
+**SmartCook** is a private, self-hosted cookbook for Nextcloud. It brings together recipe capture, rich organisation, AI-assisted improvements, meal planning and shopping lists—while recipes and settings remain in your own Nextcloud instance.
 
-## ✨ What you can do
+## ✨ What’s new
+
+- **Import recipes from YouTube and Facebook.** Paste a YouTube URL to extract its video title and description, or a public Facebook post/Reel URL to extract its public caption. SmartCook turns the available recipe text into a structured, reviewable draft before saving.
+- **Mass editing built for real collections.** Filter and select recipes, then assign or remove tags, categories, tools, cuisines, meal types, cooking methods and seasons in a focused administration workspace.
+- **Mass AI refinement with control at every step.** Analyse a selected set of recipes, inspect each proposed change field by field, deselect anything you do not want, then apply only the approved improvements. Ingredients and preparation steps are never altered by this workflow.
+- **Ingredient alternatives.** Record substitutions directly beside the original ingredient, including their quantity, unit and notes, and keep them visible in recipe previews and public shares.
+- **A renewed interface.** The collection, import, administration and recipe-editor workflows have been refined for clearer navigation and more comfortable work with large recipe libraries.
+
+## 🚀 Core capabilities
 
 | | |
 | --- | --- |
-| 📚 **Build your recipe library** | Create structured recipes with ingredients, steps, photos, tags, categories, tools and nutritional details. |
-| 🔎 **Import recipes intelligently** | Start from a URL, pasted text, HTML, Markdown, JSON or a file; SmartCook extracts what it can and always lets you review the result. |
-| 🧠 **Use AI only when you want** | Configure an optional provider for extraction, normalisation, translations and suggestions. The app remains useful without AI. |
-| 🗓️ **Plan meals** | Organise breakfast, lunch, dinner and snacks in a weekly or monthly planner. |
-| 🛒 **Create smarter shopping lists** | Aggregate ingredients from several recipes, group them by category and tick them off as you shop. |
-| 🔐 **Keep control of your data** | SmartCook is a self-hosted Nextcloud app: your recipes stay in your own instance. |
+| 📚 **Structured recipe library** | Create and browse recipes with ingredients, alternatives, steps, photos, tags, categories, tools, nutrition and timing. |
+| 📥 **Import from almost anywhere** | Import from ordinary recipe URLs, **YouTube videos**, **public Facebook posts and Reels**, pasted text, HTML, Markdown, JSON and files. Review every extracted field before saving. |
+| 🧠 **Optional AI assistance** | Use a compatible provider to improve extraction, generate meal plans and refine existing recipes in bulk with reviewable proposals. SmartCook remains fully useful without AI. |
+| 🏷️ **Powerful organisation** | Filter, search, favourite and sort recipes; manage taxonomy values and make targeted mass assignments across the collection. |
+| 🗓️ **Meal planning** | Schedule breakfast, lunch, dinner and snacks on weekly or monthly plans, with optional AI suggestions. |
+| 🛒 **Shopping lists** | Aggregate ingredients from multiple recipes, organise them by category and check items off as you shop. |
+| 🔐 **Your data, your server** | SmartCook is a self-hosted Nextcloud app. Recipes, attachments and configuration stay under your control. |
 
-## 🧭 Highlights
+## 🔎 Import recipes from the web, social video and posts
 
-- 🌍 English and Italian interface
-- ➗ Quantities, units, fractions and serving-size recalculation
-- 🏷️ Categories, coloured tags, favourites and flexible filters
-- ⏱️ Preparation, resting and cooking times, temperatures and kitchen tools
-- 📎 Attachments, recipe photos and public sharing options
-- 📥 Schema.org recipe import with deterministic parsing before optional AI fallback
-- 🔍 Search by title, ingredients, tags, time, allergens, cuisine, calories and more
-- 📤 Exports for JSON, JSON-LD, Markdown, HTML and printable recipes
+SmartCook’s import workflow is designed to preserve your control: it extracts a draft, shows a complete preview, and saves nothing until you confirm.
+
+- **YouTube:** supports `youtube.com`, `www.youtube.com` and `youtu.be` links. SmartCook reads the publicly available title and video description. Top comments can be used when a YouTube Data API key is configured.
+- **Facebook:** supports public `facebook.com` posts, Reels and `fb.watch` links. SmartCook reads the publicly exposed post or Reel description; private or restricted content cannot be imported.
+- **Other sources:** Schema.org recipe pages, standard webpages, text, HTML, Markdown, JSON and supported documents are handled through deterministic parsers, with optional AI refinement for incomplete or unstructured sources.
+
+![SmartCook import screen](img/readme/smartcook-import.png)
 
 ## 📸 See it in action
 
-### Keep a beautiful, searchable recipe collection
+### Your collection at a glance
 
-![SmartCook recipe collection](img/readme/smartcook-recipes.png)
+![SmartCook dashboard](img/readme/smartcook-dashboard.png)
 
-Browse your collection through visual recipe cards, then narrow it down with full-text search, category and tag filters, favourites, and sorting controls.
+The dashboard shows collection totals, recently updated recipes and the ingredients, categories and tags you use most.
 
-### Import recipes from almost anywhere
+### Organise many recipes in one place
 
-![SmartCook recipe import screen](img/readme/smartcook-import.png)
+![SmartCook bulk editing](img/readme/smartcook-bulk-editing.png)
 
-SmartCook gives you one focused import flow for recipe URLs, plain text, Markdown, JSON and files with OCR support. You can review the extracted data before it becomes part of your library.
+Select a filtered group of recipes and apply targeted taxonomy changes without touching the rest of your collection.
 
-### Create structured recipes at your own pace
+### Let AI propose improvements—then keep the final word
+
+![SmartCook AI refinement](img/readme/smartcook-ai-refinement.png)
+
+AI refinement works across selected recipes while keeping ingredients and procedure intact. Every proposed identity or organisation change is visible and individually selectable before it is applied.
+
+### Capture every useful cooking detail
 
 ![SmartCook recipe editor](img/readme/smartcook-recipe-editor.png)
 
-Use the guided editor to capture a recipe’s identity, timing, ingredients, preparation steps and organisation details.
+The guided editor covers identity, timing, ingredients with alternatives, preparation steps and organisation metadata.
 
-### Find a cover when a recipe needs one
+## 🧭 More highlights
 
-![SmartCook cover image search](img/readme/smartcook-cover-search.png)
-
-For recipes without a cover, SmartCook can surface image candidates so you can choose the right visual before saving it to your library.
-
-## 🚀 Getting started
-
-SmartCook is designed as a standard Nextcloud app.
-
-1. Download a SmartCook release compatible with your Nextcloud version.
-2. Extract the `smartcook` folder into your instance's `custom_apps` directory.
-3. Enable **SmartCook** from **Apps** in Nextcloud.
-4. Open **SmartCook** from the main navigation and add your first recipe.
-
-> [!TIP]
-> Before upgrading a production installation, back up your database, configuration and existing SmartCook app directory.
+- English and Italian interface
+- Quantity, unit, fraction and serving-size recalculation
+- Preparation, resting and cooking times, temperatures and kitchen tools
+- Attachments, recipe photos, public sharing links and revision history
+- Search by title, ingredients, tags, time, allergens, cuisine, calories and more
+- Duplicate detection and guided merge
+- Cover-image suggestions and selection
+- Exports in JSON-LD, Markdown and printable HTML
+- Nextcloud unified search, notifications, queued imports and cleanup jobs
 
 ## 🤖 Optional AI
 
-AI is entirely optional. When enabled, it can help with importing and refining recipe data; when disabled, SmartCook uses its deterministic import and parsing pipeline instead.
+AI is opt-in and configurable per user. SmartCook supports Nextcloud Assistant, OpenAI-compatible providers (including OpenAI, OpenRouter, Ollama, LocalAI and Mistral), Anthropic and Gemini.
 
-Configure your provider from the app settings. Keep provider credentials private and use an endpoint you trust.
+Use it for three distinct jobs:
+
+1. **Import refinement** when a source is incomplete or unstructured.
+2. **Meal-plan suggestions** that respect your recipe catalogue and stated preferences.
+3. **Bulk recipe refinement** for editorial fields and organisation metadata, always with a preview and explicit approval of the proposed changes.
+
+Choose an endpoint you trust and keep provider credentials private. Deterministic import and management features continue to work with AI disabled.
+
+## 🏁 Getting started
+
+SmartCook is a standard Nextcloud app.
+
+1. Download a SmartCook release compatible with your Nextcloud version.
+2. Extract the `smartcook` folder into the instance’s `custom_apps` directory.
+3. Enable **SmartCook** from **Apps** in Nextcloud.
+4. Open **SmartCook** from the main navigation, then create a recipe or paste a link into **Import**.
+
+> [!TIP]
+> Before upgrading a production installation, back up the database, configuration and existing SmartCook app directory.
 
 ## 🧪 Project status
 
-SmartCook is under active development. Expect frequent improvements, and please report reproducible issues with the Nextcloud version, PHP version, steps to reproduce and relevant error details.
+SmartCook is under active development. For a useful bug report, include the Nextcloud and PHP versions, reproduction steps and relevant error details.
 
 - 🐛 [Report an issue](https://github.com/gabryk91/smartcook/issues)
 - 💡 [Browse the source code](https://github.com/gabryk91/smartcook)
