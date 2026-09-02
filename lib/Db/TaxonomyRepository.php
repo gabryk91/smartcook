@@ -16,7 +16,7 @@ final class TaxonomyRepository extends AbstractRepository {
     ];
     private const VALUE_KINDS = [
         'cuisine' => 'cuisine', 'mealType' => 'meal_type',
-        'cookingMethod' => 'cook_method', 'season' => 'season', 'origin' => 'origin',
+        'cookingMethod' => 'cook_method', 'season' => 'season',
     ];
     public function __construct(IDBConnection $db, private TextNormalizer $normalizer) {
         parent::__construct($db);
@@ -58,6 +58,7 @@ final class TaxonomyRepository extends AbstractRepository {
                 'unit' => $unit,
                 'notes' => $this->nullString($ingredient['notes'] ?? null),
                 'optional' => (bool)($ingredient['optional'] ?? false),
+				'alternatives' => $this->encode($ingredient['alternatives'] ?? []),
                 'sort_order' => (int)($ingredient['sortOrder'] ?? $ingredient['sort_order'] ?? $index),
                 'group_name' => $this->nullString($ingredient['group'] ?? $ingredient['groupName'] ?? null),
             ]);
@@ -69,7 +70,7 @@ final class TaxonomyRepository extends AbstractRepository {
         $qb = $this->db->getQueryBuilder();
         $qb->select(
             'ri.id', 'ri.ingredient_id', 'ri.original_text', 'ri.quantity', 'ri.amount', 'ri.unit',
-            'ri.notes', 'ri.optional', 'ri.sort_order', 'ri.group_name',
+			'ri.notes', 'ri.optional', 'ri.alternatives', 'ri.sort_order', 'ri.group_name',
             'i.name', 'i.norm_name', 'i.category', 'i.allergens', 'i.substitutes'
         )
             ->from('smartcook_r_ingr', 'ri')
@@ -89,6 +90,7 @@ final class TaxonomyRepository extends AbstractRepository {
                 'unit' => $row['unit'],
                 'notes' => $row['notes'],
                 'optional' => (bool)$row['optional'],
+				'alternatives' => $this->decode($row['alternatives'], []),
                 'sortOrder' => (int)$row['sort_order'],
                 'group' => $row['group_name'],
                 'category' => $row['category'],
@@ -352,13 +354,23 @@ final class TaxonomyRepository extends AbstractRepository {
         return array_map(static fn (array $row): int => (int)$row['id'], $this->fetchAll($qb));
     }
 
-    /** @return list<array{id: int, title: string, cuisine: string|null}> */
+    /** @return list<array<string, mixed>> */
     public function listRecipeChoicesForUser(string $userId): array {
         $qb = $this->db->getQueryBuilder();
-        $qb->select('id', 'title', 'cuisine')->from('smartcook_recipes')
+        $qb->select('id', 'title', 'cuisine', 'meal_type', 'cook_method', 'season')->from('smartcook_recipes')
             ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
             ->orderBy('title', 'ASC');
-        return array_map(static fn (array $row): array => ['id' => (int)$row['id'], 'title' => (string)$row['title'], 'cuisine' => $row['cuisine']], $this->fetchAll($qb));
+        return array_map(fn (array $row): array => [
+            'id' => (int)$row['id'],
+            'title' => (string)$row['title'],
+            'cuisine' => $row['cuisine'],
+            'mealType' => $row['meal_type'],
+            'cookingMethod' => $row['cook_method'],
+            'season' => $row['season'],
+            'tools' => $this->getTools((int)$row['id']),
+            'tags' => $this->getTags((int)$row['id']),
+            'categories' => $this->getCategories((int)$row['id']),
+        ], $this->fetchAll($qb));
     }
 
     /** @param list<int> $recipeIds @return list<int> */

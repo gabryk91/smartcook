@@ -9,6 +9,7 @@
 <CheckBox android:id="@+id/useAi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/use_ai" />
 <Button android:id="@+id/testConnection" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/test_connection" />
 <Button android:id="@+id/saveConfiguration" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/save_configuration" />
+<Button android:id="@+id/openSmartCook" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/open_smartcook" />
 <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" />
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/content_title" android:textStyle="bold" />
 <EditText android:id="@+id/sharedContent" android:layout_width="match_parent" android:layout_height="160dp" android:gravity="top" android:hint="@string/content_hint" android:inputType="textMultiLine" />

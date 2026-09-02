@@ -8,6 +8,7 @@
     <string name="use_ai">Use AI during import</string>
     <string name="test_connection">Test configuration</string>
     <string name="save_configuration">Save configuration</string>
+    <string name="open_smartcook">Open SmartCook</string>
     <string name="content_title">Content to import</string>
     <string name="content_hint">Share a URL or text from another app, or paste it here.</string>
     <string name="send_import">Send to SmartCook</string>

@@ -7,6 +7,7 @@ namespace OCA\SmartCook\Controller;
 use OCA\SmartCook\Service\CoverImageSearchService;
 use OCA\SmartCook\Service\DuplicateService;
 use OCA\SmartCook\Service\RecipeService;
+use OCA\SmartCook\Service\AI\RecipeRefinementService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -17,7 +18,7 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 final class RecipeController extends BaseController {
-    public function __construct(IRequest $request, LoggerInterface $logger, private RecipeService $recipes, private DuplicateService $duplicates, private CoverImageSearchService $coverImages) {
+    public function __construct(IRequest $request, LoggerInterface $logger, private RecipeService $recipes, private DuplicateService $duplicates, private CoverImageSearchService $coverImages, private RecipeRefinementService $refinement) {
         parent::__construct($request, $logger);
     }
 
@@ -158,5 +159,27 @@ final class RecipeController extends BaseController {
             $merged = $this->duplicates->merge($this->recipes->get($id), $incoming);
             return ['recipe' => $this->recipes->update($id, $merged)];
         });
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/recipes/refinement/analyze')]
+    public function analyzeRefinement(): JSONResponse {
+        $recipeIds = $this->recipeIds();
+        return $this->respond(fn (): array => ['proposals' => count($recipeIds) === 1
+            ? [$this->refinement->analyzeOne($recipeIds[0])]
+            : $this->refinement->analyze($recipeIds)]);
+    }
+
+    #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/recipes/refinement/apply')]
+    public function applyRefinement(): JSONResponse {
+        $proposals = $this->request->getParam('proposals', []);
+        return $this->respond(fn (): array => ['changed' => $this->refinement->apply(is_array($proposals) ? $proposals : [])]);
+    }
+
+    /** @return list<int> */
+    private function recipeIds(): array {
+        $ids = $this->request->getParam('recipeIds', []);
+        return is_array($ids) ? array_map('intval', $ids) : [];
     }
 }

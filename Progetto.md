@@ -20,7 +20,7 @@ SmartCook è una Community App self-hosted per Nextcloud dedicata a ricette, ing
 
 ### Ricette
 
-Titolo, descrizione, foto e galleria, autore, fonte e URL, note, stato bozza/pubblicata, preferita, date, revisioni, visibilità e condivisione. Metadati: tempi di preparazione/riposo/cottura/totale, porzioni, difficoltà, costo, calorie, valori nutrizionali, cucina, portata, metodo, stagione e origine geografica.
+Titolo, descrizione, foto e galleria, autore, fonte e URL, note, stato bozza/pubblicata, preferita, date, revisioni, visibilità e condivisione. Metadati: tempi di preparazione/riposo/cottura/totale, porzioni, difficoltà, costo, calorie, valori nutrizionali, cucina, portata, metodo e stagione.
 
 ### Ingredienti e procedimento
 

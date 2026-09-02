@@ -2,6 +2,7 @@ package it.smartcook.connector
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import it.smartcook.connector.databinding.ActivityMainBinding
 import java.util.concurrent.Executors
@@ -20,6 +21,7 @@ class MainActivity : Activity() {
         receive(intent)
         view.saveConfiguration.setOnClickListener { save() }
         view.testConnection.setOnClickListener { config()?.let { client -> runRequest(getString(R.string.testing_configuration)) { client.test() } } }
+        view.openSmartCook.setOnClickListener { openSmartCook() }
         view.sendImport.setOnClickListener {
             val content = view.sharedContent.text.toString().trim()
             if (content.isBlank()) status(getString(R.string.empty_content))
@@ -49,6 +51,11 @@ class MainActivity : Activity() {
     private fun config(): SmartCookClient? {
         if (!save()) return null
         return SmartCookClient(ConnectionConfig(preferences.get("serverUrl"), preferences.get("username"), preferences.getSecret("appPassword"))) { id, args -> getString(id, *args) }
+    }
+    private fun openSmartCook() {
+        if (!save()) return
+        val dashboardUrl = "${preferences.get("serverUrl").trimEnd('/')}/index.php/apps/smartcook/"
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(dashboardUrl)))
     }
     private fun runRequest(progress: String, request: () -> Result<String>) {
         status(progress); view.testConnection.isEnabled = false; view.sendImport.isEnabled = false

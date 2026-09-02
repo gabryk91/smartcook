@@ -63,6 +63,10 @@ final class RecipeRepository extends AbstractRepository {
         $qb->orderBy('r.' . $sort, $direction)->setMaxResults(max(1, min(500, $limit)));
 
         $recipes = array_map(fn (array $row): array => $this->mapRecipeRow($row), $this->fetchAll($qb));
+        foreach ($recipes as &$recipe) {
+            $recipe['categories'] = $this->taxonomy->getCategories((int)$recipe['id']);
+        }
+        unset($recipe);
 
         $tagNames = $this->normalizeFilterList($filters['tags'] ?? []);
         $categoryNames = $this->normalizeFilterList($filters['categories'] ?? []);
@@ -79,7 +83,7 @@ final class RecipeRepository extends AbstractRepository {
             if ($tagNames !== [] && !$this->containsAll($this->taxonomy->getTags($id), $tagNames)) {
                 return false;
             }
-            if ($categoryNames !== [] && !$this->containsAll($this->taxonomy->getCategories($id), $categoryNames)) {
+            if ($categoryNames !== [] && !$this->containsAll((array)$recipe['categories'], $categoryNames)) {
                 return false;
             }
             if ($toolNames !== [] && !$this->containsAll($this->taxonomy->getTools($id), $toolNames)) {
@@ -314,7 +318,6 @@ final class RecipeRepository extends AbstractRepository {
             'meal_type' => $this->nullString($data['mealType'] ?? $data['meal_type'] ?? null),
             'cook_method' => $this->nullString($data['cookingMethod'] ?? $data['cook_method'] ?? null),
             'season' => $this->nullString($data['season'] ?? null),
-            'origin' => $this->nullString($data['origin'] ?? null),
             'calories' => $this->nullableInt($data['calories'] ?? null),
             'nutrition' => $this->encode($data['nutrition'] ?? []),
             'notes' => $this->nullString($data['notes'] ?? null),
@@ -484,7 +487,6 @@ final class RecipeRepository extends AbstractRepository {
             'mealType' => $row['meal_type'],
             'cookingMethod' => $row['cook_method'],
             'season' => $row['season'],
-            'origin' => $row['origin'],
             'calories' => $row['calories'] !== null ? (int)$row['calories'] : null,
             'nutrition' => $this->decode($row['nutrition'], []),
             'notes' => $row['notes'],

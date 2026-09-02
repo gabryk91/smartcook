@@ -54,4 +54,21 @@ final class AiProviderRegistry {
         }
         throw new ImportException('Unsupported AI provider: ' . $providerId);
     }
+
+    /** @param array<string, mixed> $recipe @return array<string, mixed> */
+    public function refine(string $userId, array $recipe, string $language): array {
+        $config = $this->settings->ai($userId);
+        $providerId = (string)$config['provider'];
+        if ($providerId === 'disabled') {
+            throw new ImportException('AI refinement is disabled');
+        }
+        $config['userId'] = $userId;
+        $config['refinement'] = $recipe;
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($providerId)) {
+                return $provider->extractRecipe('', $language, $config);
+            }
+        }
+        throw new ImportException('Unsupported AI provider: ' . $providerId);
+    }
 }

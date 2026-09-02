@@ -32,7 +32,7 @@ final class GeminiProvider implements AiProviderInterface {
         $endpoint = rtrim((string)($config['endpoint'] ?? ''), '/') ?: 'https://generativelanguage.googleapis.com/v1beta';
         $url = $endpoint . '/models/' . rawurlencode($model) . ':generateContent?key=' . rawurlencode($key);
         $payload = [
-            'contents' => [['parts' => [['text' => isset($config['planner']) && is_array($config['planner']) ? $this->prompts->mealPlan($config['planner']['recipes'] ?? [], (string)($config['planner']['from'] ?? ''), (string)($config['planner']['to'] ?? ''), (array)($config['planner']['preferences'] ?? [])) : $this->prompts->recipe($text, $language)]]]],
+            'contents' => [['parts' => [['text' => isset($config['planner']) && is_array($config['planner']) ? $this->prompts->mealPlan($config['planner']['recipes'] ?? [], (string)($config['planner']['from'] ?? ''), (string)($config['planner']['to'] ?? ''), (array)($config['planner']['preferences'] ?? [])) : (isset($config['refinement']) && is_array($config['refinement']) ? $this->prompts->refinement($config['refinement'], $language) : $this->prompts->recipe($text, $language))]]]],
             'generationConfig' => ['temperature' => (float)($config['temperature'] ?? 0.1), 'responseMimeType' => 'application/json'],
         ];
         $response = $this->clients->newClient()->post($url, [

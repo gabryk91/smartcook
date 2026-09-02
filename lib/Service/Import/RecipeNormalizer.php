@@ -51,6 +51,7 @@ final class RecipeNormalizer {
             $calories = (int)$m[0];
         }
 
+        $recipeSourceUrl = $sourceUrl ?? $this->nullable($data['url'] ?? $data['sourceUrl'] ?? null);
         $recipe = [
             'title' => trim((string)($data['name'] ?? $data['title'] ?? $data['headline'] ?? 'Imported recipe')),
             'subtitle' => $this->nullable($data['subtitle'] ?? null),
@@ -58,7 +59,7 @@ final class RecipeNormalizer {
             'language' => (string)($data['inLanguage'] ?? $data['language'] ?? 'en'),
             'author' => $this->nullable($author),
             'sourceName' => $this->nullable($data['publisher']['name'] ?? $data['sourceName'] ?? null),
-            'sourceUrl' => $sourceUrl ?? $this->nullable($data['url'] ?? $data['sourceUrl'] ?? null),
+            'sourceUrl' => $recipeSourceUrl,
             'license' => $this->nullable($data['license'] ?? null),
             'status' => 'draft',
             'visibility' => 'private',
@@ -76,9 +77,9 @@ final class RecipeNormalizer {
             'mealType' => $this->first($data['mealType'] ?? null),
             'cookingMethod' => $this->first($data['cookingMethod'] ?? $data['cookMethod'] ?? null),
             'season' => $this->first($data['season'] ?? null),
-            'origin' => $this->first($data['origin'] ?? null),
             'calories' => is_numeric($calories) ? (int)$calories : null,
             'nutrition' => $nutrition,
+            'coverSuggestion' => $this->nullable($data['coverSuggestion'] ?? null),
             'notes' => $this->nullable($data['notes'] ?? null),
             'imagePath' => is_string($image) ? $image : null,
             'ingredients' => $ingredients,

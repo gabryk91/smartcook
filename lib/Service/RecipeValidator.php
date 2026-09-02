@@ -106,11 +106,41 @@ final class RecipeValidator {
                 'unit' => $this->normalizer->normalizeUnit(isset($ingredient['unit']) ? (string)$ingredient['unit'] : null),
                 'notes' => $this->nullableString($ingredient['notes'] ?? null),
                 'optional' => (bool)($ingredient['optional'] ?? false),
+				'alternatives' => $this->ingredientAlternatives($ingredient['alternatives'] ?? []),
                 'group' => $this->nullableString($ingredient['group'] ?? $ingredient['groupName'] ?? null),
                 'category' => $this->nullableString($ingredient['category'] ?? null),
                 'allergens' => $this->normalizer->normalizeStringList($ingredient['allergens'] ?? []),
                 'substitutes' => $this->normalizer->normalizeStringList($ingredient['substitutes'] ?? []),
                 'sortOrder' => $index,
+            ];
+        }
+        return $result;
+    }
+
+    /** @return list<array{name: string, quantity: string|null, amount: float|null, unit: string|null, notes: string|null}> */
+    private function ingredientAlternatives(mixed $alternatives): array {
+        if (!is_array($alternatives)) {
+            return [];
+        }
+        $result = [];
+        foreach ($alternatives as $alternative) {
+            if (is_string($alternative)) {
+                $alternative = ['name' => $alternative];
+            }
+            if (!is_array($alternative)) {
+                continue;
+            }
+            $name = trim((string)($alternative['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $quantity = isset($alternative['quantity']) ? trim((string)$alternative['quantity']) : null;
+            $result[] = [
+                'name' => $name,
+                'quantity' => $quantity !== '' ? $quantity : null,
+                'amount' => isset($alternative['amount']) && $alternative['amount'] !== '' ? (float)$alternative['amount'] : $this->normalizer->parseQuantity($quantity),
+                'unit' => $this->normalizer->normalizeUnit(isset($alternative['unit']) ? (string)$alternative['unit'] : null),
+                'notes' => $this->nullableString($alternative['notes'] ?? null),
             ];
         }
         return $result;

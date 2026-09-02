@@ -8,6 +8,7 @@
     <string name="use_ai">Usa l\'AI durante l\'importazione</string>
     <string name="test_connection">Verifica configurazione</string>
     <string name="save_configuration">Salva configurazione</string>
+    <string name="open_smartcook">Apri SmartCook</string>
     <string name="content_title">Contenuto da importare</string>
     <string name="content_hint">Condividi un URL o del testo da un\'altra app, oppure incollalo qui.</string>
     <string name="send_import">Invia a SmartCook</string>
