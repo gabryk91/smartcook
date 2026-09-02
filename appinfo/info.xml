@@ -5,7 +5,7 @@
     <name>SmartCook</name>
     <summary>Intelligent, multilingual recipe management for Nextcloud</summary>
     <description><![CDATA[
-SmartCook is a self-hosted recipe manager with structured ingredients, tags, automatic import from URLs or text, optional AI extraction, OCR adapters, meal planning, shopping lists, sharing, history and exports.
+SmartCook is a self-hosted recipe manager for Nextcloud with structured ingredients, substitutions, mass editing and reviewable AI refinement. Import recipes from webpages, YouTube videos, public Facebook posts and Reels, text, Markdown, JSON and files; then plan meals, build shopping lists, share recipes and export your collection.
     ]]></description>
     <version>1.0.100</version>
     <licence>MIT</licence>
@@ -13,10 +13,10 @@ SmartCook is a self-hosted recipe manager with structured ingredients, tags, aut
     <website>https://github.com/gabryk91/smartcook</website>
     <bugs>https://github.com/gabryk91/smartcook/issues</bugs>
     <repository type="git">https://github.com/gabryk91/smartcook.git</repository>
-    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-recipes.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-recipe-editor.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-dashboard.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-import.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-cover-search.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-bulk-editing.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/gabryk91/smartcook/main/img/readme/smartcook-ai-refinement.png</screenshot>
     <namespace>SmartCook</namespace>
     <category>multimedia</category>
     <category>organization</category>
