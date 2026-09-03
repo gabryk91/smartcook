@@ -68,7 +68,8 @@ final class CoverImageSearchService {
     /** @return array<string, mixed> */
     public function storeCandidate(int $recipeId, string $url, string $unsplashDownloadUrl = ''): array {
         $recipe = $this->access->owned($recipeId);
-        if (trim((string)($recipe['imagePath'] ?? '')) !== '') {
+        $currentCover = trim((string)($recipe['imagePath'] ?? ''));
+        if ($currentCover !== '' && preg_match('#^https?://#i', $currentCover) !== 1) {
             throw new ValidationException('This recipe already has a cover image');
         }
         if ($unsplashDownloadUrl !== '') {
