@@ -5,9 +5,13 @@
     <name>SmartCook</name>
     <summary>Intelligent, multilingual recipe management for Nextcloud</summary>
     <description><![CDATA[
-SmartCook is a self-hosted recipe manager for Nextcloud with structured ingredients, substitutions, mass editing and reviewable AI refinement. Import recipes from webpages, YouTube videos, public Facebook posts and Reels, text, Markdown, JSON and files; then plan meals, build shopping lists, share recipes and export your collection.
+SmartCook is a self-hosted, multilingual recipe manager for Nextcloud. Organize recipes with structured ingredients, substitutions, steps, timings, nutrition, tags, categories and tools; plan meals, generate shopping lists, share recipes and export your collection.
+
+Import recipes from ordinary webpages, YouTube videos, public Facebook posts and Reels, and public Instagram posts and Reels, as well as pasted text, Markdown, JSON and supported files. SmartCook extracts the publicly exposed title, description or caption and cover image when available, then always presents an editable preview before saving. Private, restricted or login-required social content cannot be imported.
+
+SmartCook checks Schema.org recipe data first and then uses deterministic local parsing. AI refinement and OCR are optional: choose and configure only the providers you trust. Your source is never saved until you review and confirm the extracted recipe.
     ]]></description>
-    <version>1.0.107</version>
+    <version>1.0.109</version>
     <licence>MIT</licence>
     <author>SmartCook contributors</author>
     <website>https://github.com/gabryk91/smartcook</website>

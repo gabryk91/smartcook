@@ -1991,6 +1991,10 @@ select,
 	gap: 6px 8px;
 }
 
+.version-list > div > .button-row {
+	flex: 0 0 auto;
+}
+
 .attachment-list small,
 .share-list small,
 .version-list small {
@@ -2989,8 +2993,7 @@ select,
 		z-index: 30;
 		inset-inline: 0;
 		inset-block-end: 0;
-		display: grid;
-		grid-template-columns: repeat(7, minmax(0, 1fr));
+		display: flex;
 		gap: 0;
 		height: calc(64px + env(safe-area-inset-bottom));
 		padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
@@ -2998,6 +3001,14 @@ select,
 		background: color-mix(in srgb, var(--smartcook-surface) 94%, transparent);
 		box-shadow: 0 -8px 25px rgb(0 0 0 / 8%);
 		backdrop-filter: blur(16px);
+		overflow-x: auto;
+		overflow-y: hidden;
+		overscroll-behavior-inline: contain;
+		scrollbar-width: none;
+	}
+
+	.smartcook-sidebar nav::-webkit-scrollbar {
+		display: none;
 	}
 
 	.smartcook-sidebar nav button,
@@ -3006,7 +3017,8 @@ select,
 		place-items: center;
 		grid-template-rows: 18px 1fr;
 		gap: 2px;
-		min-width: 0;
+		flex: 1 0 96px;
+		min-width: 96px;
 		min-height: 52px;
 		padding: 5px 2px;
 		border-radius: 12px;

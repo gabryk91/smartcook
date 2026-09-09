@@ -7,7 +7,7 @@
 
 ## ✨ What’s new
 
-- **Import recipes from YouTube and Facebook.** Paste a YouTube URL to extract its video title and description, or a public Facebook post/Reel URL to extract its public caption. SmartCook turns the available recipe text into a structured, reviewable draft before saving.
+- **Import recipes from YouTube, Facebook and Instagram.** Paste a YouTube URL to extract its video title and description, or a public Facebook or Instagram post/Reel URL to extract its public caption. SmartCook turns the available recipe text into a structured, reviewable draft before saving.
 - **Mass editing built for real collections.** Filter and select recipes, then assign or remove tags, categories, tools, cuisines, meal types, cooking methods and seasons in a focused administration workspace.
 - **Mass AI refinement with control at every step.** Analyse a selected set of recipes, inspect each proposed change field by field, deselect anything you do not want, then apply only the approved improvements. Ingredients and preparation steps are never altered by this workflow.
 - **Ingredient alternatives.** Record substitutions directly beside the original ingredient, including their quantity, unit and notes, and keep them visible in recipe previews and public shares.
@@ -18,7 +18,7 @@
 | | |
 | --- | --- |
 | 📚 **Structured recipe library** | Create and browse recipes with ingredients, alternatives, steps, photos, tags, categories, tools, nutrition and timing. |
-| 📥 **Import from almost anywhere** | Import from ordinary recipe URLs, **YouTube videos**, **public Facebook posts and Reels**, pasted text, HTML, Markdown, JSON and files. Review every extracted field before saving. |
+| 📥 **Import from almost anywhere** | Import from ordinary recipe URLs, **YouTube videos**, **public Facebook and Instagram posts and Reels**, pasted text, HTML, Markdown, JSON and files. Review every extracted field before saving. |
 | 🧠 **Optional AI assistance** | Use a compatible provider to improve extraction, generate meal plans and refine existing recipes in bulk with reviewable proposals. SmartCook remains fully useful without AI. |
 | 🏷️ **Powerful organisation** | Filter, search, favourite and sort recipes; manage taxonomy values and make targeted mass assignments across the collection. |
 | 🗓️ **Meal planning** | Schedule breakfast, lunch, dinner and snacks on weekly or monthly plans, with optional AI suggestions. |
@@ -31,7 +31,10 @@ SmartCook’s import workflow is designed to preserve your control: it extracts 
 
 - **YouTube:** supports `youtube.com`, `www.youtube.com` and `youtu.be` links. SmartCook reads the publicly available title and video description. Top comments can be used when a YouTube Data API key is configured.
 - **Facebook:** supports public `facebook.com` posts, Reels and `fb.watch` links. SmartCook reads the publicly exposed post or Reel description; private or restricted content cannot be imported.
+- **Instagram:** supports public `instagram.com` posts and Reels. SmartCook reads the publicly exposed caption and cover image; private, age-restricted or login-required content cannot be imported.
 - **Other sources:** Schema.org recipe pages, standard webpages, text, HTML, Markdown, JSON and supported documents are handled through deterministic parsers, with optional AI refinement for incomplete or unstructured sources.
+
+For every URL, SmartCook creates an editable preview before a recipe enters your library. It imports only information exposed by the public page: it does not download social videos, read private posts, or access comments.
 
 ![SmartCook import screen](img/readme/smartcook-import.png)
 

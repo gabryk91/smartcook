@@ -123,6 +123,18 @@ $facebookRecipe = $recipeParser->parse($facebookSource['title'] . "\n\n" . $face
 $expectSame(2, count($facebookRecipe['ingredients']), 'Facebook description ingredients');
 $expectSame(2, count($facebookRecipe['steps']), 'Facebook description steps');
 
+$instagramSource = (new FacebookDescriptionExtractor())->extract(<<<'HTML'
+<!doctype html><html><head>
+<meta property="og:title" content="cuocodicasa on Instagram: &quot;Pasta al forno&quot;">
+<meta property="og:description" content="Pasta al forno&#10;&#10;Ingredienti:&#10;- 320 g pasta&#10;- 200 g mozzarella&#10;&#10;Procedimento:&#10;1. Cuocere la pasta.&#10;2. Gratinarla in forno.">
+<meta property="og:image" content="https://cdn.example.test/pasta-al-forno.jpg">
+</head></html>
+HTML);
+$expectSame('https://cdn.example.test/pasta-al-forno.jpg', $instagramSource['image'], 'Instagram cover extraction');
+$instagramRecipe = $recipeParser->parse($instagramSource['description'], ['language' => 'it']);
+$expectSame(2, count($instagramRecipe['ingredients']), 'Instagram caption ingredients');
+$expectSame(2, count($instagramRecipe['steps']), 'Instagram caption steps');
+
 $ai = (new AiJsonParser())->parse("```json\n{\"title\":\"Torta\",\"ingredients\":[]}\n```");
 $expectSame('Torta', $ai['title'], 'AI fenced JSON parsing');
 
