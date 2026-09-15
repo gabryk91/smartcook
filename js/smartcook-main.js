@@ -176,6 +176,15 @@ const fallbackTranslations = {
         'Remove stored Google key': 'Rimuovi chiave Google salvata',
         'Searches Google Images using the recipe title and saves the first suitable result as the cover.': 'Cerca in Google Immagini usando il titolo della ricetta e salva il primo risultato idoneo come copertina.',
         'Uses the selected provider with the recipe title and saves the first suitable result as the cover.': 'Usa il provider selezionato con il titolo della ricetta e salva il primo risultato idoneo come copertina.',
+        'OCR setup': 'Configurazione OCR',
+        'Set up local OCR': 'Configura OCR locale',
+        'SmartCook uses Tesseract for images and pdftotext for PDFs. Install these tools in the operating system or container that runs Nextcloud; they are not included in the SmartCook app.': 'SmartCook usa Tesseract per le immagini e pdftotext per i PDF. Installa questi strumenti nel sistema operativo o nel container che esegue Nextcloud: non sono inclusi nell’app SmartCook.',
+        'Run this from the Unraid terminal when the Nextcloud container is named Nextcloud and is based on Debian.': 'Esegui questo dal terminale Unraid quando il container Nextcloud si chiama Nextcloud ed è basato su Debian.',
+        'Verify the commands and language packs as the Nextcloud web user.': 'Verifica i comandi e i pacchetti lingua come utente web di Nextcloud.',
+        'Other Linux systems': 'Altri sistemi Linux',
+        'Install the matching packages in the operating system or container that runs Nextcloud.': 'Installa i pacchetti corrispondenti nel sistema operativo o nel container che esegue Nextcloud.',
+        'After installing': 'Dopo l’installazione',
+        'Set the extractor to Local Tesseract / pdftotext, use ita+eng when both languages are installed, then save the settings. Packages installed directly in a container can be lost when it is recreated; use a custom image for a permanent setup.': 'Imposta l’estrattore su Tesseract / pdftotext locale, usa ita+eng quando sono installate entrambe le lingue, quindi salva le impostazioni. I pacchetti installati direttamente nel container possono essere persi quando viene ricreato: usa un’immagine personalizzata per una configurazione permanente.',
     },
 };
 const tr = (text) => {
@@ -1663,6 +1672,43 @@ async function renderAdministration(view) {
     };
     await load();
 }
+function openOcrHelp() {
+    const modal = document.createElement('div');
+    modal.className = 'ocr-help-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'smartcook-ocr-help-title');
+    modal.innerHTML = `<div class="ocr-help-card"><div class="section-heading"><h2 id="smartcook-ocr-help-title">${esc(tr('Set up local OCR'))}</h2><button class="icon-button" data-close-ocr-help type="button" aria-label="${attr(tr('Close'))}" title="${attr(tr('Close'))}">&times;</button></div><p>${esc(tr('SmartCook uses Tesseract for images and pdftotext for PDFs. Install these tools in the operating system or container that runs Nextcloud; they are not included in the SmartCook app.'))}</p><section><h3>Unraid</h3><p>${esc(tr('Run this from the Unraid terminal when the Nextcloud container is named Nextcloud and is based on Debian.'))}</p><pre><code>docker exec -u root Nextcloud sh -lc '
+apt-get update &amp;&amp;
+apt-get install -y tesseract-ocr tesseract-ocr-ita tesseract-ocr-eng poppler-utils
+'</code></pre><p>${esc(tr('Verify the commands and language packs as the Nextcloud web user.'))}</p><pre><code>docker exec -u www-data Nextcloud sh -lc '
+tesseract --list-langs &amp;&amp;
+pdftotext -v
+'</code></pre></section><section><h3>${esc(tr('Other Linux systems'))}</h3><p>${esc(tr('Install the matching packages in the operating system or container that runs Nextcloud.'))}</p><pre><code>Debian / Ubuntu
+apt-get install -y tesseract-ocr tesseract-ocr-ita tesseract-ocr-eng poppler-utils
+
+Alpine Linux
+apk add --no-cache tesseract-ocr tesseract-ocr-data-ita tesseract-ocr-data-eng poppler-utils
+
+Fedora / RHEL / Rocky Linux
+dnf install -y tesseract tesseract-langpack-ita tesseract-langpack-eng poppler-utils</code></pre></section><section><h3>${esc(tr('After installing'))}</h3><p>${esc(tr('Set the extractor to Local Tesseract / pdftotext, use ita+eng when both languages are installed, then save the settings. Packages installed directly in a container can be lost when it is recreated; use a custom image for a permanent setup.'))}</p></section><button class="secondary" data-close-ocr-help type="button">${esc(tr('Close'))}</button></div>`;
+    const close = () => {
+        document.removeEventListener('keydown', onKeyDown);
+        modal.remove();
+    };
+    const onKeyDown = event => {
+        if (event.key === 'Escape')
+            close();
+    };
+    modal.querySelectorAll('[data-close-ocr-help]').forEach(button => button.addEventListener('click', close));
+    modal.addEventListener('click', event => {
+        if (event.target === modal)
+            close();
+    });
+    document.addEventListener('keydown', onKeyDown);
+    document.body.append(modal);
+    modal.querySelector('[data-close-ocr-help]')?.focus();
+}
 async function renderSettings(view) {
     const settings = (await working(() => request('/settings'))).settings;
 	view.innerHTML = `<div class="settings-layout"><main class="view-stack"><div class="editor-actions settings-actions"><div><button class="primary" data-save-settings type="button">${esc(tr('Save settings'))}</button></div></div>
@@ -1674,7 +1720,7 @@ async function renderSettings(view) {
 		</div><div class="info-box"><b>Nextcloud Assistant</b><p>${esc(tr('Uses the language-model provider already configured by the instance administrator and requires no duplicate API key.'))}</p></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Cover image'))}</p></div></div><div class="form-grid"><label>${esc(tr('Image search provider'))}<select data-setting="coverImageProvider"><option value="google">Google</option><option value="pexels">Pexels</option><option value="unsplash">Unsplash</option></select></label><label class="span-2">${esc(tr('Programmable Search engine ID'))}<input data-setting="googleImageSearchEngineId" value="${attr(settings.googleImageSearchEngineId)}"></label><label>${esc(tr('Google API key'))}<input data-setting="googleImageSearchApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasGoogleImageSearchApiKey ? tr('Key already stored; leave blank to keep it') : tr('Google API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="googleImageSearchApiKey" type="checkbox"> ${esc(tr('Remove stored Google key'))}</label><label>${esc(tr('Pexels API key'))}<input data-setting="pexelsApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasPexelsApiKey ? tr('Key already stored; leave blank to keep it') : tr('Pexels API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="pexelsApiKey" type="checkbox"> ${esc(tr('Remove stored Pexels key'))}</label><label>${esc(tr('Unsplash access key'))}<input data-setting="unsplashAccessKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasUnsplashAccessKey ? tr('Key already stored; leave blank to keep it') : tr('Unsplash access key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="unsplashAccessKey" type="checkbox"> ${esc(tr('Remove stored Unsplash key'))}</label></div><p class="section-help">${esc(tr('Uses the selected provider with the recipe title and saves the first suitable result as the cover.'))}</p></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('AI meal planner'))}</p></div></div><div class="form-grid"><label class="span-2">${esc(tr('Planner prompt'))}<textarea data-setting="aiPlannerPrompt" rows="3">${esc(settings.aiPlannerPrompt)}</textarea></label><label class="span-2">${esc(tr('Dietary preferences and constraints'))}<textarea data-setting="plannerPreferences" rows="3" placeholder="${attr(tr('Example: vegetarian, no peanuts, low salt'))}">${esc(settings.plannerPreferences)}</textarea></label><label>${esc(tr('Maximum cooking time per meal'))}<input data-setting="plannerCookingTime" type="number" min="5" max="600" value="${settings.plannerCookingTime}"><small>${esc(tr('minutes'))}</small></label><label>${esc(tr('Default servings'))}<input data-setting="plannerServings" type="number" min="1" max="30" value="${settings.plannerServings}"></label></div></section>
-		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Documents'))}</p><h2>${esc(tr('OCR and PDF extraction'))}</h2></div><span class="status-pill ${settings.ocrProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.ocrProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid"><label>${esc(tr('Extractor'))}<select data-setting="ocrProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="local">${esc(tr('Local Tesseract / pdftotext'))}</option><option value="external">${esc(tr('External HTTP service'))}</option></select></label><label>${esc(tr('OCR languages'))}<input data-setting="ocrLanguage" value="${attr(settings.ocrLanguage)}"></label><label>${esc(tr('Tesseract executable'))}<input data-setting="tesseractPath" value="${attr(settings.tesseractPath)}"></label><label>${esc(tr('pdftotext executable'))}<input data-setting="pdfToTextPath" value="${attr(settings.pdfToTextPath)}"></label><label class="span-2">${esc(tr('External endpoint'))}<input data-setting="ocrEndpoint" type="url" value="${attr(settings.ocrEndpoint)}"></label><label>${esc(tr('API key'))}<input data-setting="ocrApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasOcrApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="ocrApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label></div></section>
+		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Documents'))}</p><h2>${esc(tr('OCR and PDF extraction'))}</h2></div><div class="ocr-heading-actions"><span class="status-pill ${settings.ocrProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.ocrProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span><button class="secondary icon-button ocr-help-button" data-ocr-help type="button" aria-label="${attr(tr('OCR setup'))}" title="${attr(tr('OCR setup'))}">?</button></div></div><div class="form-grid"><label>${esc(tr('Extractor'))}<select data-setting="ocrProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="local">${esc(tr('Local Tesseract / pdftotext'))}</option><option value="external">${esc(tr('External HTTP service'))}</option></select></label><label>${esc(tr('OCR languages'))}<input data-setting="ocrLanguage" value="${attr(settings.ocrLanguage)}"></label><label>${esc(tr('Tesseract executable'))}<input data-setting="tesseractPath" value="${attr(settings.tesseractPath)}"></label><label>${esc(tr('pdftotext executable'))}<input data-setting="pdfToTextPath" value="${attr(settings.pdfToTextPath)}"></label><label class="span-2">${esc(tr('External endpoint'))}<input data-setting="ocrEndpoint" type="url" value="${attr(settings.ocrEndpoint)}"></label><label>${esc(tr('API key'))}<input data-setting="ocrApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasOcrApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="ocrApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label></div></section>
 		<section class="panel form-section danger-zone"><p class="eyebrow">${esc(tr('Danger zone'))}</p><h2>${esc(tr('Cover image'))}</h2><p>${esc(tr('Uses the selected provider with the recipe title and saves the first suitable result as the cover.'))}</p><button class="danger secondary full" data-fill-missing-covers type="button">${esc(tr('Find covers for all missing recipes'))}</button></section>
 		</main>
 		<aside class="panel privacy-card"><p class="eyebrow">${esc(tr('Privacy'))}</p><h2>${esc(tr('You control every processor'))}</h2><p>${esc(tr('Deterministic URL and text parsing stays in your Nextcloud. Content is sent to an AI or external OCR service only when you enable and invoke it.'))}</p><ul><li>${esc(tr('API keys are encrypted with the Nextcloud server secret.'))}</li><li>${esc(tr('Imported data is always shown as an editable preview.'))}</li><li>${esc(tr('URL imports reject private and reserved network addresses.'))}</li></ul></aside></div>`;
@@ -1687,6 +1733,7 @@ async function renderSettings(view) {
     const coverImageProvider = view.querySelector('[data-setting="coverImageProvider"]');
     if (coverImageProvider)
         coverImageProvider.value = settings.coverImageProvider || 'google';
+    view.querySelector('[data-ocr-help]')?.addEventListener('click', openOcrHelp);
     view.querySelector('[data-save-settings]')?.addEventListener('click', async () => {
         const payload = {};
         view.querySelectorAll('[data-setting]').forEach(field => {

@@ -2674,6 +2674,74 @@ select,
 	align-items: center;
 }
 
+.ocr-heading-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ocr-help-button {
+	border: 1px solid var(--smartcook-border);
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.ocr-help-modal {
+	position: fixed;
+	z-index: 1000;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: rgb(15 23 42 / 55%);
+}
+
+.ocr-help-card {
+	width: min(760px, 100%);
+	max-height: min(760px, 100%);
+	overflow: auto;
+	display: grid;
+	gap: 16px;
+	padding: 24px;
+	border: 1px solid var(--smartcook-border);
+	background: var(--smartcook-surface);
+	box-shadow: var(--smartcook-shadow);
+}
+
+.ocr-help-card .section-heading {
+	align-items: center;
+	padding-block-end: 12px;
+	border-block-end: 1px solid var(--smartcook-border);
+}
+
+.ocr-help-card .section-heading h2,
+.ocr-help-card h3,
+.ocr-help-card p {
+	margin: 0;
+}
+
+.ocr-help-card section {
+	display: grid;
+	gap: 8px;
+}
+
+.ocr-help-card p {
+	color: var(--smartcook-muted);
+	line-height: 1.5;
+}
+
+.ocr-help-card pre {
+	overflow-x: auto;
+	margin: 0;
+	padding: 12px;
+	border: 1px solid var(--smartcook-border);
+	background: var(--smartcook-surface-soft);
+	color: var(--smartcook-text);
+	font-size: 12px;
+	line-height: 1.45;
+	white-space: pre-wrap;
+}
+
 .cover-picker-grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));

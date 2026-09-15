@@ -1,5 +1,7 @@
 # SmartCook 🍳
 
+[🇬🇧 English](README.md) · [🇮🇹 Italiano](README.it.md)
+
 > [!WARNING]
 > **Vibe-coded project.** SmartCook is built through a fast, AI-assisted and experimentation-driven workflow. It is actively evolving: please review changes carefully and avoid using it as the only copy of important data until you have tested it in your own Nextcloud environment.
 
@@ -99,6 +101,43 @@ SmartCook is a standard Nextcloud app.
 
 > [!TIP]
 > Before upgrading a production installation, back up the database, configuration and existing SmartCook app directory.
+
+## 📄 OCR and PDF extraction
+
+SmartCook can read recipes from images and PDFs with a local Tesseract/Poppler installation. These system tools are not bundled with the Nextcloud app: install them in the operating system or container that runs Nextcloud, then choose **Local Tesseract / pdftotext** in **SmartCook → Settings**. Use `ita+eng` for Italian and English, and keep `tesseract` and `pdftotext` as the executable names unless your system uses different paths.
+
+Verify the installation with the same user that runs Nextcloud:
+
+```sh
+tesseract --list-langs
+pdftotext -v
+```
+
+The language list must include `ita` and `eng` when using `ita+eng`.
+
+### Unraid / Nextcloud Docker container
+
+For a Debian-based Nextcloud container named `Nextcloud`, run from the Unraid terminal:
+
+```sh
+docker exec -u root Nextcloud sh -lc '
+apt-get update &&
+apt-get install -y tesseract-ocr tesseract-ocr-ita tesseract-ocr-eng poppler-utils
+'
+
+docker exec -u www-data Nextcloud sh -lc '
+tesseract --list-langs &&
+pdftotext -v
+'
+```
+
+### Other systems
+
+- **Debian / Ubuntu:** `apt-get update && apt-get install -y tesseract-ocr tesseract-ocr-ita tesseract-ocr-eng poppler-utils`
+- **Alpine Linux:** `apk add --no-cache tesseract-ocr tesseract-ocr-data-ita tesseract-ocr-data-eng poppler-utils`
+- **Fedora / RHEL / Rocky Linux:** `dnf install -y tesseract tesseract-langpack-ita tesseract-langpack-eng poppler-utils`
+
+If a container is recreated during a Nextcloud update, packages installed interactively may be removed. For a permanent Docker setup, build a custom image based on the exact Nextcloud image currently in use and install the same packages in its Dockerfile. SmartCook's OCR help button in Settings includes these commands as a quick reference.
 
 ## 🧪 Project status
 
