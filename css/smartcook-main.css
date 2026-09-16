@@ -2802,6 +2802,18 @@ select,
 	border-radius: 0;
 }
 
+.recipe-source-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+}
+
+.recipe-source-link span {
+	font-size: 18px;
+	line-height: 1;
+}
+
 .recipe-view-meta {
 	display: flex;
 	flex-wrap: wrap;

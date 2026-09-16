@@ -24,6 +24,7 @@ final class ImportManager {
         MarkdownImporter $markdown,
         JsonImporter $json,
         FileImporter $file,
+        private MultiRecipeTextSplitter $multiRecipe,
         private AiProviderRegistry $ai,
         private RecipeNormalizer $normalizer,
         private RecipeValidator $validator,
@@ -41,6 +42,17 @@ final class ImportManager {
         $settings = $this->settings->get($userId);
         $payload['maxBytes'] ??= $settings['maxImportBytes'];
         $result = $this->importer($kind)->import($payload);
+        $previews = [];
+        foreach ($this->multiRecipe->split($result, $kind, $payload) as $candidate) {
+            $previews[] = $this->previewResult($userId, $candidate, $payload, $useAi, $provider, $includeDuplicates);
+        }
+        $primary = $previews[0];
+        $primary['previews'] = $previews;
+        return $primary;
+    }
+
+    /** @param array<string, mixed> $payload @return array<string, mixed> */
+    private function previewResult(string $userId, ImportResult $result, array $payload, bool $useAi, ?string $provider, bool $includeDuplicates): array {
         $recipe = $result->recipe;
         $strategy = $result->strategy;
         $warnings = $result->warnings;

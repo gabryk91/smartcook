@@ -148,6 +148,7 @@ const fallbackTranslations = {
         'Select one or more categories': 'Seleziona una o più categorie',
         'Select one or more tags': 'Seleziona uno o più tag',
         'Find cover image': 'Trova immagine di copertina',
+        'Open source': 'Apri fonte',
         'Cover image found': 'Immagine di copertina trovata',
         'Cover saved locally': 'Copertina salvata localmente',
         'Cover removed': 'Copertina rimossa',
@@ -211,6 +212,23 @@ const attr = esc;
 const safeExternalUrl = (value) => {
     const text = String(value ?? '');
     return /^https?:\/\//i.test(text) ? text : '';
+};
+const sourceServiceName = (url) => {
+    try {
+        const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
+        if (/(^|\.)youtube\.com$|(^|\.)youtu\.be$/.test(host))
+            return 'YouTube';
+        if (/(^|\.)facebook\.com$|(^|\.)fb\.watch$/.test(host))
+            return 'Facebook';
+        if (/(^|\.)instagram\.com$/.test(host))
+            return 'Instagram';
+        if (/(^|\.)tiktok\.com$/.test(host))
+            return 'TikTok';
+        return host;
+    }
+    catch {
+        return '';
+    }
 };
 const asNumber = (value, fallback = 0) => {
     const parsed = Number(value);
@@ -382,7 +400,7 @@ function renderShell(section, id) {
 		<aside class="smartcook-sidebar" aria-label="SmartCook">
 			<div class="brand"><img src="${attr(appIconUrl)}" alt=""><div><strong>SmartCook</strong><span>${esc(tr('Recipe intelligence'))}</span></div></div>
 			<nav>${nav.map(([route, label]) => `<a class="${section === route || (route === 'recipes' && ['recipe', 'editor'].includes(section)) ? 'active' : ''}" href="#/${route}">${esc(label)}</a>`).join('')}</nav>
-			${section !== 'editor' ? `<a class="primary mobile-create" href="#/new" aria-label="${attr(tr('New recipe'))}"><span class="mobile-create-icon" aria-hidden="true">+</span><span class="mobile-create-label">${esc(tr('New recipe'))}</span></a>` : ''}
+			${section === 'dashboard' ? `<a class="primary mobile-create" href="#/new" aria-label="${attr(tr('New recipe'))}"><span class="mobile-create-icon" aria-hidden="true">+</span><span class="mobile-create-label">${esc(tr('New recipe'))}</span></a>` : ''}
 		</aside>
 		<main class="smartcook-content">
 			<header class="page-header"><div><h1>${esc(shellTitle(section, id))}</h1>${shellIntro(section)}</div><div class="busy" data-smartcook-busy hidden>${esc(tr('Working...'))}</div></header>
@@ -580,6 +598,8 @@ function stepRow(item = { text: '' }, index = 0, total = 1) {
 }
 function recipeViewer(recipe) {
     const image = recipeImageUrl(recipe.imagePath);
+	const sourceUrl = safeExternalUrl(recipe.sourceUrl);
+	const sourceLabel = String(sourceServiceName(sourceUrl) || recipe.sourceName || '').trim();
 	const categories = (recipe.categories || []).map(category => String(category?.name || category || '').trim()).filter(Boolean);
 	const categoryLabel = categories.join(' · ') || tr('Uncategorized');
 	const calories = asNumber(recipe.calories);
@@ -599,7 +619,7 @@ function recipeViewer(recipe) {
         return `<li><span class="recipe-step-number">${index + 1}</span><div><p>${esc(step.text)}</p>${details.length ? `<small>${esc(details.join(' · '))}</small>` : ''}</div></li>`;
     }).join('');
     return `<div class="recipe-view-shell"><article class="recipe-view panel">
-        <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(categoryLabel)}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions"><button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
+        <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(categoryLabel)}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}<div class="recipe-view-actions">${sourceUrl ? `<a class="secondary recipe-source-link" href="${attr(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${attr(tr('Open source'))}"><span aria-hidden="true">&#8599;</span>${esc(tr('Open source'))}${sourceLabel ? `: ${esc(sourceLabel)}` : ''}</a>` : ''}<button class="secondary" data-view-mark-cooked type="button">${esc(tr('Cooked today'))}</button><a class="primary" href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></div></header>
         <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span>${calories > 0 ? `<span><strong>${calories}</strong> ${esc(tr('kcal x 1 serving'))}</span>` : ''}<span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
     </article>${recipe.id ? `<details class="recipe-view-download"><summary>${esc(tr('Download'))}</summary><div><a href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></details>` : ''}</div>`;
@@ -1061,7 +1081,7 @@ async function renderImport(view) {
                         showNotice(tr('Waiting for processing'), 'error');
                         return;
                     }
-                    previews = [job.result];
+                    previews = job.result.previews || [job.result];
                     savedPreviews = new Set();
                     activeExternalJobId = job.id;
                     const previewHolder = view.querySelector('[data-import-preview]');
@@ -1099,7 +1119,8 @@ async function renderImport(view) {
                         if (provider)
                             form.append('provider', provider);
                         try {
-                            previews.push(await request('/import/file', { method: 'POST', body: form }));
+                            const response = await request('/import/file', { method: 'POST', body: form });
+                            previews.push(...(response.previews || [response]));
                         }
                         catch (error) {
                             failedFiles.push(`${file.name}: ${error instanceof Error ? error.message : tr('Unexpected error')}`);
@@ -1123,7 +1144,8 @@ async function renderImport(view) {
                 }
                 setImportBusy(true);
                 try {
-                    previews = [await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi, provider: provider || null } }))];
+                    const response = await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi, provider: provider || null } }));
+                    previews = response.previews || [response];
                     savedPreviews = new Set();
                 }
                 finally {
