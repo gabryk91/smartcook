@@ -10,6 +10,7 @@ use OCA\SmartCook\Service\Import\FacebookDescriptionExtractor;
 use OCA\SmartCook\Service\Import\JsonLdRecipeExtractor;
 use OCA\SmartCook\Service\Import\RecipeNormalizer;
 use OCA\SmartCook\Service\Import\TextRecipeParser;
+use OCA\SmartCook\Service\Ocr\NativePdfTextExtractor;
 use OCA\SmartCook\Service\TextNormalizer;
 
 $checks = 0;
@@ -137,5 +138,15 @@ $expectSame(2, count($instagramRecipe['steps']), 'Instagram caption steps');
 
 $ai = (new AiJsonParser())->parse("```json\n{\"title\":\"Torta\",\"ingredients\":[]}\n```");
 $expectSame('Torta', $ai['title'], 'AI fenced JSON parsing');
+
+$pdfPath = tempnam(sys_get_temp_dir(), 'smartcook-pdf-');
+$pdfStream = "BT\n/F1 12 Tf\n72 720 Td\n(Pasta al pomodoro) Tj\n0 -20 Td\n(Ingredienti: 200 g pasta) Tj\n0 -20 Td\n(Procedimento: cuoci e condisci.) Tj\nET";
+$compressedPdfStream = gzcompress($pdfStream);
+$pdf = "%PDF-1.4\n1 0 obj\n<< /Length " . strlen($compressedPdfStream) . " /Filter /FlateDecode >>\nstream\n" . $compressedPdfStream . "\nendstream\nendobj\n%%EOF";
+file_put_contents($pdfPath, $pdf);
+$pdfText = (new NativePdfTextExtractor())->extract($pdfPath);
+unlink($pdfPath);
+$expect(str_contains($pdfText, 'Pasta al pomodoro'), 'Embedded PDF text extraction');
+$expect(str_contains($pdfText, 'Procedimento: cuoci e condisci.'), 'Embedded PDF procedure extraction');
 
 fwrite(STDOUT, "SmartCook smoke tests passed: {$checks} checks.\n");

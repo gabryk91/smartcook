@@ -6,6 +6,7 @@ namespace OCA\SmartCook\Service\Import;
 
 use OCA\SmartCook\Exception\ImportException;
 use OCA\SmartCook\Service\Ocr\DocumentTextExtractorRegistry;
+use OCA\SmartCook\Service\Ocr\NativePdfTextExtractor;
 
 final class FileImporter implements ImporterInterface {
     public function __construct(
@@ -14,6 +15,7 @@ final class FileImporter implements ImporterInterface {
         private HtmlImporter $html,
         private MarkdownImporter $markdown,
         private JsonImporter $json,
+        private NativePdfTextExtractor $pdfText,
     ) {
     }
 
@@ -43,6 +45,16 @@ final class FileImporter implements ImporterInterface {
         }
         if (in_array($extension, ['md', 'markdown'], true)) {
             return $this->markdown->import(array_merge($payload, ['text' => $this->read($path)]));
+        }
+        if (str_contains($mime, 'pdf') || $extension === 'pdf') {
+            try {
+                $text = $this->pdfText->extract($path);
+                return new ImportResult($this->textParser->parse($text, $payload), $text, 'pdf-embedded-text');
+            } catch (ImportException $e) {
+                if ($e->getMessage() !== 'The PDF contains no embedded text') {
+                    throw $e;
+                }
+            }
         }
         $text = $this->documents->extract($userId, $path, $mime, $name);
         return new ImportResult($this->textParser->parse($text, $payload), $text, 'document-text-extraction');
