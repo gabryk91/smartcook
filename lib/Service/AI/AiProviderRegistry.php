@@ -71,4 +71,21 @@ final class AiProviderRegistry {
         }
         throw new ImportException('Unsupported AI provider: ' . $providerId);
     }
+
+    /** @param list<array<string, mixed>> $recipes @return array<string, mixed> */
+    public function answer(string $userId, string $question, array $recipes, string $language): array {
+        $config = $this->settings->ai($userId);
+        $providerId = (string)$config['provider'];
+        if ($providerId === 'disabled') {
+            throw new ImportException('The cookbook assistant requires an enabled AI provider');
+        }
+        $config['userId'] = $userId;
+        $config['assistant'] = ['question' => $question, 'recipes' => $recipes];
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($providerId)) {
+                return $provider->extractRecipe('', $language, $config);
+            }
+        }
+        throw new ImportException('Unsupported AI provider: ' . $providerId);
+    }
 }

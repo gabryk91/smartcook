@@ -42,6 +42,16 @@ const fallbackTranslations = {
         'Additional attachment': 'Allegato aggiuntivo',
         'Generate with AI': 'Genera con AI',
         'AI meal planner': 'Pianificatore pasti AI',
+        'Cookbook assistant': 'Assistente del ricettario',
+        'Ask your cookbook': 'Chiedi al tuo ricettario',
+        'Ask about recipes, available ingredients or meal ideas.': 'Chiedi informazioni su ricette, ingredienti disponibili o idee per i pasti.',
+        'What can I cook with eggs, zucchini and Parmesan?': 'Cosa posso cucinare con uova, zucchine e parmigiano?',
+        'Ask': 'Chiedi',
+        'Ask a question about your cookbook': 'Fai una domanda sul tuo ricettario',
+        'Answer': 'Risposta',
+        'Recommended recipes': 'Ricette consigliate',
+        'No recipe was recommended. Try asking with ingredients, a dietary preference or a time limit.': 'Non è stata consigliata nessuna ricetta. Prova a indicare ingredienti, preferenze alimentari o un limite di tempo.',
+        'The assistant uses the AI provider configured in Settings and only the recipes you can access.': 'L’assistente usa il provider AI configurato nelle Impostazioni e solo le ricette a cui puoi accedere.',
         'Weekly instruction (optional)': 'Istruzione per questa settimana (opzionale)',
         'Meal plan generated': 'Piano pasti generato',
         'Dietary preferences and constraints': 'Preferenze alimentari e vincoli',
@@ -365,7 +375,7 @@ function splitNames(value) {
 function shellTitle(section, id) {
     const titles = {
         dashboard: tr('Dashboard'), recipes: tr('Recipes'), recipe: tr('Recipe overview'), editor: id ? tr('Edit recipe') : tr('New recipe'),
-        import: tr('Import'), planner: tr('Meal planner'), shopping: tr('Shopping lists'), administration: tr('Administration'), settings: tr('Settings'),
+        import: tr('Import'), assistant: tr('Cookbook assistant'), planner: tr('Meal planner'), shopping: tr('Shopping lists'), administration: tr('Administration'), settings: tr('Settings'),
     };
     return titles[section] || 'SmartCook';
 }
@@ -402,7 +412,7 @@ function renderShell(section, id) {
     if (!root)
         throw new Error('SmartCook root was not found');
     const nav = [
-        ['dashboard', tr('Dashboard')], ['recipes', tr('Recipes')], ['import', tr('Import')],
+        ['dashboard', tr('Dashboard')], ['recipes', tr('Recipes')], ['import', tr('Import')], ['assistant', tr('Cookbook assistant')],
         ['planner', tr('Meal planner')], ['shopping', tr('Shopping lists')], ['administration', tr('Administration')], ['settings', tr('Settings')],
     ];
     root.innerHTML = `<div class="smartcook-shell">
@@ -1045,6 +1055,25 @@ async function loadVersions(view, recipeId) {
         window.setTimeout(() => { location.hash = `#/recipes/${recipeId}`; }, 0);
     }));
 }
+async function renderAssistant(view) {
+    let response = null;
+    const paint = () => {
+        const recommendations = response?.recommendations || [];
+        view.innerHTML = `<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">SmartCook AI</p><h2>${esc(tr('Ask your cookbook'))}</h2></div></div><p class="section-help">${esc(tr('Ask about recipes, available ingredients or meal ideas.'))}</p><label><span class="sr-only">${esc(tr('Ask your cookbook'))}</span><textarea data-assistant-question rows="3" placeholder="${attr(tr('What can I cook with eggs, zucchini and Parmesan?'))}"></textarea></label><div class="editor-actions"><button class="primary" data-assistant-ask type="button">${esc(tr('Ask'))}</button></div><p class="section-help">${esc(tr('The assistant uses the AI provider configured in Settings and only the recipes you can access.'))}</p></section>${response ? `<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">SmartCook AI</p><h2>${esc(tr('Answer'))}</h2></div></div><p class="assistant-answer">${esc(response.answer || tr('Unexpected error'))}</p></section><section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">SmartCook AI</p><h2>${esc(tr('Recommended recipes'))}</h2></div></div>${recommendations.length ? `<div class="recipe-grid assistant-recommendations">${recommendations.map(item => `<article class="recipe-card"><div class="recipe-card-body"><a href="#/recipes/${asNumber(item.recipe?.id)}"><h3>${esc(item.recipe?.title || tr('Untitled recipe'))}</h3></a><p>${esc(item.reason || '')}</p></div></article>`).join('')}</div>` : `<p class="section-help">${esc(tr('No recipe was recommended. Try asking with ingredients, a dietary preference or a time limit.'))}</p>`}</section>` : ''}`;
+        view.querySelector('[data-assistant-ask]')?.addEventListener('click', async () => {
+            const question = String(view.querySelector('[data-assistant-question]')?.value || '').trim();
+            if (!question) {
+                showNotice(tr('Ask a question about your cookbook'), 'error');
+                return;
+            }
+            const result = await working(() => request('/assistant/chat', { method: 'POST', json: { question, language: document.documentElement.lang || 'it' } }));
+            response = result.response;
+            paint();
+        });
+    };
+    paint();
+}
+
 async function renderImport(view) {
     let kind = 'url';
     let previews = [];
@@ -1917,6 +1946,9 @@ async function route() {
                 break;
             case 'import':
                 await renderImport(view);
+                break;
+            case 'assistant':
+                await renderAssistant(view);
                 break;
             case 'planner':
                 await renderPlanner(view);

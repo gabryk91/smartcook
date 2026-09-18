@@ -5,6 +5,13 @@ declare(strict_types=1);
 namespace OCA\SmartCook\Service\AI;
 
 final class AiPromptFactory {
+    /** @param list<array<string, mixed>> $recipes */
+    public function assistant(string $question, array $recipes, string $language): string {
+        $catalog = json_encode($recipes, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $schema = '{"answer":"string","recommendations":[{"recipeId":1,"reason":"string"}]}';
+        return "You are SmartCook's cookbook assistant. Answer the user's question using only the supplied recipe catalog. You may give practical cooking advice, but never claim that a recipe, ingredient, quantity, allergen, time, or dietary property exists unless it is present in the catalog. When ingredients are available, recommend recipes that use the greatest useful overlap; clearly mention important missing ingredients. Do not invent recipe IDs. Keep the answer concise, helpful, and in {$language}. Return only valid JSON without Markdown using exactly this shape: {$schema}. Include at most 8 recommendations and only recipeId values from the catalog.\n\nUSER QUESTION:\n{$question}\n\nRECIPE CATALOG:\n{$catalog}";
+    }
+
     /** @param array<string, mixed> $recipe */
     public function refinement(array $recipe, string $language): string {
         $recipeJson = json_encode($recipe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

@@ -532,6 +532,10 @@ button:disabled,
 	color: var(--smartcook-muted);
 }
 
+.assistant-answer {
+	white-space: pre-wrap;
+}
+
 .toolbar {
 	display: flex;
 	align-items: end;
