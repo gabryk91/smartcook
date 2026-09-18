@@ -99,7 +99,11 @@ final class RecipeController extends BaseController {
     #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/recipes/{id}/cover/search')]
     public function searchCover(int $id): JSONResponse {
-        return $this->respond(fn (): array => ['candidates' => $this->coverImages->findCandidates($id)]);
+        return $this->respond(function () use ($id): array {
+            $query = trim((string)$this->request->getParam('query', ''));
+            $page = max(1, (int)$this->request->getParam('page', 1));
+            return ['candidates' => $this->coverImages->findCandidates($id, $query !== '' ? $query : null, $page)];
+        });
     }
 
     #[NoAdminRequired]

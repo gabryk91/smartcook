@@ -52,17 +52,20 @@ final class CoverImageSearchService {
     }
 
     /** @return list<array{url:string,thumbnailUrl:string,label:string,downloadUrl?:string}> */
-    public function findCandidates(int $recipeId): array {
+    public function findCandidates(int $recipeId, ?string $query = null, int $page = 1): array {
         $recipe = $this->access->owned($recipeId);
         if (trim((string)($recipe['imagePath'] ?? '')) !== '') {
             throw new ValidationException('This recipe already has a cover image');
         }
-        $title = trim((string)($recipe['title'] ?? ''));
+        $title = trim($query ?? (string)($recipe['title'] ?? ''));
         if ($title === '') {
             throw new ValidationException('Add a recipe title before searching for an image');
         }
+        if (mb_strlen($title) > 255) {
+            throw new ValidationException('The image search text is too long');
+        }
         $settings = $this->settings->get((string)$recipe['ownerId'], true);
-        return $this->findImageCandidates($title, $settings);
+        return $this->findImageCandidates($title, $settings, max(1, min(10, $page)));
     }
 
     /** @return array<string, mixed> */
@@ -110,40 +113,40 @@ final class CoverImageSearchService {
     }
 
     /** @param array<string, mixed> $settings */
-    private function findImageCandidates(string $title, array $settings): array {
+    private function findImageCandidates(string $title, array $settings, int $page): array {
         return match ((string)($settings['coverImageProvider'] ?? 'google')) {
-            'pexels' => $this->pexelsImageCandidates($title, trim((string)($settings['pexelsApiKey'] ?? ''))),
-            'unsplash' => $this->unsplashImageCandidates($title, trim((string)($settings['unsplashAccessKey'] ?? ''))),
-            default => $this->googleImageCandidates($title, trim((string)($settings['googleImageSearchApiKey'] ?? '')), trim((string)($settings['googleImageSearchEngineId'] ?? ''))),
+            'pexels' => $this->pexelsImageCandidates($title, trim((string)($settings['pexelsApiKey'] ?? '')), $page),
+            'unsplash' => $this->unsplashImageCandidates($title, trim((string)($settings['unsplashAccessKey'] ?? '')), $page),
+            default => $this->googleImageCandidates($title, trim((string)($settings['googleImageSearchApiKey'] ?? '')), trim((string)($settings['googleImageSearchEngineId'] ?? '')), $page),
         };
     }
 
     /** @return list<array{url:string,thumbnailUrl:string,label:string}> */
-    private function googleImageCandidates(string $title, string $apiKey, string $engineId): array {
+    private function googleImageCandidates(string $title, string $apiKey, string $engineId, int $page): array {
         if ($apiKey === '' || $engineId === '') {
             throw new ValidationException('Configure Google image search in Settings before using this feature');
         }
         $response = $this->getJson('https://www.googleapis.com/customsearch/v1', [
-            'cx' => $engineId, 'q' => $title, 'searchType' => 'image', 'num' => 6, 'safe' => 'active', 'imgType' => 'photo',
+            'cx' => $engineId, 'q' => $title, 'searchType' => 'image', 'num' => 10, 'start' => (($page - 1) * 10) + 1, 'safe' => 'active', 'imgType' => 'photo',
         ], ['X-Goog-Api-Key' => $apiKey]);
         return $this->candidates($response['items'] ?? [], static fn (array $item): array => ['url' => (string)($item['link'] ?? ''), 'thumbnailUrl' => (string)($item['image']['thumbnailLink'] ?? $item['link'] ?? ''), 'label' => (string)($item['title'] ?? '')], 'Google image search');
     }
 
     /** @return list<array{url:string,thumbnailUrl:string,label:string}> */
-    private function pexelsImageCandidates(string $title, string $apiKey): array {
+    private function pexelsImageCandidates(string $title, string $apiKey, int $page): array {
         if ($apiKey === '') {
             throw new ValidationException('Configure the Pexels API key in Settings before using this feature');
         }
-        $response = $this->getJson('https://api.pexels.com/v1/search', ['query' => $title, 'per_page' => 6, 'orientation' => 'landscape'], ['Authorization' => $apiKey]);
+        $response = $this->getJson('https://api.pexels.com/v1/search', ['query' => $title, 'per_page' => 10, 'page' => $page, 'orientation' => 'landscape'], ['Authorization' => $apiKey]);
         return $this->candidates($response['photos'] ?? [], static fn (array $item): array => ['url' => (string)($item['src']['large'] ?? ''), 'thumbnailUrl' => (string)($item['src']['medium'] ?? ''), 'label' => (string)($item['alt'] ?? $item['photographer'] ?? '')], 'Pexels image search');
     }
 
     /** @return list<array{url:string,thumbnailUrl:string,label:string,downloadUrl:string}> */
-    private function unsplashImageCandidates(string $title, string $accessKey): array {
+    private function unsplashImageCandidates(string $title, string $accessKey, int $page): array {
         if ($accessKey === '') {
             throw new ValidationException('Configure the Unsplash access key in Settings before using this feature');
         }
-        $response = $this->getJson('https://api.unsplash.com/search/photos', ['query' => $title, 'per_page' => 6, 'orientation' => 'landscape'], ['Authorization' => 'Client-ID ' . $accessKey]);
+        $response = $this->getJson('https://api.unsplash.com/search/photos', ['query' => $title, 'per_page' => 10, 'page' => $page, 'orientation' => 'landscape'], ['Authorization' => 'Client-ID ' . $accessKey]);
         return $this->candidates($response['results'] ?? [], static fn (array $item): array => ['url' => (string)($item['urls']['regular'] ?? ''), 'thumbnailUrl' => (string)($item['urls']['small'] ?? ''), 'label' => (string)($item['alt_description'] ?? $item['user']['name'] ?? ''), 'downloadUrl' => (string)($item['links']['download_location'] ?? '')], 'Unsplash image search');
     }
 

@@ -596,6 +596,10 @@ button:disabled,
 	border-radius: 7px;
 }
 
+.taxonomy-picker-options [hidden] {
+	display: none !important;
+}
+
 .taxonomy-picker-options label:hover {
 	background: var(--smartcook-surface-soft);
 }
@@ -2753,6 +2757,18 @@ select,
 
 .cover-picker-card .section-heading {
 	align-items: center;
+}
+
+.cover-picker-search {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: end;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.cover-picker-search label {
+	min-width: 0;
 }
 
 .ocr-heading-actions {

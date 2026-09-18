@@ -177,6 +177,9 @@ const fallbackTranslations = {
         failed: 'non riuscite',
         'Choose a cover image': 'Scegli un’immagine di copertina',
         'Use this image': 'Usa questa immagine',
+		'Search terms': 'Termini di ricerca',
+		Search: 'Cerca',
+		'Show 10 more images': 'Mostra altre 10 immagini',
         'Programmable Search engine ID': 'ID motore Programmable Search',
         'Google API key': 'Chiave API Google',
         'Key already stored; leave blank to keep it': 'Chiave già salvata; lascia vuoto per conservarla',
@@ -633,29 +636,55 @@ function recipeViewer(recipe) {
 function coverPreviewUrl(recipeId, thumbnailUrl) {
     return appUrl(`/recipes/${recipeId}/cover/preview?url=${encodeURIComponent(thumbnailUrl)}`);
 }
-function chooseCoverCandidate(recipeId, candidates) {
+function chooseCoverCandidate(recipeId, initialQuery, candidates) {
     return new Promise(resolve => {
-        const safeCandidates = (candidates || []).filter(candidate => safeExternalUrl(candidate.url) && safeExternalUrl(candidate.thumbnailUrl));
+        let query = String(initialQuery || '');
+        let page = 1;
+        let safeCandidates = (candidates || []).filter(candidate => safeExternalUrl(candidate.url) && safeExternalUrl(candidate.thumbnailUrl));
         const modal = document.createElement('div');
         modal.className = 'cover-picker-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-label', tr('Choose a cover image'));
-        modal.innerHTML = `<div class="cover-picker-card"><div class="section-heading"><h2>${esc(tr('Choose a cover image'))}</h2><button class="icon-button" data-close-cover-picker type="button" aria-label="${attr(tr('Close'))}">x</button></div><div class="cover-picker-grid">${safeCandidates.map((candidate, index) => `<button data-cover-candidate="${index}" type="button"><img src="${attr(coverPreviewUrl(recipeId, candidate.thumbnailUrl))}" alt=""><span>${esc(candidate.label || tr('Use this image'))}</span></button>`).join('')}</div><button class="secondary" data-close-cover-picker type="button">${esc(tr('Cancel'))}</button></div>`;
         const close = (candidate = null) => { modal.remove(); resolve(candidate); };
-        modal.querySelectorAll('[data-close-cover-picker]').forEach(button => button.addEventListener('click', () => close()));
-        modal.querySelectorAll('[data-cover-candidate]').forEach(button => button.addEventListener('click', () => close(safeCandidates[asNumber(button.dataset.coverCandidate)] || null)));
+		const render = () => {
+			modal.innerHTML = `<div class="cover-picker-card"><div class="section-heading"><h2>${esc(tr('Choose a cover image'))}</h2><button class="icon-button" data-close-cover-picker type="button" aria-label="${attr(tr('Close'))}">x</button></div><form class="cover-picker-search" data-cover-search-form><label>${esc(tr('Search terms'))}<input data-cover-search-query name="smartcook-cover-search" value="${attr(query)}" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-bwignore="true"></label><button class="secondary" type="submit">${esc(tr('Search'))}</button></form><div class="cover-picker-grid">${safeCandidates.map((candidate, index) => `<button data-cover-candidate="${index}" type="button"><img src="${attr(coverPreviewUrl(recipeId, candidate.thumbnailUrl))}" alt=""><span>${esc(candidate.label || tr('Use this image'))}</span></button>`).join('')}</div><div class="button-row"><button class="secondary" data-more-cover-candidates type="button">${esc(tr('Show 10 more images'))}</button><button class="ghost" data-close-cover-picker type="button">${esc(tr('Cancel'))}</button></div></div>`;
+			modal.querySelectorAll('[data-close-cover-picker]').forEach(button => button.addEventListener('click', () => close()));
+			modal.querySelectorAll('[data-cover-candidate]').forEach(button => button.addEventListener('click', () => close(safeCandidates[asNumber(button.dataset.coverCandidate)] || null)));
+			modal.querySelector('[data-cover-search-form]')?.addEventListener('submit', async event => {
+				event.preventDefault();
+				query = modal.querySelector('[data-cover-search-query]')?.value.trim() || initialQuery;
+				page = 1;
+				await loadCandidates();
+			});
+			modal.querySelector('[data-more-cover-candidates]')?.addEventListener('click', async () => {
+				query = modal.querySelector('[data-cover-search-query]')?.value.trim() || initialQuery;
+				page++;
+				await loadCandidates();
+			});
+		};
+		const loadCandidates = async () => {
+			try {
+				const response = await request(`/recipes/${recipeId}/cover/search`, { method: 'POST', json: { query, page } });
+				safeCandidates = (response.candidates || []).filter(candidate => safeExternalUrl(candidate.url) && safeExternalUrl(candidate.thumbnailUrl));
+				render();
+			}
+			catch (error) {
+				showNotice(error instanceof Error ? error.message : tr('Unexpected error'), 'error');
+			}
+		};
         modal.addEventListener('click', event => { if (event.target === modal) close(); });
         document.body.append(modal);
-        modal.querySelector('[data-cover-candidate], [data-close-cover-picker]')?.focus();
+		render();
+        modal.querySelector('[data-cover-search-query]')?.focus();
     });
 }
 async function renderRecipe(view, id) {
     const recipe = (await working(() => request(`/recipes/${id}`))).recipe;
     view.innerHTML = recipeViewer(recipe);
     view.querySelector('[data-find-cover]')?.addEventListener('click', async () => {
-        const response = await working(() => request(`/recipes/${recipe.id}/cover/search`, { method: 'POST', json: {} }));
-        const candidate = await chooseCoverCandidate(recipe.id, response.candidates);
+        const response = await working(() => request(`/recipes/${recipe.id}/cover/search`, { method: 'POST', json: { query: recipe.title, page: 1 } }));
+        const candidate = await chooseCoverCandidate(recipe.id, recipe.title, response.candidates);
         if (!candidate)
             return;
         await working(() => request(`/recipes/${recipe.id}/cover`, { method: 'POST', json: { url: candidate.url, downloadUrl: candidate.downloadUrl || '' } }));
@@ -853,7 +882,7 @@ function editorForm(recipe, taxonomy = {}, step = 1) {
 	return `<section class="editor-top wizard-header"><div><p class="eyebrow">${esc(recipe.id ? tr('Recipe details') : tr('Create manually'))}</p><h2>${esc(recipe.title || tr('Untitled recipe'))}</h2></div></section>${navigation}<div class="editor-layout recipe-wizard-layout"><main class="view-stack"><div class="panel">${stepContent}${step === 5 ? `<div class="advanced-panels">
 			${recipe.id ? `
 			<section class="panel form-section" data-media-section><p class="eyebrow">${esc(tr('Files'))}</p><h2>${esc(tr('Attachments'))}</h2>${externalCover ? `<div class="media-upload-group cover-upload"><strong>${esc(tr('Cover image'))}</strong><small>${esc(tr('The current cover is hosted externally. Save it locally to make it reliable and available in attachments.'))}</small><div class="button-row"><button class="secondary" data-store-current-cover type="button">${esc(tr('Save cover locally'))}</button><button class="danger secondary" data-remove-cover type="button">${esc(tr('Remove cover'))}</button></div></div>` : ''}<div class="media-upload-group cover-upload"><label><strong>${esc(tr('Cover image'))}</strong><input data-cover-file type="file" accept="image/*"></label><small>${esc(tr('The uploaded image becomes the recipe cover after saving.'))}</small></div><div class="media-upload-group"><label><strong>${esc(tr('Additional attachment'))}</strong><input data-media-file type="file"></label><button class="secondary" data-upload-media type="button">${esc(tr('Upload attachment'))}</button></div><ul class="media-list">${recipe.media.map(item => item.id ? `<li><a href="${attr(mediaUrl(item.id))}" target="_blank" rel="noopener"><strong>${esc(item.altText || item.path.split('/').pop() || item.kind)}</strong><small>${esc(item.mime || item.kind)} · ${formatBytes(item.fileSize)} · ${formatMediaDate(item.createdAt)}</small></a><button class="icon-button danger" data-delete-media="${attr(item.id)}" type="button" aria-label="${attr(tr('Delete'))}">x</button></li>` : '').join('')}</ul></section>
-			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with placeholder="${attr(tr('User or group ID'))}"><input data-share-password type="password" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
+			<section class="panel form-section" data-sharing-section><p class="eyebrow">${esc(tr('Access'))}</p><h2>${esc(tr('Sharing'))}</h2><div data-share-list></div><div class="share-form"><select data-share-type><option value="link">${esc(tr('Public link'))}</option><option value="user">${esc(tr('User'))}</option><option value="group">${esc(tr('Group'))}</option></select><input data-share-with name="smartcook-share-with" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" aria-label="${attr(tr('User or group ID'))}" placeholder="${attr(tr('User or group ID'))}"><input data-share-password name="smartcook-link-password" type="password" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" aria-label="${attr(tr('Optional link password'))}" placeholder="${attr(tr('Optional link password'))}"><label class="check-inline"><input data-share-edit type="checkbox"> ${esc(tr('Allow editing'))}</label><button class="secondary" data-create-share type="button">${esc(tr('Create share'))}</button></div></section>
 			<section class="panel form-section" data-history-section><p class="eyebrow">${esc(tr('Audit trail'))}</p><h2>${esc(tr('Version history'))}</h2><div class="version-list" data-version-list></div></section>
 			<section class="panel form-section danger-zone"><h2>${esc(tr('Danger zone'))}</h2><button class="danger secondary" data-delete-recipe type="button">${esc(tr('Delete recipe'))}</button></section>` : `<section class="panel empty-state"><h2>${esc(tr('Save first'))}</h2><p>${esc(tr('Attachments, sharing and version history become available after the first save.'))}</p></section>`}
 		</div>` : ''}${stepAddition}<footer class="wizard-actions"><div class="wizard-navigation-actions"><button class="secondary wizard-navigation-button" data-wizard-back type="button"${step === 1 ? ' disabled' : ''}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14 6-6 6 6 6"/></svg>${esc(tr('Previous'))}</button>${step < 5 ? `<button class="secondary wizard-navigation-button" data-wizard-next type="button">${esc(tr('Next'))}<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 6 6 6-6 6"/></svg></button>` : ''}</div><button class="primary" data-save-recipe type="button">${esc(tr('Save recipe'))}</button></footer></div></main></div>`;
