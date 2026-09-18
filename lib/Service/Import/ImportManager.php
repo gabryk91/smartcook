@@ -42,13 +42,16 @@ final class ImportManager {
         $settings = $this->settings->get($userId);
         $payload['maxBytes'] ??= $settings['maxImportBytes'];
         $result = $this->importer($kind)->import($payload);
+        $candidates = $this->multiRecipe->split($result, $kind, $payload);
         $previews = [];
-        foreach ($this->multiRecipe->split($result, $kind, $payload) as $index => $candidate) {
+        foreach ($candidates as $index => $candidate) {
             // A multi-recipe document can generate many previews. Looking up every
             // saved recipe for each one turns a single upload into thousands of DB reads.
             // Keep the duplicate hint for the primary preview and let the remaining
             // recipes render without delaying the request.
-            $previews[] = $this->previewResult($userId, $candidate, $payload, $useAi, $provider, $includeDuplicates && $index === 0);
+            // AI refinement is a network request that may take up to the provider timeout.
+            // Apply it once for a multi-recipe source instead of serially blocking every preview.
+            $previews[] = $this->previewResult($userId, $candidate, $payload, $useAi && (count($candidates) === 1 || $index === 0), $provider, $includeDuplicates && $index === 0);
         }
         $primary = $previews[0];
         $primary['previews'] = $previews;
@@ -86,6 +89,16 @@ final class ImportManager {
             // run without one, so they intentionally defer this optional hint.
             'duplicates' => $includeDuplicates ? $this->duplicates->find($recipe) : [],
         ];
+    }
+
+    /** @param array<string, mixed> $recipe @return array<string, mixed> */
+    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider): array {
+        if ($recipe === []) {
+            throw new ImportException('No recipe preview was provided');
+        }
+        $aiRecipe = $this->ai->extract($userId, mb_substr($this->recipeSource($recipe), 0, 120000), $language, $provider);
+        $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
+        return $this->validator->validate($this->merge($aiRecipe, $recipe));
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */
@@ -164,5 +177,27 @@ final class ImportManager {
             }
         }
         return $primary;
+    }
+
+    /** @param array<string, mixed> $recipe */
+    private function recipeSource(array $recipe): string {
+        $ingredients = array_map(static function (mixed $item): string {
+            if (!is_array($item)) {
+                return (string)$item;
+            }
+            return trim(implode(' ', array_filter([
+                isset($item['quantity']) ? (string)$item['quantity'] : '',
+                (string)($item['unit'] ?? ''),
+                (string)($item['name'] ?? ''),
+                (string)($item['notes'] ?? ''),
+            ])));
+        }, (array)($recipe['ingredients'] ?? []));
+        $steps = array_map(static fn (mixed $step): string => is_array($step) ? (string)($step['text'] ?? '') : (string)$step, (array)($recipe['steps'] ?? []));
+        return trim(implode("\n\n", [
+            (string)($recipe['title'] ?? ''),
+            (string)($recipe['description'] ?? ''),
+            "Ingredients:\n" . implode("\n", array_filter($ingredients)),
+            "Procedure:\n" . implode("\n", array_filter($steps)),
+        ]));
     }
 }

@@ -53,6 +53,20 @@ final class ImportController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/import/refine')]
+    public function refine(): JSONResponse {
+        return $this->respond(function (): array {
+            $recipe = $this->payload('recipe');
+            if ($recipe === []) {
+                throw new ValidationException('Recipe preview is required', ['recipe' => 'Required']);
+            }
+            $language = (string)$this->request->getParam('language', 'en');
+            $provider = $this->request->getParam('provider', null);
+            return ['recipe' => $this->imports->refinePreview($this->userContext->userId(), $recipe, $language, is_string($provider) ? $provider : null)];
+        });
+    }
+
+    #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/import/queue')]
     public function enqueue(): JSONResponse {
         return $this->respond(function (): array {

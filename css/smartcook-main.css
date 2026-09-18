@@ -2078,6 +2078,76 @@ select,
 	padding: 24px;
 }
 
+.import-preview-index,
+.import-common-tag {
+	display: grid;
+	gap: 10px;
+	margin: 18px 0;
+	padding: 16px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: var(--smartcook-radius, 12px);
+	background: var(--smartcook-surface-soft);
+}
+
+.import-preview-index > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.import-preview-index button {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.import-preview-card {
+	margin-top: 16px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: var(--smartcook-radius, 12px);
+	background: var(--smartcook-surface);
+}
+
+.import-preview-card > summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 16px 20px;
+	cursor: pointer;
+	list-style: none;
+}
+
+.import-preview-card > summary::-webkit-details-marker {
+	display: none;
+}
+
+.import-preview-card > summary::after {
+	content: '\25be';
+	color: var(--smartcook-muted);
+}
+
+.import-preview-card[open] > summary::after {
+	transform: rotate(180deg);
+}
+
+.import-preview-card > summary h3,
+.import-preview-card > summary p {
+	margin: 0;
+}
+
+.import-preview-summary {
+	color: var(--smartcook-muted);
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.import-preview-body {
+	padding: 0 20px 20px;
+	border-top: 1px solid var(--smartcook-border);
+}
+
 .import-cover-preview {
 	display: block;
 	width: 100%;
@@ -2122,6 +2192,17 @@ select,
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 22px;
+}
+
+.preview-columns > label {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+}
+
+.preview-columns textarea {
+	min-height: 260px;
+	resize: vertical;
 }
 
 .preview-columns h3 small {

@@ -123,6 +123,12 @@ const fallbackTranslations = {
         'recipes extracted. Review them before saving.': 'ricette estratte. Controllale prima di salvarle.',
         'Save all recipes': 'Salva tutte le ricette',
         'Saving recipe': 'Salvataggio ricetta',
+		'Choose a recipe to review': 'Scegli una ricetta da controllare',
+		'Apply this tag to every imported recipe': 'Applica questo tag a tutte le ricette importate',
+		'Ingredients (one per line)': 'Ingredienti (uno per riga)',
+		'Quantity | unit | ingredient | notes': 'Quantità | unità | ingrediente | note',
+		'Steps (one per line)': 'Passaggi (uno per riga)',
+		Steps: 'Passaggi',
 		'Imported classification': 'Classificazione importata',
 		'Suggested cover photo': 'Foto di copertina suggerita',
 		'AI suggestion': 'Suggerimento AI',
@@ -1014,6 +1020,7 @@ async function renderImport(view) {
     let kind = 'url';
     let previews = [];
     let savedPreviews = new Set();
+	let commonImportTag = '';
     let activeExternalJobId = null;
     const setImportBusy = (active, title = tr('Importing recipe'), detail = tr('Please wait while the source is analyzed.')) => {
         const modal = view.querySelector('[data-import-loading]');
@@ -1027,6 +1034,29 @@ async function renderImport(view) {
             modal.hidden = !active;
         }
     };
+	const refinePreviews = async (holder, language, provider) => {
+		const pending = previews.map((preview, index) => ({ preview, index })).filter(({ preview }) => !String(preview.strategy || '').includes('+ai'));
+		if (!pending.length)
+			return;
+		try {
+			for (const [position, { preview, index }] of pending.entries()) {
+				setImportBusy(true, tr('AI refinement'), `${tr('Recipe')} ${position + 1} ${tr('of')} ${pending.length}: ${preview.recipe.title}`);
+				try {
+					const response = await request('/import/refine', { method: 'POST', json: { recipe: preview.recipe, language, provider: provider || null } });
+					previews[index].recipe = response.recipe;
+					previews[index].strategy = `${preview.strategy}+ai`;
+				}
+				catch (error) {
+					previews[index].warnings = [...(preview.warnings || []), `${tr('AI refinement')}: ${error instanceof Error ? error.message : tr('Unexpected error')}`];
+				}
+				holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
+				bindImportSave(holder);
+			}
+		}
+		finally {
+			setImportBusy(false);
+		}
+	};
     const paint = () => {
         view.innerHTML = `<section class="panel" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></section>
 		<section class="two-column import-layout"><article class="panel form-section">
@@ -1035,7 +1065,7 @@ async function renderImport(view) {
 			<div class="form-grid"><label>${esc(tr('Output language'))}<input data-import-language value="${attr(document.documentElement.lang || 'it')}"></label><label>${esc(tr('AI provider override'))}<select data-import-provider><option value="">${esc(tr('Use settings'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option></select></label></div>
 			<label class="check-inline ai-toggle"><input data-import-ai type="checkbox"><span><b>${esc(tr('Use AI refinement'))}</b><small>${esc(tr('Optional fallback for incomplete or unstructured sources'))}</small></span></label>
 			<button class="primary" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
-        </article><article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews)}</article></section>
+        </article><article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews, commonImportTag)}</article></section>
 		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
         view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); activeExternalJobId = null; paint(); }));
         const loadInbox = async () => {
@@ -1075,7 +1105,7 @@ async function renderImport(view) {
                     savedPreviews = new Set();
                     activeExternalJobId = job.id;
                     const previewHolder = view.querySelector('[data-import-preview]');
-                    previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+                    previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
                     bindImportSave(previewHolder);
                     previewHolder.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }));
@@ -1144,14 +1174,28 @@ async function renderImport(view) {
             }
             showNotice(previews.length > 1 ? `${previews.length} ${tr('recipes extracted. Review them before saving.')}` : tr('Recipe data extracted. Review it before saving.'));
             const holder = view.querySelector('[data-import-preview]');
-            holder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+            holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
             bindImportSave(holder);
+			if (useAi)
+				await refinePreviews(holder, language, provider);
         });
         if (previews.length)
             bindImportSave(view.querySelector('[data-import-preview]'));
         loadInbox();
     };
     const bindImportSave = (holder) => {
+		holder.querySelector('[data-import-common-tag]')?.addEventListener('input', event => {
+			commonImportTag = event.currentTarget.value;
+		});
+		holder.querySelectorAll('[data-open-import-preview]').forEach(button => button.addEventListener('click', () => {
+			const index = Number(button.dataset.openImportPreview);
+			const card = holder.querySelectorAll('[data-import-preview-card]')[index];
+			if (!card)
+				return;
+			card.open = true;
+			card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			card.querySelector('[data-preview-title]')?.focus({ preventScroll: true });
+		}));
         holder.querySelector('[data-save-all-import]')?.addEventListener('click', async (event) => {
             const button = event.currentTarget;
             const pendingIndexes = previews.map((_, index) => index).filter(index => !savedPreviews.has(index));
@@ -1159,10 +1203,18 @@ async function renderImport(view) {
                 location.hash = '#/recipes';
                 return;
             }
+            const sharedTags = commonImportTag.split(',').map(tag => tag.trim()).filter(Boolean);
             holder.querySelectorAll('[data-import-preview-card]').forEach((card, index) => {
                 const preview = previews[index];
                 preview.recipe.title = card.querySelector('[data-preview-title]')?.value.trim() || preview.recipe.title;
                 preview.recipe.description = card.querySelector('[data-preview-description]')?.value.trim() || preview.recipe.description;
+				preview.recipe.cuisine = card.querySelector('[data-preview-cuisine]')?.value.trim() || null;
+				preview.recipe.mealType = card.querySelector('[data-preview-meal-type]')?.value.trim() || null;
+				preview.recipe.cookingMethod = card.querySelector('[data-preview-cooking-method]')?.value.trim() || null;
+				preview.recipe.tags = [...new Set([...previewNames(card.querySelector('[data-preview-tags]')?.value), ...sharedTags])];
+				preview.recipe.categories = previewNames(card.querySelector('[data-preview-categories]')?.value);
+				preview.recipe.ingredients = previewIngredients(card.querySelector('[data-preview-ingredients]')?.value);
+				preview.recipe.steps = previewSteps(card.querySelector('[data-preview-steps]')?.value);
             });
             button.disabled = true;
             const failedRecipes = [];
@@ -1195,7 +1247,7 @@ async function renderImport(view) {
             }
             if (failedRecipes.length) {
                 showNotice(`${tr('Some recipes could not be saved')}: ${failedRecipes.join('; ')}`, 'error');
-                holder.innerHTML = importPreviewsHtml(previews, savedPreviews);
+                holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
                 bindImportSave(holder);
                 return;
             }
@@ -1225,13 +1277,28 @@ function externalImportInboxHtml(jobs) {
         return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${error}</div><div class="button-row">${mainAction}<button class="ghost danger" data-delete-external-import="${attr(job.id)}" type="button">${esc(tr('Delete import'))}</button></div></div>`;
     }).join('')}</div>` : `<p>${esc(tr('No received imports yet'))}</p>`}`;
 }
-function importPreviewsHtml(previews, savedPreviews) {
+function previewNames(value) {
+	return String(value || '').split(',').map(item => item.trim()).filter(Boolean);
+}
+function previewIngredients(value) {
+	return String(value || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+		const parts = line.split('|').map(part => part.trim());
+		if (parts.length === 1)
+			return { name: parts[0], quantity: null, unit: null, notes: null };
+		const quantity = Number(parts[0].replace(',', '.'));
+		return { name: parts[2] || parts[0], quantity: Number.isFinite(quantity) ? quantity : null, unit: parts[1] || null, notes: parts.slice(3).join(' | ') || null };
+	}).filter(item => item.name);
+}
+function previewSteps(value) {
+	return String(value || '').split(/\r?\n/).map(text => text.trim()).filter(Boolean).map(text => ({ text }));
+}
+function importPreviewsHtml(previews, savedPreviews, commonImportTag = '') {
     if (!previews.length)
         return `<div class="empty-preview"><div>&#8761;</div><h2>${esc(tr('Preview appears here'))}</h2><p>${esc(tr('The source is never saved as a recipe until you review and confirm the extracted fields.'))}</p></div>`;
     const pending = previews.length - savedPreviews.size;
-    return `<div class="section-heading"><div><p class="eyebrow">${previews.length} ${esc(tr('recipes extracted. Review them before saving.'))}</p><h2>${esc(tr('Import previews'))}</h2></div><button class="primary" data-save-all-import type="button">${esc(pending ? tr('Save all recipes') : tr('View recipes'))}</button></div>${previews.map((item, index) => importPreviewHtml(item, savedPreviews.has(index))).join('')}`;
+    return `<div class="section-heading"><div><p class="eyebrow">${previews.length} ${esc(tr('recipes extracted. Review them before saving.'))}</p><h2>${esc(tr('Import previews'))}</h2></div><button class="primary" data-save-all-import type="button">${esc(pending ? tr('Save all recipes') : tr('View recipes'))}</button></div>${previews.length > 1 ? `<nav class="import-preview-index" aria-label="${attr(tr('Choose a recipe to review'))}"><strong>${esc(tr('Choose a recipe to review'))}</strong><div>${previews.map((item, index) => `<button class="secondary" data-open-import-preview="${index}" type="button">${index + 1}. ${esc(item.recipe.title || tr('Import preview'))}</button>`).join('')}</div></nav><label class="import-common-tag">${esc(tr('Apply this tag to every imported recipe'))}<input data-import-common-tag value="${attr(commonImportTag)}" autocomplete="new-password"></label>` : ''}${previews.map((item, index) => importPreviewHtml(item, savedPreviews.has(index), index)).join('')}`;
 }
-function importPreviewHtml(preview, saved = false) {
+function importPreviewHtml(preview, saved = false, index = 0) {
     const recipe = preview.recipe;
 	const names = (values) => (values || []).map(value => String(value?.name || value || '').trim()).filter(Boolean);
 	const categories = names(recipe.categories);
@@ -1241,19 +1308,22 @@ function importPreviewHtml(preview, saved = false) {
 		[tr('Categories'), categories.join(' · ')],
 		[tr('Cuisine'), recipe.cuisine],
 		[tr('Cooking method'), recipe.cookingMethod],
-		[tr('Meal type'), recipe.mealType],
+		[tr('Meal type'), mealLabel(recipe.mealType)],
 		[tr('Calories'), asNumber(recipe.calories) > 0 ? `${asNumber(recipe.calories)} kcal` : ''],
 		[tr('Tags'), tags.map(tag => `#${tag}`).join(' · ')],
 	].filter(([, value]) => String(value || '').trim() !== '');
-    return `<div class="import-preview-card" data-import-preview-card><div class="section-heading"><div><p class="eyebrow">${esc(preview.strategy)}</p><h3>${esc(recipe.title || tr('Import preview'))}</h3></div>${saved ? `<span class="status-pill enabled">${esc(tr('Saved'))}</span>` : ''}</div>
+    const ingredientText = (recipe.ingredients || []).map(item => [item.quantity ?? '', item.unit || '', item.name || '', item.notes || ''].join(' | ')).join('\n');
+	const stepText = (recipe.steps || []).map(step => step.text || '').join('\n');
+    return `<details class="import-preview-card" data-import-preview-card ${index === 0 ? 'open' : ''}><summary><div><p class="eyebrow">${index + 1}. ${esc(preview.strategy)}</p><h3>${esc(recipe.title || tr('Import preview'))}</h3></div>${saved ? `<span class="status-pill enabled">${esc(tr('Saved'))}</span>` : `<span class="import-preview-summary">${recipe.ingredients.length} ${esc(tr('Ingredients'))} · ${recipe.steps.length} ${esc(tr('Steps'))}</span>`}</summary><div class="import-preview-body">
 		${preview.warnings.length ? `<div class="warning-list">${preview.warnings.map(warning => `<p>${esc(warning)}</p>`).join('')}</div>` : ''}
 		${coverImage ? `<img class="import-cover-preview" src="${attr(coverImage)}" alt="">` : ''}
 		<label>${esc(tr('Title'))}<input data-preview-title value="${attr(recipe.title)}"></label><label>${esc(tr('Description'))}<textarea data-preview-description rows="3">${esc(recipe.description)}</textarea></label>
+		<div class="form-grid import-preview-fields"><label>${esc(tr('Tags'))}<input data-preview-tags value="${attr(tags.join(', '))}" autocomplete="new-password"></label><label>${esc(tr('Categories'))}<input data-preview-categories value="${attr(categories.join(', '))}" autocomplete="new-password"></label><label>${esc(tr('Cuisine'))}<input data-preview-cuisine value="${attr(recipe.cuisine)}"></label><label>${esc(tr('Meal type'))}<input data-preview-meal-type value="${attr(recipe.mealType)}"></label><label class="span-2">${esc(tr('Cooking method'))}<input data-preview-cooking-method value="${attr(recipe.cookingMethod)}"></label></div>
 		<div class="preview-metrics"><span>${recipe.servings} ${esc(tr('servings'))}</span><span>${recipe.prepTime} min ${esc(tr('prep'))}</span><span>${recipe.cookTime} min ${esc(tr('cook'))}</span><span>${recipe.totalTime} min ${esc(tr('total'))}</span></div>
 		${classification.length ? `<section class="import-classification"><h3>${esc(tr('Imported classification'))}</h3><dl>${classification.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></section>` : ''}
 		${recipe.coverSuggestion ? `<section class="import-cover-suggestion"><span aria-hidden="true">&#10024;</span><div><strong>${esc(tr('Suggested cover photo'))}</strong><p>${esc(recipe.coverSuggestion)}</p><small>${esc(tr('AI suggestion'))}</small></div></section>` : ''}
-		<div class="preview-columns"><div><h3>${esc(tr('Ingredients'))} <small>${recipe.ingredients.length}</small></h3><ul>${recipe.ingredients.map(item => { const alternatives = (item.alternatives || []).map(alternative => [alternative.quantity, displayUnit(alternative.unit), alternative.name].filter(Boolean).join(' ')).filter(Boolean); return `<li><b>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</b> ${esc(item.name)}${alternatives.length ? `<small class="recipe-ingredient-alternatives">${esc(tr('Alternatives'))}: ${esc(alternatives.join(' · '))}</small>` : ''}</li>`; }).join('')}</ul></div><div><h3>${esc(tr('Procedure'))} <small>${recipe.steps.length}</small></h3><ol>${recipe.steps.map(step => `<li>${esc(step.text)}</li>`).join('')}</ol></div></div>
-		${preview.duplicates.length ? `<div class="duplicate-box"><h3>${esc(tr('Possible duplicates'))}</h3>${preview.duplicates.map(match => `<a href="#/recipes/${match.recipe.id}">${esc(match.recipe.title)} <span>${Math.round(match.score * 100)}%</span></a>`).join('')}</div>` : ''}</div>`;
+		<div class="preview-columns"><label><h3>${esc(tr('Ingredients'))} <small>${recipe.ingredients.length}</small></h3><textarea data-preview-ingredients rows="12" aria-label="${attr(tr('Ingredients (one per line)'))}">${esc(ingredientText)}</textarea><small>${esc(tr('Quantity | unit | ingredient | notes'))}</small></label><label><h3>${esc(tr('Procedure'))} <small>${recipe.steps.length}</small></h3><textarea data-preview-steps rows="12" aria-label="${attr(tr('Steps (one per line)'))}">${esc(stepText)}</textarea><small>${esc(tr('Steps (one per line)'))}</small></label></div>
+		${preview.duplicates.length ? `<div class="duplicate-box"><h3>${esc(tr('Possible duplicates'))}</h3>${preview.duplicates.map(match => `<a href="#/recipes/${match.recipe.id}">${esc(match.recipe.title)} <span>${Math.round(match.score * 100)}%</span></a>`).join('')}</div>` : ''}</div></details>`;
 }
 function startOfWeek(date) {
     const copy = new Date(date);
