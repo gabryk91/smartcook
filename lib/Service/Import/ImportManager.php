@@ -43,8 +43,12 @@ final class ImportManager {
         $payload['maxBytes'] ??= $settings['maxImportBytes'];
         $result = $this->importer($kind)->import($payload);
         $previews = [];
-        foreach ($this->multiRecipe->split($result, $kind, $payload) as $candidate) {
-            $previews[] = $this->previewResult($userId, $candidate, $payload, $useAi, $provider, $includeDuplicates);
+        foreach ($this->multiRecipe->split($result, $kind, $payload) as $index => $candidate) {
+            // A multi-recipe document can generate many previews. Looking up every
+            // saved recipe for each one turns a single upload into thousands of DB reads.
+            // Keep the duplicate hint for the primary preview and let the remaining
+            // recipes render without delaying the request.
+            $previews[] = $this->previewResult($userId, $candidate, $payload, $useAi, $provider, $includeDuplicates && $index === 0);
         }
         $primary = $previews[0];
         $primary['previews'] = $previews;
