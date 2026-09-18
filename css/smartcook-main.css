@@ -727,12 +727,6 @@ button:disabled,
 	background: var(--smartcook-surface-soft);
 }
 
-.toolbar-pills .taxonomy-filter {
-	display: flex;
-	align-items: center;
-	min-width: 0;
-}
-
 .toolbar-pills .taxonomy-picker-trigger {
 	min-height: 38px;
 	padding: 0 14px;
@@ -775,15 +769,14 @@ button:disabled,
 	font-weight: 600;
 }
 
-.toolbar > label,
-.toolbar > .taxonomy-filter {
+.toolbar > label {
 	min-width: 150px;
 }
 
 .toolbar .taxonomy-filter {
-	min-width: 180px;
 	display: flex;
 	align-items: center;
+	min-width: 0;
 }
 
 .taxonomy-picker {
@@ -808,7 +801,9 @@ button:disabled,
 	position: absolute;
 	z-index: 20;
 	top: calc(100% + 4px);
-	inline-size: 100%;
+	inset-inline-start: 0;
+	inline-size: max(100%, 240px);
+	max-inline-size: min(90vw, 320px);
 	padding: 10px;
 	border: 1px solid var(--smartcook-border);
 	border-radius: 10px;
