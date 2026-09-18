@@ -2909,7 +2909,6 @@ select:focus {
 .list-sidebar {
 	display: flex;
 	flex-direction: column;
-	align-self: start;
 	padding: 16px;
 }
 
@@ -2917,6 +2916,7 @@ select:focus {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	flex: 1 1 auto;
 }
 
 .list-sidebar-items > a {
@@ -3099,15 +3099,14 @@ select:focus {
 }
 
 .recipe-selector-servings {
-	width: 34px;
+	width: 26px;
 	min-height: 0;
 	border: 0;
 	background: transparent;
 	padding: 0;
 	text-align: center;
-	font-size: 14px;
+	font-size: 13.5px;
 	font-weight: 700;
-	color: var(--smartcook-text);
 	appearance: textfield;
 }
 
