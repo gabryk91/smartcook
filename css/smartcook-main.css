@@ -246,7 +246,10 @@ a {
 	flex: 0 0 auto;
 }
 
-.primary {
+/* :is(.smartcook-shell, .public-recipe) boosts specificity above Nextcloud core's
+ * `button:not(.button-vue, [class^="vs__"])` rule (0,1,1), which otherwise wins over a
+ * bare single-class selector (0,1,0) and silently overrides button text color. */
+:is(.smartcook-shell, .public-recipe) .primary {
 	background: var(--smartcook-accent);
 	color: var(--color-primary-element-text, #fff);
 }
@@ -255,12 +258,12 @@ a {
 	gap: 6px;
 }
 
-.primary:hover {
+:is(.smartcook-shell, .public-recipe) .primary:hover {
 	background: var(--smartcook-accent-hover);
 	color: var(--color-primary-element-text, #fff);
 }
 
-.secondary {
+:is(.smartcook-shell, .public-recipe) .secondary {
 	border-color: var(--smartcook-border);
 	background: var(--smartcook-surface);
 	color: var(--smartcook-text);
@@ -271,12 +274,12 @@ a {
 	background: var(--smartcook-surface-soft);
 }
 
-.ghost {
+:is(.smartcook-shell, .public-recipe) .ghost {
 	background: transparent;
 	color: var(--smartcook-text);
 }
 
-.danger {
+:is(.smartcook-shell, .public-recipe) .danger {
 	color: var(--color-error, #c00);
 }
 
@@ -299,6 +302,10 @@ button:disabled,
 	border: 0;
 	background: transparent;
 	font-size: 20px;
+}
+
+:is(.smartcook-shell, .public-recipe) .icon-button {
+	color: var(--smartcook-text);
 }
 
 .icon-button:hover {
@@ -716,8 +723,11 @@ button:disabled,
 	border: 0;
 	border-radius: 999px;
 	background: var(--smartcook-accent);
-	color: #fff;
 	cursor: pointer;
+}
+
+:is(.smartcook-shell, .public-recipe) .assistant-send {
+	color: #fff;
 }
 
 .assistant-send svg {
@@ -820,8 +830,21 @@ button:disabled,
 	border: 1px solid var(--smartcook-border);
 	border-radius: 10px;
 	background: var(--smartcook-surface);
-	color: var(--smartcook-text);
 	text-align: start;
+}
+
+.taxonomy-picker-chevron {
+	width: 11px;
+	height: 7px;
+	flex: 0 0 auto;
+	margin-inline-start: 8px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23767c85' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-size: 11px 7px;
+}
+
+:is(.smartcook-shell, .public-recipe) .taxonomy-picker-trigger {
+	color: var(--smartcook-text);
 }
 
 .taxonomy-picker-menu {
@@ -1547,8 +1570,11 @@ select:focus {
 	padding: 8px 12px 14px;
 	border: 0;
 	background: transparent;
-	color: var(--smartcook-muted);
 	cursor: pointer;
+}
+
+:is(.smartcook-shell, .public-recipe) .recipe-wizard button {
+	color: var(--smartcook-muted);
 }
 
 .recipe-wizard button::after {
@@ -1708,15 +1734,23 @@ select:focus {
 	border: 0;
 	border-radius: 999px;
 	background: transparent;
-	color: var(--smartcook-muted);
 	font-weight: 650;
 	font-size: 13px;
 	cursor: pointer;
 }
 
+:is(.smartcook-shell, .public-recipe) .tabs button,
+:is(.smartcook-shell, .public-recipe) .source-tabs button {
+	color: var(--smartcook-muted);
+}
+
 .tabs button.active,
 .source-tabs button.active {
 	background: var(--smartcook-accent);
+}
+
+:is(.smartcook-shell, .public-recipe) .tabs button.active,
+:is(.smartcook-shell, .public-recipe) .source-tabs button.active {
 	color: var(--color-primary-element-text, #fff);
 }
 
@@ -2897,6 +2931,9 @@ select:focus {
 	width: 100%;
 	border: 1px dashed var(--smartcook-border);
 	background: transparent;
+}
+
+:is(.smartcook-shell, .public-recipe) .add-meal {
 	color: var(--smartcook-muted);
 }
 
@@ -2991,10 +3028,13 @@ select:focus {
 	border: 1px dashed var(--smartcook-border);
 	border-radius: 10px;
 	background: transparent;
-	color: var(--smartcook-muted);
 	font-weight: 650;
 	font-size: 13.5px;
 	cursor: pointer;
+}
+
+:is(.smartcook-shell, .public-recipe) .list-sidebar-new {
+	color: var(--smartcook-muted);
 }
 
 .list-sidebar-new svg {
@@ -3093,9 +3133,12 @@ select:focus {
 	border-radius: 999px;
 	background: var(--smartcook-surface);
 	box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
-	color: var(--smartcook-text);
 	font-weight: 700;
 	cursor: pointer;
+}
+
+:is(.smartcook-shell, .public-recipe) .stepper-btn {
+	color: var(--smartcook-text);
 }
 
 .recipe-selector-servings {
