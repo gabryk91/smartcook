@@ -1159,7 +1159,7 @@ async function renderImport(view) {
 		}
 	};
     const paint = () => {
-        view.innerHTML = `<div class="view-stack import-shell">
+        view.innerHTML = `<div class="view-stack">
 			<section class="panel" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></section>
 			<article class="panel form-section">
 				<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>

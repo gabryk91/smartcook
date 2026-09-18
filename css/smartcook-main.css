@@ -2454,10 +2454,6 @@ select:focus {
 	font-weight: 650;
 }
 
-.import-shell {
-	max-width: 1000px;
-}
-
 .source-tabs {
 	overflow-x: auto;
 }
@@ -3925,7 +3921,7 @@ select:focus {
 		font-size: 12px;
 	}
 
-	.import-shell textarea[data-import-text] {
+	textarea[data-import-text] {
 		height: 260px;
 	}
 
