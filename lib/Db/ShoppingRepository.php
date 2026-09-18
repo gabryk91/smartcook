@@ -54,7 +54,35 @@ final class ShoppingRepository extends AbstractRepository {
         $qb->select('*')->from('smartcook_shop_lists')
             ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
             ->orderBy('updated_at', 'DESC');
-        return array_map(fn (array $row): array => $this->mapList($row, false), $this->fetchAll($qb));
+        $rows = $this->fetchAll($qb);
+        $counts = $this->itemCounts(array_map(fn (array $row): int => (int)$row['id'], $rows));
+        return array_map(function (array $row) use ($counts): array {
+            $list = $this->mapList($row, false);
+            $summary = $counts[$list['id']] ?? ['total' => 0, 'checked' => 0];
+            $list['itemCount'] = $summary['total'];
+            $list['checkedCount'] = $summary['checked'];
+            return $list;
+        }, $rows);
+    }
+
+    /** @param list<int> $listIds @return array<int, array{total:int, checked:int}> */
+    private function itemCounts(array $listIds): array {
+        if ($listIds === []) {
+            return [];
+        }
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('list_id', 'checked')->from('smartcook_shop_items')
+            ->where($qb->expr()->in('list_id', $qb->createNamedParameter($listIds, IQueryBuilder::PARAM_INT_ARRAY)));
+        $counts = [];
+        foreach ($this->fetchAll($qb) as $row) {
+            $listId = (int)$row['list_id'];
+            $counts[$listId] ??= ['total' => 0, 'checked' => 0];
+            $counts[$listId]['total']++;
+            if ((bool)$row['checked']) {
+                $counts[$listId]['checked']++;
+            }
+        }
+        return $counts;
     }
 
     public function getList(int $id, string $userId): ?array {

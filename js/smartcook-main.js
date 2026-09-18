@@ -57,6 +57,13 @@ const fallbackTranslations = {
         'Delete this meal?': 'Eliminare questo pasto?',
         'Empty week': 'Svuota settimana',
         'Generate one from your recipes': 'Generane una dalle tue ricette',
+        'No items yet': 'Nessun articolo',
+        of: 'di',
+        completed: 'completati',
+        Completed: 'Completata',
+        'New list': 'Nuova lista',
+        Decrease: 'Diminuisci',
+        Increase: 'Aumenta',
         Appearance: 'Aspetto',
         'Interface theme': 'Tema dell\'interfaccia',
         Theme: 'Tema',
@@ -1608,11 +1615,39 @@ async function renderShopping(view) {
         paint();
     };
     const open = async (id) => { selected = (await working(() => request(`/shopping/${id}`))).list; paint(); };
+    const listStatus = (list) => {
+        if (!list.itemCount)
+            return tr('No items yet');
+        if (list.checkedCount >= list.itemCount)
+            return tr('Completed');
+        return `${list.checkedCount} ${tr('of')} ${list.itemCount} ${tr('completed')}`;
+    };
+    const groupItems = (items) => {
+        const groups = new Map();
+        items.forEach(item => {
+            const key = item.category || tr('Uncategorized');
+            if (!groups.has(key))
+                groups.set(key, []);
+            groups.get(key).push(item);
+        });
+        return [...groups.entries()];
+    };
     const paint = () => {
-        view.innerHTML = `<div class="shopping-layout"><aside class="panel list-sidebar"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Saved'))}</p></div></div>${lists.map(list => `<button class="${selected?.id === list.id ? 'active' : ''}" data-open-list="${list.id}" type="button"><span><strong>${esc(list.name)}</strong><small>${esc(new Date(list.updatedAt * 1000).toLocaleDateString())}</small></span><b>&rsaquo;</b></button>`).join('') || `<div class="empty-state list-sidebar-empty"><div class="list-sidebar-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h12v20l-6-3-6 3z"/></svg></div><p><strong>${esc(tr('No lists yet'))}</strong><br>${esc(tr('Generate one from your recipes'))}</p></div>`}</aside>
-		<main class="view-stack"><section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Generate'))}</p><h2>${esc(tr('From recipes'))}</h2></div></div><label>${esc(tr('List name'))}<input data-list-name value="${attr(tr('Weekly shopping'))}"></label><p class="recipe-selector-heading">${esc(tr('Servings per recipe'))}</p><div class="recipe-selector">${recipes.map(recipe => `<label><input data-list-recipe="${recipe.id}" type="checkbox"><div class="recipe-thumb">${recipeThumb(recipe)}</div><span>${esc(recipe.title)}</span><input class="recipe-selector-servings" data-list-servings="${recipe.id}" type="number" min="1" value="${recipe.servings || 1}" aria-label="${attr(tr('Servings'))}"></label>`).join('')}</div><button class="primary" data-create-list type="button">${esc(tr('Generate shopping list'))}</button><small class="section-help">${esc(tr('Quantities with compatible units are summed automatically.'))}</small></section>
-		${selected ? `<section class="panel shopping-sheet"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Active list'))}</p><h2>${esc(selected.name)}</h2></div><button class="danger ghost" data-delete-list type="button">${esc(tr('Delete'))}</button></div><div class="add-item"><input data-new-item placeholder="${attr(tr('Add an item...'))}"><button class="secondary" data-add-item type="button">+</button></div><div class="shopping-items">${(selected.items || []).map(item => `<label class="${item.checked ? 'checked' : ''}"><input data-toggle-item="${item.id}" type="checkbox"${item.checked ? ' checked' : ''}><span><strong>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</strong> ${esc(item.name)}<small>${esc([item.category, item.notes].filter(Boolean).join(' - '))}</small></span></label>`).join('')}</div></section>` : ''}</main></div>`;
-        view.querySelectorAll('[data-open-list]').forEach(button => button.addEventListener('click', () => { void open(asNumber(button.dataset.openList)); }));
+        const checkedCount = selected ? (selected.items || []).filter(item => item.checked).length : 0;
+        const totalCount = selected ? (selected.items || []).length : 0;
+        const progress = totalCount ? Math.round(checkedCount / totalCount * 100) : 0;
+        view.innerHTML = `<div class="shopping-layout"><aside class="panel list-sidebar"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Saved'))}</p></div></div><div class="list-sidebar-items">${lists.map(list => `<a class="${selected?.id === list.id ? 'active' : ''}" data-open-list="${list.id}" href="#"><span class="list-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-6-3-6 3z"/></svg></span><span class="list-sidebar-text"><strong>${esc(list.name)}</strong><small>${esc(listStatus(list))}</small></span></a>`).join('') || `<div class="empty-state list-sidebar-empty"><div class="list-sidebar-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h12v20l-6-3-6 3z"/></svg></div><p><strong>${esc(tr('No lists yet'))}</strong><br>${esc(tr('Generate one from your recipes'))}</p></div>`}</div>${lists.length ? `<button class="list-sidebar-new" data-new-list type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>${esc(tr('New list'))}</button>` : ''}</aside>
+		<main class="view-stack">${selected ? `<section class="panel shopping-sheet"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Active list'))}</p><h2>${esc(selected.name)}</h2></div><button class="ghost danger" data-delete-list type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>${esc(tr('Delete'))}</button></div>${totalCount ? `<div class="shopping-progress"><span class="shopping-progress-track"><span class="shopping-progress-fill" style="width:${progress}%"></span></span><span class="shopping-progress-label">${checkedCount} ${esc(tr('of'))} ${totalCount}</span></div>` : ''}<div class="add-item"><input data-new-item placeholder="${attr(tr('Add an item...'))}"><button class="secondary" data-add-item type="button">+</button></div><div class="shopping-items">${groupItems(selected.items || []).map(([category, items]) => `<div class="shopping-group"><p class="shopping-group-heading">${esc(category)}</p>${items.map(item => `<label class="${item.checked ? 'checked' : ''}"><input data-toggle-item="${item.id}" type="checkbox"${item.checked ? ' checked' : ''}><span><strong>${esc(item.quantity)} ${esc(displayUnit(item.unit))}</strong> ${esc(item.name)}${item.notes ? `<small>${esc(item.notes)}</small>` : ''}</span></label>`).join('')}</div>`).join('')}</div></section>` : ''}
+		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Generate'))}</p><h2>${esc(tr('From recipes'))}</h2></div></div><label>${esc(tr('List name'))}<input data-list-name value="${attr(tr('Weekly shopping'))}"></label><p class="recipe-selector-heading">${esc(tr('Servings per recipe'))}</p><div class="recipe-selector">${recipes.map(recipe => `<label><input data-list-recipe="${recipe.id}" type="checkbox"><div class="recipe-thumb">${recipeThumb(recipe)}</div><span>${esc(recipe.title)}</span><span class="servings-stepper"><button type="button" class="stepper-btn" data-step="-1" data-step-target="${recipe.id}" aria-label="${attr(tr('Decrease'))}">&minus;</button><input class="recipe-selector-servings" data-list-servings="${recipe.id}" type="number" min="1" value="${recipe.servings || 1}" aria-label="${attr(tr('Servings'))}"><button type="button" class="stepper-btn" data-step="1" data-step-target="${recipe.id}" aria-label="${attr(tr('Increase'))}">+</button></span></label>`).join('')}</div><button class="primary" data-create-list type="button">${esc(tr('Generate shopping list'))}</button><small class="section-help">${esc(tr('Quantities with compatible units are summed automatically.'))}</small></section>
+		</main></div>`;
+        view.querySelectorAll('[data-open-list]').forEach(button => button.addEventListener('click', (event) => { event.preventDefault(); void open(asNumber(button.dataset.openList)); }));
+        view.querySelector('[data-new-list]')?.addEventListener('click', () => { selected = null; paint(); });
+        view.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => {
+            const input = view.querySelector(`[data-list-servings="${button.dataset.stepTarget}"]`);
+            if (!input)
+                return;
+            input.value = String(Math.max(1, asNumber(input.value, 1) + asNumber(button.dataset.step, 0)));
+        }));
         view.querySelector('[data-create-list]')?.addEventListener('click', async () => {
             const name = view.querySelector('[data-list-name]')?.value.trim() || tr('Shopping list');
             const selections = [...view.querySelectorAll('[data-list-recipe]:checked')].map(box => ({ recipeId: asNumber(box.dataset.listRecipe), servings: asNumber(view.querySelector(`[data-list-servings="${box.dataset.listRecipe}"]`)?.value, 1) }));

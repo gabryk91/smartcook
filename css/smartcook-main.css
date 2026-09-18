@@ -226,6 +226,7 @@ a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	gap: 6px;
 	min-height: 38px;
 	padding: 0 15px;
 	border: 1px solid transparent;
@@ -234,6 +235,15 @@ a {
 	font-weight: 600;
 	cursor: pointer;
 	justify-self: start;
+}
+
+.primary svg,
+.secondary svg,
+.ghost svg,
+.danger svg {
+	width: 15px;
+	height: 15px;
+	flex: 0 0 auto;
 }
 
 .primary {
@@ -781,7 +791,7 @@ button:disabled,
 	min-height: 38px;
 	border: 0;
 	border-radius: 999px;
-	background: var(--smartcook-surface-soft);
+	background-color: var(--smartcook-surface-soft);
 	color: var(--smartcook-text);
 	font-weight: 600;
 }
@@ -914,6 +924,17 @@ select {
 textarea {
 	resize: vertical;
 	line-height: 1.5;
+}
+
+select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding-inline-end: 34px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23767c85' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	cursor: pointer;
 }
 
 input[type='checkbox'],
@@ -2890,32 +2911,99 @@ select:focus {
 	padding: 16px;
 }
 
-.list-sidebar > button {
+.list-sidebar-items {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	padding: 11px;
-	border: 0;
-	border-radius: 10px;
-	background: transparent;
-	color: var(--smartcook-text);
-	text-align: start;
-	cursor: pointer;
+	flex-direction: column;
+	gap: 6px;
+	flex: 1 1 auto;
 }
 
-.list-sidebar > button:hover,
-.list-sidebar > button.active {
+.list-sidebar-items > a {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px;
+	border-radius: 12px;
+	color: var(--smartcook-text);
+	text-decoration: none;
+}
+
+.list-sidebar-items > a:hover {
 	background: var(--smartcook-surface-soft);
 }
 
-.list-sidebar span {
-	display: grid;
-	gap: 3px;
+.list-sidebar-items > a.active {
+	background: color-mix(in srgb, var(--smartcook-accent) 12%, var(--smartcook-surface));
 }
 
-.list-sidebar small {
+.list-sidebar-icon {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	flex: 0 0 auto;
+	border-radius: 10px;
+	background: var(--smartcook-surface-soft);
 	color: var(--smartcook-muted);
+}
+
+.list-sidebar-icon svg {
+	width: 17px;
+	height: 17px;
+}
+
+.list-sidebar-items > a.active .list-sidebar-icon {
+	background: var(--smartcook-accent);
+	color: #fff;
+}
+
+.list-sidebar-text {
+	display: grid;
+	gap: 2px;
+	min-width: 0;
+}
+
+.list-sidebar-text strong {
+	overflow: hidden;
+	font-size: 14px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.list-sidebar-text small {
+	color: var(--smartcook-muted);
+	font-size: 12px;
+}
+
+.list-sidebar-items > a.active .list-sidebar-text small {
+	color: var(--smartcook-accent);
+	font-weight: 650;
+}
+
+.list-sidebar-new {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin-top: 14px;
+	height: 40px;
+	border: 1px dashed var(--smartcook-border);
+	border-radius: 10px;
+	background: transparent;
+	color: var(--smartcook-muted);
+	font-weight: 650;
+	font-size: 13.5px;
+	cursor: pointer;
+}
+
+.list-sidebar-new svg {
+	width: 14px;
+	height: 14px;
+}
+
+.list-sidebar-new:hover {
+	border-color: var(--smartcook-accent);
+	color: var(--smartcook-accent);
 }
 
 .list-sidebar-empty {
@@ -2964,7 +3052,7 @@ select:focus {
 
 .recipe-selector label {
 	display: grid;
-	grid-template-columns: 20px 36px 1fr 70px;
+	grid-template-columns: 20px 36px 1fr auto;
 	align-items: center;
 	gap: 12px;
 	padding: 10px 8px;
@@ -2981,23 +3069,102 @@ select:focus {
 	font-size: 15px;
 }
 
-.recipe-selector-servings {
-	min-height: 34px;
-	padding: 4px 8px;
-	text-align: center;
-}
-
 .recipe-selector input[type='checkbox'] {
 	width: 18px;
 	min-height: 18px;
+}
+
+.servings-stepper {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px;
+	border-radius: 999px;
+	background: var(--smartcook-surface-soft);
+}
+
+.stepper-btn {
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--smartcook-surface);
+	box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+	color: var(--smartcook-text);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.recipe-selector-servings {
+	width: 26px;
+	min-height: 0;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	text-align: center;
+	font-size: 13.5px;
+	font-weight: 700;
+	appearance: textfield;
+}
+
+.recipe-selector-servings::-webkit-inner-spin-button,
+.recipe-selector-servings::-webkit-outer-spin-button {
+	margin: 0;
+	appearance: none;
 }
 
 .shopping-sheet {
 	padding: 24px;
 }
 
+.shopping-progress {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-block-start: 16px;
+}
+
+.shopping-progress-track {
+	flex: 1 1 auto;
+	height: 8px;
+	border-radius: 999px;
+	background: var(--smartcook-surface-soft);
+	overflow: hidden;
+}
+
+.shopping-progress-fill {
+	display: block;
+	height: 100%;
+	border-radius: 999px;
+	background: #1a8a4c;
+}
+
+.shopping-progress-label {
+	flex: 0 0 auto;
+	color: var(--smartcook-muted);
+	font-size: 12.5px;
+	font-weight: 650;
+	white-space: nowrap;
+}
+
 .add-item {
 	margin-block: 18px;
+}
+
+.shopping-group + .shopping-group {
+	margin-block-start: 14px;
+}
+
+.shopping-group-heading {
+	margin: 0 0 4px;
+	padding: 0 4px;
+	color: var(--smartcook-muted);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .05em;
+	text-transform: uppercase;
 }
 
 .shopping-items label {
@@ -3956,11 +4123,7 @@ select:focus {
 	}
 
 	.list-sidebar {
-		display: flex;
-		gap: 8px;
 		padding: 10px;
-		overflow-x: auto;
-		scroll-snap-type: x proximity;
 	}
 
 	.list-sidebar .section-heading {
@@ -3968,7 +4131,14 @@ select:focus {
 		padding: 5px 8px;
 	}
 
-	.list-sidebar > button {
+	.list-sidebar-items {
+		flex-direction: row;
+		gap: 8px;
+		overflow-x: auto;
+		scroll-snap-type: x proximity;
+	}
+
+	.list-sidebar-items > a {
 		flex: 0 0 min(78vw, 280px);
 		scroll-snap-align: start;
 		border: 1px solid var(--smartcook-border);
