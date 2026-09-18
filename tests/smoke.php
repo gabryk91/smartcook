@@ -141,8 +141,25 @@ $expectSame('Torta', $ai['title'], 'AI fenced JSON parsing');
 
 $pdfPath = tempnam(sys_get_temp_dir(), 'smartcook-pdf-');
 $pdfStream = "BT\n/F1 12 Tf\n72 720 Td\n(Pasta al pomodoro) Tj\n0 -20 Td\n(Ingredienti: 200 g pasta) Tj\n0 -20 Td\n(Procedimento: cuoci e condisci.) Tj\nET";
-$compressedPdfStream = gzcompress($pdfStream);
-$pdf = "%PDF-1.4\n1 0 obj\n<< /Length " . strlen($compressedPdfStream) . " /Filter /FlateDecode >>\nstream\n" . $compressedPdfStream . "\nendstream\nendobj\n%%EOF";
+$objects = [
+    "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+    "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+    "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n",
+    "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+    "5 0 obj\n<< /Length " . strlen($pdfStream) . " >>\nstream\n" . $pdfStream . "\nendstream\nendobj\n",
+];
+$pdf = "%PDF-1.4\n";
+$offsets = [];
+foreach ($objects as $object) {
+    $offsets[] = strlen($pdf);
+    $pdf .= $object;
+}
+$xrefOffset = strlen($pdf);
+$pdf .= "xref\n0 " . (count($objects) + 1) . "\n0000000000 65535 f \n";
+foreach ($offsets as $offset) {
+    $pdf .= sprintf('%010d 00000 n ', $offset) . "\n";
+}
+$pdf .= "trailer\n<< /Size " . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n{$xrefOffset}\n%%EOF";
 file_put_contents($pdfPath, $pdf);
 $pdfText = (new NativePdfTextExtractor())->extract($pdfPath);
 unlink($pdfPath);

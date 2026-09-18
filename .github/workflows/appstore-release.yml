@@ -19,6 +19,13 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
 
+      - name: Set up PHP for packaging
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: iconv, mbstring, zlib
+          tools: composer:v2
+
       - name: Verify the release version
         id: version
         shell: bash
@@ -32,6 +39,9 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "asset_name=smartcook-${version}.tar.gz" >> "$GITHUB_OUTPUT"
 
+      - name: Install production PHP dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
       - name: Create App Store archive
         id: package
         shell: bash
@@ -39,7 +49,7 @@ jobs:
           staging_directory="build/appstore/smartcook"
           rm -rf "build/appstore"
           mkdir -p "${staging_directory}"
-          for entry in appinfo css img js l10n lib templates LICENSE README.md; do
+          for entry in appinfo css img js l10n lib templates vendor LICENSE README.md; do
             cp -R "${entry}" "${staging_directory}/${entry}"
           done
           archive="build/${{ steps.version.outputs.asset_name }}"

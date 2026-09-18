@@ -19,6 +19,11 @@ if (!function_exists('mb_substr')) {
         return $length === null ? substr($value, $offset) : substr($value, $offset, $length);
     }
 }
+if (!function_exists('mb_check_encoding')) {
+    function mb_check_encoding(string $value, ?string $encoding = null): bool {
+        return preg_match('//u', $value) === 1;
+    }
+}
 
 spl_autoload_register(static function (string $class): void {
     $prefix = 'OCA\\SmartCook\\';
