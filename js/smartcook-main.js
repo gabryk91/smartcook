@@ -1159,16 +1159,16 @@ async function renderImport(view) {
 		}
 	};
     const paint = () => {
-        view.innerHTML = `<div class="panel import-shell">
-			<div class="import-shell-section" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></div>
-			<div class="import-shell-section form-section">
+        view.innerHTML = `<div class="view-stack import-shell">
+			<section class="panel" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></section>
+			<article class="panel form-section">
 				<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>
 	            ${kind === 'url' ? `<label>${esc(tr('Recipe URL'))}<input data-import-url type="url" placeholder="https://example.com/recipe"></label>` : kind === 'file' ? `<label>${esc(tr('PDF, image, Markdown, HTML or JSON'))}<input data-import-file type="file" multiple accept="image/*,.pdf,.txt,.md,.markdown,.html,.htm,.json"><small>${esc(tr('Select one or more files. Images and PDFs require a configured OCR/document extractor.'))}</small></label>` : `<label>${esc(tr('Source content'))}<textarea data-import-text rows="18" placeholder="${attr(tr('Paste the recipe, including ingredients and procedure...'))}"></textarea></label>`}
 				<div class="form-grid"><label>${esc(tr('Output language'))}<input data-import-language value="${attr(document.documentElement.lang || 'it')}"></label><label>${esc(tr('AI provider override'))}<select data-import-provider><option value="">${esc(tr('Use settings'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option></select></label></div>
 				<label class="check-inline ai-toggle"><input data-import-ai type="checkbox"><span><b>${esc(tr('Use AI refinement'))}</b><small>${esc(tr('Optional fallback for incomplete or unstructured sources'))}</small></span></label>
 				<button class="primary" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
-			</div>
-			<div class="import-shell-section preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews, commonImportTag)}</div>
+			</article>
+			<article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews, commonImportTag)}</article>
 		</div>
 		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
         view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); activeExternalJobId = null; paint(); }));

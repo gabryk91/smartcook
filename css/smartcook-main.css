@@ -2456,20 +2456,6 @@ select:focus {
 
 .import-shell {
 	max-width: 1000px;
-	margin: 0 auto;
-}
-
-.import-shell-section {
-	padding: 22px 24px;
-	border-block-end: 1px solid var(--smartcook-border);
-}
-
-.import-shell-section:last-child {
-	border-block-end: 0;
-}
-
-.import-shell-section.preview-panel {
-	min-height: 0;
 }
 
 .source-tabs {
