@@ -9,6 +9,41 @@ const smartWindow = window;
 const appId = 'smartcook';
 const root = document.getElementById('smartcook');
 const publicRoot = document.getElementById('smartcook-public');
+const uiThemeKey = 'smartcookUiTheme';
+const uiThemes = ['default', 'editorial', 'minimal', 'bold'];
+function applyUiTheme(theme) {
+    const value = uiThemes.includes(theme) ? theme : 'default';
+    [root, publicRoot].forEach(node => {
+        if (!node)
+            return;
+        if (value === 'default')
+            node.removeAttribute('data-theme');
+        else
+            node.setAttribute('data-theme', value);
+    });
+    return value;
+}
+function loadUiTheme() {
+    let stored = 'default';
+    try {
+        stored = window.localStorage.getItem(uiThemeKey) || 'default';
+    }
+    catch (error) {
+        stored = 'default';
+    }
+    return applyUiTheme(stored);
+}
+function saveUiTheme(theme) {
+    const value = applyUiTheme(theme);
+    try {
+        window.localStorage.setItem(uiThemeKey, value);
+    }
+    catch (error) {
+        // Ignore storage failures (private browsing, quota, etc.).
+    }
+    return value;
+}
+loadUiTheme();
 let busyCount = 0;
 let messageTimer = 0;
 const fallbackTranslations = {
@@ -21,6 +56,14 @@ const fallbackTranslations = {
         'Delete this share?': 'Eliminare questa condivisione?',
         'Delete this meal?': 'Eliminare questo pasto?',
         'Empty week': 'Svuota settimana',
+        Appearance: 'Aspetto',
+        'Interface theme': 'Tema dell\'interfaccia',
+        Theme: 'Tema',
+        Default: 'Predefinito',
+        'Editorial — warm, magazine style': 'Editoriale — caldo, stile rivista',
+        'Minimal — dense, flat lists': 'Minimale — liste dense e piatte',
+        'Bold — dark sidebar, colorful cards': 'Vivace — barra laterale scura, card colorate',
+        'Changes the look of this browser only; it is not shared with other devices or users.': 'Cambia l\'aspetto solo su questo browser; non è condiviso con altri dispositivi o utenti.',
 		Alternatives: 'Alternative',
 		'Add alternative': 'Aggiungi alternativa',
 		'Alternative ingredient': 'Ingrediente alternativo',
@@ -1897,7 +1940,14 @@ dnf install -y tesseract tesseract-langpack-ita tesseract-langpack-eng poppler-u
 }
 async function renderSettings(view) {
     const settings = (await working(() => request('/settings'))).settings;
+    const uiTheme = loadUiTheme();
 	view.innerHTML = `<div class="settings-layout"><main class="view-stack"><div class="editor-actions settings-actions"><div><button class="primary" data-save-settings type="button">${esc(tr('Save settings'))}</button></div></div>
+		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Appearance'))}</p><h2>${esc(tr('Interface theme'))}</h2></div></div><div class="form-grid"><label class="span-2">${esc(tr('Theme'))}<select data-theme-select>
+			<option value="default"${uiTheme === 'default' ? ' selected' : ''}>${esc(tr('Default'))}</option>
+			<option value="editorial"${uiTheme === 'editorial' ? ' selected' : ''}>${esc(tr('Editorial — warm, magazine style'))}</option>
+			<option value="minimal"${uiTheme === 'minimal' ? ' selected' : ''}>${esc(tr('Minimal — dense, flat lists'))}</option>
+			<option value="bold"${uiTheme === 'bold' ? ' selected' : ''}>${esc(tr('Bold — dark sidebar, colorful cards'))}</option>
+		</select><small>${esc(tr('Changes the look of this browser only; it is not shared with other devices or users.'))}</small></label></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('General'))}</p><h2>${esc(tr('Library preferences'))}</h2></div></div><div class="form-grid"><label>${esc(tr('Default language'))}<input data-setting="language" value="${attr(settings.language)}" placeholder="auto / it / en"></label><label>${esc(tr('Measurement system'))}<select data-setting="measurementSystem"><option value="metric"${settings.measurementSystem === 'metric' ? ' selected' : ''}>${esc(tr('Metric'))}</option><option value="imperial"${settings.measurementSystem === 'imperial' ? ' selected' : ''}>${esc(tr('Imperial'))}</option></select></label><label class="span-2">${esc(tr('Attachments folder in Nextcloud Files'))}<input data-setting="attachmentsFolder" value="${attr(settings.attachmentsFolder)}"></label><label>${esc(tr('Maximum URL import size'))}<input data-setting="maxImportBytes" type="number" min="100000" max="20000000" value="${settings.maxImportBytes}"><small>${esc(tr('bytes'))}</small></label></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Optional intelligence'))}</p><h2>${esc(tr('AI provider'))}</h2></div><span class="status-pill ${settings.aiProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.aiProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid">
 			<label>${esc(tr('Provider'))}<select data-setting="aiProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option><option value="custom">${esc(tr('Custom OpenAI-compatible'))}</option></select></label>
@@ -1919,6 +1969,10 @@ async function renderSettings(view) {
     const coverImageProvider = view.querySelector('[data-setting="coverImageProvider"]');
     if (coverImageProvider)
         coverImageProvider.value = settings.coverImageProvider || 'google';
+    view.querySelector('[data-theme-select]')?.addEventListener('change', event => {
+        const target = event.target;
+        saveUiTheme(target.value);
+    });
     view.querySelector('[data-ocr-help]')?.addEventListener('click', openOcrHelp);
     view.querySelector('[data-save-settings]')?.addEventListener('click', async () => {
         const payload = {};

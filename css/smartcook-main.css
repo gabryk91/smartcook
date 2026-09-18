@@ -8,6 +8,18 @@
 	--smartcook-muted: var(--color-text-maxcontrast, #6b7075);
 	--smartcook-radius: 16px;
 	--smartcook-shadow: 0 8px 30px rgb(0 0 0 / 8%);
+
+	/* Selectable UI theme tokens. Defaults below reproduce the current
+	 * look unchanged; theme blocks at the end of this file override a
+	 * subset of them when #smartcook/#smartcook-public carries data-theme. */
+	--smartcook-content-bg: var(--smartcook-surface);
+	--smartcook-panel-border: 1px solid var(--smartcook-border);
+	--smartcook-panel-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+	--smartcook-font-heading: inherit;
+	--smartcook-font-body: inherit;
+	--smartcook-sidebar-bg: var(--smartcook-surface-soft);
+	--smartcook-sidebar-text: var(--smartcook-text);
+	--smartcook-sidebar-muted: var(--smartcook-muted);
 }
 
 * {
@@ -69,6 +81,7 @@ a {
 	padding: 22px 16px;
 	border-inline-end: 1px solid var(--smartcook-border);
 	background: var(--smartcook-surface);
+	color: var(--smartcook-sidebar-text);
 }
 
 .brand,
@@ -99,7 +112,11 @@ a {
 
 .brand span {
 	font-size: 12px;
-	color: var(--smartcook-muted);
+	color: var(--smartcook-sidebar-muted);
+}
+
+.brand strong {
+	color: var(--smartcook-sidebar-text);
 }
 
 .smartcook-sidebar nav {
@@ -189,10 +206,10 @@ a {
 }
 
 .panel {
-	border: 1px solid var(--smartcook-border);
+	border: var(--smartcook-panel-border);
 	border-radius: var(--smartcook-radius);
 	background: var(--smartcook-surface);
-	box-shadow: 0 2px 12px rgb(0 0 0 / 4%);
+	box-shadow: var(--smartcook-panel-shadow);
 }
 
 .panel h2,
@@ -990,9 +1007,10 @@ select:focus {
 
 .recipe-card {
 	overflow: hidden;
-	border: 1px solid var(--smartcook-border);
+	border: var(--smartcook-panel-border);
 	border-radius: var(--smartcook-radius);
 	background: var(--smartcook-surface);
+	box-shadow: var(--smartcook-panel-shadow);
 	transition: transform .16s ease, box-shadow .16s ease;
 }
 
@@ -1196,14 +1214,14 @@ select:focus {
 /* Application layout: a light, editorial workspace that keeps Nextcloud's
  * active color tokens while putting focus on recipes and data. */
 .smartcook-shell {
-	background: var(--smartcook-surface);
+	background: var(--smartcook-content-bg);
 }
 
 .smartcook-sidebar {
 	width: 260px;
 	gap: 24px;
 	padding: 26px 18px 18px;
-	background: var(--smartcook-surface-soft);
+	background: var(--smartcook-sidebar-bg);
 }
 
 .smartcook-sidebar nav {
@@ -1246,7 +1264,7 @@ select:focus {
 .smartcook-content {
 	margin-inline-start: 260px;
 	padding: 36px clamp(24px, 3.5vw, 56px) 64px;
-	background: var(--smartcook-surface);
+	background: var(--smartcook-content-bg);
 }
 
 .page-header {
@@ -1289,7 +1307,7 @@ select:focus {
 }
 
 .panel {
-	box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+	box-shadow: var(--smartcook-panel-shadow);
 }
 
 .panel-heading,
@@ -4102,4 +4120,114 @@ select:focus {
 		align-items: flex-start;
 		margin-block-end: 12px;
 	}
+}
+
+/* ==========================================================================
+   Selectable UI themes
+   Set on #smartcook / #smartcook-public via data-theme. Each block only
+   overrides the design tokens defined at :root plus the few sidebar rules
+   that cannot be expressed as tokens (dark sidebar for "bold").
+   ========================================================================== */
+
+[data-theme] .smartcook-shell,
+[data-theme] .smartcook-content,
+[data-theme] .public-page {
+	font-family: var(--smartcook-font-body);
+}
+
+[data-theme] h1,
+[data-theme] h2,
+[data-theme] h3,
+[data-theme] .brand strong,
+[data-theme] .public-brand strong {
+	font-family: var(--smartcook-font-heading);
+}
+
+/* A — Editoriale: warm, magazine-like, flat cards, serif headings. */
+[data-theme="editorial"] {
+	--smartcook-accent: #c1592a;
+	--smartcook-accent-hover: #a84a20;
+	--smartcook-surface: #fff;
+	--smartcook-surface-soft: #f3ece0;
+	--smartcook-border: #e7dfd1;
+	--smartcook-text: #2b2620;
+	--smartcook-muted: #8a8071;
+	--smartcook-radius: 8px;
+	--smartcook-shadow: 0 10px 26px rgb(43 38 32 / 10%);
+	--smartcook-content-bg: #fbf6ee;
+	--smartcook-panel-border: none;
+	--smartcook-panel-shadow: none;
+	--smartcook-font-heading: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+	--smartcook-sidebar-bg: #fbf6ee;
+	--smartcook-sidebar-text: #5b5347;
+	--smartcook-sidebar-muted: #9c9284;
+}
+
+/* B — Minimale: dense, flat, thin dividers instead of shadows. */
+[data-theme="minimal"] {
+	--smartcook-accent: #0f766e;
+	--smartcook-accent-hover: #0b5c56;
+	--smartcook-surface: #fff;
+	--smartcook-surface-soft: #f7f7f8;
+	--smartcook-border: #e5e5e8;
+	--smartcook-text: #17171a;
+	--smartcook-muted: #6b6b72;
+	--smartcook-radius: 10px;
+	--smartcook-shadow: 0 4px 14px rgb(0 0 0 / 6%);
+	--smartcook-content-bg: #fff;
+	--smartcook-panel-border: 1px solid var(--smartcook-border);
+	--smartcook-panel-shadow: none;
+	--smartcook-sidebar-bg: #fafafa;
+	--smartcook-sidebar-text: #5b5b60;
+	--smartcook-sidebar-muted: #9c9ca3;
+}
+
+/* C — Vivace: dark sidebar, bold rounded color cards. */
+[data-theme="bold"] {
+	--smartcook-accent: #e85d3c;
+	--smartcook-accent-hover: #d14e2f;
+	--smartcook-surface: #fff;
+	--smartcook-surface-soft: #f3f1ec;
+	--smartcook-border: #ede8de;
+	--smartcook-text: #23201b;
+	--smartcook-muted: #7a7266;
+	--smartcook-radius: 20px;
+	--smartcook-shadow: 0 10px 24px rgb(35 32 27 / 10%);
+	--smartcook-content-bg: #fafaf7;
+	--smartcook-panel-border: none;
+	--smartcook-panel-shadow: var(--smartcook-shadow);
+	--smartcook-font-heading: 'Century Gothic', 'Trebuchet MS', 'Segoe UI', sans-serif;
+	--smartcook-sidebar-bg: #23201b;
+	--smartcook-sidebar-text: rgb(255 255 255 / 68%);
+	--smartcook-sidebar-muted: rgb(255 255 255 / 55%);
+}
+
+[data-theme="bold"] .brand strong,
+[data-theme="bold"] .public-brand strong {
+	color: #fff;
+}
+
+[data-theme="bold"] .brand img,
+[data-theme="bold"] .public-brand img {
+	background: var(--smartcook-accent);
+}
+
+[data-theme="bold"] .nav-icon {
+	color: rgb(255 255 255 / 55%);
+}
+
+[data-theme="bold"] .smartcook-sidebar nav button:hover,
+[data-theme="bold"] .smartcook-sidebar nav a:hover {
+	background: rgb(255 255 255 / 8%);
+}
+
+[data-theme="bold"] .smartcook-sidebar nav button.active,
+[data-theme="bold"] .smartcook-sidebar nav a.active {
+	background: var(--smartcook-accent);
+	color: #fff;
+	box-shadow: none;
+}
+
+[data-theme="bold"] .smartcook-sidebar nav a.active .nav-icon {
+	color: #fff;
 }
