@@ -133,7 +133,7 @@ a {
 	border: 0;
 	border-radius: 11px;
 	background: transparent;
-	color: var(--smartcook-text);
+	color: var(--smartcook-sidebar-text);
 	text-align: start;
 	text-decoration: none;
 	cursor: pointer;
@@ -2885,7 +2885,8 @@ select:focus {
 }
 
 .list-sidebar {
-	align-self: start;
+	display: flex;
+	flex-direction: column;
 	padding: 16px;
 }
 
@@ -2919,10 +2920,13 @@ select:focus {
 
 .list-sidebar-empty {
 	display: grid;
+	flex: 1 1 auto;
+	align-content: center;
 	justify-items: center;
 	gap: 10px;
-	min-height: 0;
+	min-height: 160px;
 	padding: 34px 10px;
+	text-align: center;
 }
 
 .list-sidebar-empty-icon {
@@ -4230,4 +4234,148 @@ select:focus {
 
 [data-theme="bold"] .smartcook-sidebar nav a.active .nav-icon {
 	color: #fff;
+}
+
+/* Structural differences beyond palette: each theme also reshapes the
+   sidebar and/or the recipe card grid, reusing the card-as-row pattern
+   already defined for the mobile breakpoint above. */
+
+/* C — Vivace: sidebar floats as a rounded dark panel instead of a flush bar. */
+[data-theme="bold"] .smartcook-sidebar {
+	inset-block: calc(var(--header-height, 50px) + 16px) 16px;
+	inset-inline-start: 16px;
+	width: 228px;
+	border-inline-end: 0;
+	border-radius: 26px;
+	box-shadow: 0 16px 36px rgb(35 32 27 / 18%);
+}
+
+[data-theme="bold"] .smartcook-content {
+	margin-inline-start: 260px;
+}
+
+[data-theme="bold"] .recipe-image {
+	height: 170px;
+}
+
+/* A — Editoriale: recipes read as a divided list, not boxed cards. */
+[data-theme="editorial"] .recipe-grid {
+	grid-template-columns: 1fr;
+	gap: 0;
+}
+
+[data-theme="editorial"] .recipe-card {
+	display: grid;
+	grid-template-columns: 104px minmax(0, 1fr);
+	align-items: center;
+	min-height: 0;
+	border: 0;
+	border-radius: 0;
+	border-block-end: 1px solid var(--smartcook-border);
+	background: transparent;
+}
+
+[data-theme="editorial"] .recipe-card:hover {
+	transform: none;
+	box-shadow: none;
+}
+
+[data-theme="editorial"] .recipe-card .recipe-image,
+[data-theme="editorial"] .recipe-card .recipe-image img,
+[data-theme="editorial"] .recipe-card .image-placeholder {
+	width: 104px;
+	height: 78px;
+	border-radius: 6px;
+}
+
+[data-theme="editorial"] .recipe-card .recipe-image {
+	align-self: center;
+	margin-block: 16px;
+}
+
+[data-theme="editorial"] .recipe-image-overlay,
+[data-theme="editorial"] .recipe-badge,
+[data-theme="editorial"] .time-pill {
+	display: none;
+}
+
+[data-theme="editorial"] .recipe-card-body {
+	padding: 16px 4px 16px 20px;
+	gap: 6px;
+}
+
+[data-theme="editorial"] .recipe-card-body > a h2 {
+	font-weight: 500;
+}
+
+[data-theme="editorial"] .recipe-card .recipe-fav {
+	inset-inline-end: 4px;
+	inset-block-start: 50%;
+	transform: translateY(-50%);
+	background: transparent;
+}
+
+/* B — Minimale: recipes read as a dense, single-line row list. */
+[data-theme="minimal"] .recipe-grid {
+	grid-template-columns: 1fr;
+	gap: 0;
+}
+
+[data-theme="minimal"] .recipe-card {
+	display: grid;
+	grid-template-columns: 44px minmax(0, 1fr);
+	align-items: center;
+	min-height: 0;
+	border: 0;
+	border-radius: 0;
+	border-block-end: 1px solid var(--smartcook-border);
+	background: transparent;
+}
+
+[data-theme="minimal"] .recipe-card:hover {
+	transform: none;
+	box-shadow: none;
+	background: var(--smartcook-surface-soft);
+}
+
+[data-theme="minimal"] .recipe-card .recipe-image,
+[data-theme="minimal"] .recipe-card .recipe-image img,
+[data-theme="minimal"] .recipe-card .image-placeholder {
+	width: 44px;
+	height: 44px;
+	border-radius: 8px;
+	font-size: 16px;
+}
+
+[data-theme="minimal"] .recipe-card .recipe-image {
+	align-self: center;
+	margin-block: 10px;
+}
+
+[data-theme="minimal"] .recipe-image-overlay,
+[data-theme="minimal"] .recipe-badge,
+[data-theme="minimal"] .time-pill {
+	display: none;
+}
+
+[data-theme="minimal"] .recipe-card-body {
+	padding: 10px 8px 10px 14px;
+	gap: 2px;
+}
+
+[data-theme="minimal"] .recipe-card-body > p {
+	display: none;
+}
+
+[data-theme="minimal"] .card-meta {
+	font-size: 11px;
+}
+
+[data-theme="minimal"] .recipe-card .recipe-fav {
+	inset-inline-end: 4px;
+	inset-block-start: 50%;
+	transform: translateY(-50%);
+	width: 24px;
+	height: 24px;
+	background: transparent;
 }
