@@ -93,6 +93,7 @@ Scegli un endpoint di cui ti fidi e mantieni riservate le credenziali del provid
 ## 🏁 Per iniziare
 
 SmartCook è un’app standard per Nextcloud.
+Supporta Nextcloud dalla versione 31 alla 35.
 
 1. Scarica una release di SmartCook compatibile con la tua versione di Nextcloud.
 2. Estrai la cartella `smartcook` nella directory `custom_apps` dell’istanza.

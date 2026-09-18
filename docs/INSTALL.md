@@ -18,7 +18,7 @@ The installable archive includes compiled JavaScript and CSS. It does not requir
 
 ## Compatibility target
 
-- Nextcloud 31-34.
+- Nextcloud 31-35.
 - PHP 8.1 or newer and the normal Nextcloud PHP extensions, including DOM and mbstring.
 - MariaDB/MySQL, PostgreSQL or SQLite.
 
