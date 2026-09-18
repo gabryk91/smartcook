@@ -280,7 +280,7 @@ a {
 }
 
 :is(.smartcook-shell, .public-recipe) .danger {
-	color: var(--color-error, #c00);
+	color: var(--color-text-error, var(--color-error-text, #c00));
 }
 
 button:disabled,
@@ -1051,6 +1051,8 @@ select:focus {
 }
 
 .recipe-card {
+	display: flex;
+	flex-direction: column;
 	overflow: hidden;
 	border: var(--smartcook-panel-border);
 	border-radius: var(--smartcook-radius);
@@ -1150,7 +1152,9 @@ select:focus {
 }
 
 .recipe-card-body {
-	display: grid;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
 	gap: 12px;
 	padding: 18px;
 }
@@ -1204,7 +1208,10 @@ select:focus {
 .card-meta {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 8px 14px;
+	margin-top: auto;
+	padding-top: 2px;
 	font-size: 12px;
 	color: var(--smartcook-muted);
 }
