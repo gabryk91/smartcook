@@ -4153,12 +4153,18 @@ select:focus {
 	.source-tabs {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		padding: 0;
+		border-radius: 0;
+		background: transparent;
 		overflow: visible;
 	}
 
 	.source-tabs button {
 		min-width: 0;
 		padding-inline: 6px;
+		border-radius: var(--smartcook-radius);
+		background: var(--smartcook-surface-soft);
 		font-size: 12px;
 	}
 
@@ -4312,34 +4318,6 @@ select:focus {
 	.recipe-grid {
 		grid-template-columns: 1fr;
 		gap: 12px;
-	}
-
-	.recipe-card {
-		display: grid;
-		grid-template-columns: 112px minmax(0, 1fr);
-		min-height: 112px;
-	}
-
-	.recipe-card .recipe-image {
-		width: 112px;
-		height: 112px;
-	}
-
-	.recipe-card .recipe-image img,
-	.recipe-card .image-placeholder {
-		width: 112px;
-		height: 112px;
-	}
-
-	.recipe-card-body {
-		padding: 12px 12px 12px 0;
-	}
-
-	.recipe-card .recipe-fav {
-		inset-inline-end: calc(100% - 106px);
-		width: 26px;
-		height: 26px;
-		font-size: 13px;
 	}
 
 	.notice {
