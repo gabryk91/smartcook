@@ -3341,12 +3341,20 @@ select:focus {
 	margin: 0;
 }
 
-.recipe-view-download {
-	position: relative;
-	justify-self: end;
+.recipe-view-footer-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
-.recipe-view-download summary {
+.recipe-view-download,
+.recipe-view-actions-menu {
+	position: relative;
+}
+
+.recipe-view-download summary,
+.recipe-view-actions-menu summary {
 	padding: 8px 12px;
 	border: 1px solid var(--smartcook-border);
 	background: var(--smartcook-surface);
@@ -3355,39 +3363,60 @@ select:focus {
 	list-style: none;
 }
 
-.recipe-view-download summary::-webkit-details-marker {
+.recipe-view-download summary::-webkit-details-marker,
+.recipe-view-actions-menu summary::-webkit-details-marker {
 	display: none;
 }
 
-.recipe-view-download summary::after {
+.recipe-view-download summary::after,
+.recipe-view-actions-menu summary::after {
+	display: inline-block;
 	margin-inline-start: 8px;
-	content: '⌄';
+	vertical-align: .255em;
+	content: '';
+	border-top: .3em solid currentColor;
+	border-right: .3em solid transparent;
+	border-left: .3em solid transparent;
 }
 
-.recipe-view-download[open] summary::after {
-	content: '⌃';
+.recipe-view-download[open] summary::after,
+.recipe-view-actions-menu[open] summary::after {
+	border-top: 0;
+	border-bottom: .3em solid currentColor;
 }
 
-.recipe-view-download > div {
+.recipe-view-download > div,
+.recipe-view-actions-menu > div {
 	position: absolute;
 	z-index: 2;
 	inset-inline-end: 0;
 	inset-block-end: calc(100% + 6px);
 	display: grid;
-	min-width: 130px;
+	min-width: 180px;
 	border: 1px solid var(--smartcook-border);
 	background: var(--smartcook-surface);
 	box-shadow: var(--smartcook-shadow);
 }
 
-.recipe-view-download a {
+.recipe-view-download a,
+.recipe-view-actions-menu a,
+.recipe-view-actions-menu button {
 	padding: 10px 12px;
 	color: var(--smartcook-text);
+	border: 0;
+	background: transparent;
+	font: inherit;
+	text-align: start;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .recipe-view-download a:hover,
-.recipe-view-download a:focus-visible {
+.recipe-view-download a:focus-visible,
+.recipe-view-actions-menu a:hover,
+.recipe-view-actions-menu a:focus-visible,
+.recipe-view-actions-menu button:hover,
+.recipe-view-actions-menu button:focus-visible {
 	background: var(--smartcook-surface-soft);
 }
 
