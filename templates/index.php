@@ -6,6 +6,7 @@ use OCA\SmartCook\AppInfo\Application;
 use OCP\Util;
 
 Util::addScript(Application::APP_ID, Application::APP_ID . '-main');
+Util::addStyle(Application::APP_ID, 'fontawesome/all.min');
 Util::addStyle(Application::APP_ID, Application::APP_ID . '-main');
 Util::addTranslations(Application::APP_ID);
 ?>

@@ -629,9 +629,8 @@ button:disabled,
 	color: #fff;
 }
 
-.assistant-avatar svg {
-	width: 17px;
-	height: 17px;
+.assistant-avatar .fa-solid {
+	font-size: 17px;
 }
 
 .assistant-turn .assistant-bubble-answer {
@@ -730,9 +729,8 @@ button:disabled,
 	color: #fff;
 }
 
-.assistant-send svg {
-	width: 16px;
-	height: 16px;
+.assistant-send .fa-solid {
+	font-size: 16px;
 }
 
 .assistant-footnote {
@@ -911,9 +909,8 @@ button:disabled,
 	transform: translateY(-50%);
 }
 
-.search-field > span svg {
-	width: 17px;
-	height: 17px;
+.search-field > span .fa-solid {
+	font-size: 17px;
 }
 
 .search-field input {
@@ -1290,6 +1287,7 @@ select:focus {
 .nav-icon {
 	width: 19px;
 	height: 19px;
+	font-size: 19px;
 	flex: 0 0 auto;
 	color: var(--smartcook-muted);
 }
@@ -1408,9 +1406,8 @@ select:focus {
 	border-radius: 13px;
 }
 
-.metric-icon svg {
-	width: 24px;
-	height: 24px;
+.metric-icon .fa-solid {
+	font-size: 24px;
 }
 
 .metric-icon-recipes {
@@ -1709,9 +1706,8 @@ select:focus {
 	padding: 0 24px 20px;
 }
 
-.wizard-navigation-button svg {
-	width: 20px;
-	height: 20px;
+.wizard-navigation-button .fa-solid {
+	font-size: 20px;
 	fill: none;
 	stroke: currentColor;
 	stroke-linecap: round;
@@ -2201,7 +2197,9 @@ select:focus {
 .ingredient-alternatives > div:first-child strong::before {
 	margin-inline-end: 8px;
 	color: var(--smartcook-accent);
-	content: '↳';
+	font-family: 'Font Awesome 6 Free';
+	font-weight: 900;
+	content: '\f061';
 }
 
 .ingredient-alternatives .ghost {
@@ -2602,7 +2600,9 @@ select:focus {
 }
 
 .import-preview-card > summary::after {
-	content: '\25be';
+	font-family: 'Font Awesome 6 Free';
+	font-weight: 900;
+	content: '\f078';
 	color: var(--smartcook-muted);
 }
 
@@ -2796,9 +2796,8 @@ select:focus {
 	padding: 0;
 }
 
-.planner-week-button svg {
-	width: 22px;
-	height: 22px;
+.planner-week-button .fa-solid {
+	font-size: 22px;
 	fill: none;
 	stroke: currentColor;
 	stroke-linecap: round;
@@ -2992,9 +2991,8 @@ select:focus {
 	color: var(--smartcook-muted);
 }
 
-.list-sidebar-icon svg {
-	width: 17px;
-	height: 17px;
+.list-sidebar-icon .fa-solid {
+	font-size: 17px;
 }
 
 .list-sidebar-items > a.active .list-sidebar-icon {
@@ -3044,9 +3042,8 @@ select:focus {
 	color: var(--smartcook-muted);
 }
 
-.list-sidebar-new svg {
-	width: 14px;
-	height: 14px;
+.list-sidebar-new .fa-solid {
+	font-size: 14px;
 }
 
 .list-sidebar-new:hover {
@@ -3075,9 +3072,8 @@ select:focus {
 	color: var(--smartcook-muted);
 }
 
-.list-sidebar-empty-icon svg {
-	width: 20px;
-	height: 20px;
+.list-sidebar-empty-icon .fa-solid {
+	font-size: 20px;
 }
 
 .list-sidebar-empty p {
@@ -3368,21 +3364,15 @@ select:focus {
 	display: none;
 }
 
-.recipe-view-download summary::after,
-.recipe-view-actions-menu summary::after {
-	display: inline-block;
+.recipe-dropdown-icon {
 	margin-inline-start: 8px;
-	vertical-align: .255em;
-	content: '';
-	border-top: .3em solid currentColor;
-	border-right: .3em solid transparent;
-	border-left: .3em solid transparent;
+	font-size: .75em;
+	transition: transform .15s ease;
 }
 
-.recipe-view-download[open] summary::after,
-.recipe-view-actions-menu[open] summary::after {
-	border-top: 0;
-	border-bottom: .3em solid currentColor;
+.recipe-view-download[open] .recipe-dropdown-icon,
+.recipe-view-actions-menu[open] .recipe-dropdown-icon {
+	transform: rotate(180deg);
 }
 
 .recipe-view-download > div,
@@ -3401,6 +3391,9 @@ select:focus {
 .recipe-view-download a,
 .recipe-view-actions-menu a,
 .recipe-view-actions-menu button {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	padding: 10px 12px;
 	color: var(--smartcook-text);
 	border: 0;
