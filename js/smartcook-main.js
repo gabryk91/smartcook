@@ -23,6 +23,8 @@ const fallbackTranslations = {
         'Delete this meal?': 'Eliminare questo pasto?',
         'Empty week': 'Svuota settimana',
         Actions: 'Azioni',
+        Share: 'Condividi',
+        'Could not copy the link': 'Impossibile copiare il link',
         'Add to today\'s plan': 'Aggiungi al piano di oggi',
         'Add to shopping list': 'Aggiungi alla lista della spesa',
         'Generate one from your recipes': 'Generane una dalle tue ricette',
@@ -685,7 +687,42 @@ function recipeViewer(recipe) {
         <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">&#10024;</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(categoryLabel)}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}${sourceUrl ? `<div class="recipe-view-actions"><a class="secondary recipe-source-link" href="${attr(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${attr(tr('Open source'))}"><span aria-hidden="true">&#8599;</span>${esc(tr('Open source'))}${sourceLabel ? `: ${esc(sourceLabel)}` : ''}</a></div>` : ''}</div></header>
         <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span>${calories > 0 ? `<span><strong>${calories}</strong> ${esc(tr('kcal x 1 serving'))}</span>` : ''}<span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
-    </article>${recipe.id ? `<div class="recipe-view-footer-actions"><details class="recipe-view-download"><summary>${esc(tr('Download'))}</summary><div><a href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></details><details class="recipe-view-actions-menu"><summary>${esc(tr('Actions'))}</summary><div>${recipe.excludeFromPlanner ? '' : `<button data-add-to-today type="button">${esc(tr('Add to today\'s plan'))}</button>`}<button data-add-to-shopping type="button">${esc(tr('Add to shopping list'))}</button><a href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></details></div>` : ''}</div>`;
+    </article>${recipe.id ? `<div class="recipe-view-footer-actions"><details class="recipe-view-download"><summary>${esc(tr('Download'))}</summary><div><a href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></details><details class="recipe-view-actions-menu"><summary>${esc(tr('Actions'))}</summary><div><button data-share-recipe type="button">${esc(tr('Share'))}</button>${recipe.excludeFromPlanner ? '' : `<button data-add-to-today type="button">${esc(tr('Add to today\'s plan'))}</button>`}<button data-add-to-shopping type="button">${esc(tr('Add to shopping list'))}</button><a href="#/recipes/${recipe.id}/edit">${esc(tr('Edit recipe'))}</a></div></details></div>` : ''}</div>`;
+}
+async function shareRecipe(recipe) {
+    const url = window.location.href;
+    if (typeof navigator.share === 'function') {
+        try {
+            await navigator.share({ title: recipe.title, text: recipe.title, url });
+            return;
+        }
+        catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError')
+                return;
+        }
+    }
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(url);
+        }
+        else {
+            const input = document.createElement('textarea');
+            input.value = url;
+            input.setAttribute('readonly', '');
+            input.style.position = 'fixed';
+            input.style.opacity = '0';
+            document.body.append(input);
+            input.select();
+            const copied = document.execCommand('copy');
+            input.remove();
+            if (!copied)
+                throw new Error('Copy failed');
+        }
+        showNotice(tr('Link copied'));
+    }
+    catch {
+        showNotice(tr('Could not copy the link'), 'error');
+    }
 }
 function coverPreviewUrl(recipeId, thumbnailUrl) {
     return appUrl(`/recipes/${recipeId}/cover/preview?url=${encodeURIComponent(thumbnailUrl)}`);
@@ -753,6 +790,7 @@ async function renderRecipe(view, id) {
         await working(() => request('/shopping', { method: 'POST', json: { name: `${tr('Shopping list')}: ${recipe.title}`, recipes: [{ recipeId: recipe.id, servings: Math.max(1, asNumber(recipe.servings, 1)) }] } }));
         showNotice(tr('Shopping list created'));
     });
+    view.querySelector('[data-share-recipe]')?.addEventListener('click', () => { void shareRecipe(recipe); });
 }
 function bindRowRemoval(container) {
     container.querySelectorAll('[data-remove-row]').forEach(button => button.addEventListener('click', () => {
