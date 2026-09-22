@@ -20,6 +20,8 @@
 	--smartcook-sidebar-bg: var(--smartcook-surface-soft);
 	--smartcook-sidebar-text: var(--smartcook-text);
 	--smartcook-sidebar-muted: var(--smartcook-muted);
+	--smartcook-media-badge-bg: rgb(0 0 0 / 72%);
+	--smartcook-media-badge-text: #fff;
 }
 
 * {
@@ -1117,8 +1119,8 @@ select:focus {
 	gap: 4px;
 	padding: 4px 9px;
 	border-radius: 999px;
-	background: rgb(255 255 255 / 92%);
-	color: var(--smartcook-text);
+	background: var(--smartcook-media-badge-bg);
+	color: var(--smartcook-media-badge-text);
 	font-size: 11.5px;
 	font-weight: 650;
 }
