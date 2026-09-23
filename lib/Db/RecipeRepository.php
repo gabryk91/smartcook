@@ -80,10 +80,10 @@ final class RecipeRepository extends AbstractRepository {
 
         return array_values(array_filter($recipes, function (array $recipe) use ($tagNames, $categoryNames, $toolNames, $ingredientNames, $excludedAllergens): bool {
             $id = (int)$recipe['id'];
-            if ($tagNames !== [] && !$this->containsAll($this->taxonomy->getTags($id), $tagNames)) {
+            if ($tagNames !== [] && !$this->containsAny($this->taxonomy->getTags($id), $tagNames)) {
                 return false;
             }
-            if ($categoryNames !== [] && !$this->containsAll((array)$recipe['categories'], $categoryNames)) {
+            if ($categoryNames !== [] && !$this->containsAny((array)$recipe['categories'], $categoryNames)) {
                 return false;
             }
             if ($toolNames !== [] && !$this->containsAll($this->taxonomy->getTools($id), $toolNames)) {
@@ -530,6 +530,19 @@ final class RecipeRepository extends AbstractRepository {
             }
         }
         return true;
+    }
+
+    /** @param list<array<string, mixed>> $entities @param list<string> $needles */
+    private function containsAny(array $entities, array $needles): bool {
+        $names = array_map(static fn (array $entity): string => mb_strtolower((string)($entity['name'] ?? '')), $entities);
+        foreach ($needles as $needle) {
+            foreach ($names as $name) {
+                if (str_contains($name, $needle)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private function uuid(): string {
