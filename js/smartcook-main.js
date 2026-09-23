@@ -572,8 +572,8 @@ async function renderRecipes(view, routeParams = new URLSearchParams()) {
     const load = async () => {
         const [sortField, direction] = sort.value.split(':');
         const params = new URLSearchParams({ search: search.value, favorite: favorites.checked ? '1' : '', sort: sortField, ...(direction ? { direction } : {}) });
-        selectedTags.forEach(tag => params.append('tags', tag));
-        selectedCategories.forEach(category => params.append('categories', category));
+        selectedTags.forEach(tag => params.append('tags[]', tag));
+        selectedCategories.forEach(category => params.append('categories[]', category));
         ingredients.forEach(ingredient => params.append('ingredients', ingredient));
         const payload = await working(() => request(`/recipes?${params.toString()}`));
         const recipes = payload.recipes;
