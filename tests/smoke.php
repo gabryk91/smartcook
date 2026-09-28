@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/bootstrap.php';
 
 use OCA\SmartCook\Service\AI\AiJsonParser;
+use OCA\SmartCook\Service\AI\AiPromptFactory;
 use OCA\SmartCook\Service\Import\IngredientParser;
 use OCA\SmartCook\Service\Import\FacebookDescriptionExtractor;
 use OCA\SmartCook\Service\Import\JsonLdRecipeExtractor;
@@ -49,6 +50,9 @@ $expectSame('2', $difficulty->normalize('Facile'), 'Easy difficulty');
 $expectSame('3', $difficulty->normalize('media'), 'Medium difficulty');
 $expectSame('4', $difficulty->normalize('Difficile'), 'Difficult difficulty');
 $expectSame('5', $difficulty->normalize('Molto difficile'), 'Very difficult difficulty');
+$refinementPrompt = (new AiPromptFactory())->refinement(['title' => 'Pasta', 'ingredients' => [['name' => 'Pasta']], 'steps' => []], 'it');
+$expect(str_contains($refinementPrompt, '"steps"'), 'AI refinement schema includes procedure proposal');
+$expect(str_contains($refinementPrompt, 'has no non-empty procedure'), 'AI refinement limits procedure generation to missing procedures');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');

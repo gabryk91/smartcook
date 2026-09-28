@@ -11,7 +11,7 @@ use OCA\SmartCook\Service\RecipeAccessService;
 use OCA\SmartCook\Service\RecipeService;
 
 final class RecipeRefinementService {
-    private const FIELDS = ['title', 'subtitle', 'description', 'author', 'sourceName', 'sourceUrl', 'difficulty', 'cuisine', 'mealType', 'cookingMethod', 'season', 'calories', 'nutrition', 'tools', 'tags', 'categories'];
+    private const FIELDS = ['title', 'subtitle', 'description', 'author', 'sourceName', 'sourceUrl', 'difficulty', 'cuisine', 'mealType', 'cookingMethod', 'season', 'calories', 'nutrition', 'steps', 'tools', 'tags', 'categories'];
     private const COLLECTION_FIELDS = ['tools', 'tags', 'categories'];
     private const CLEARABLE_FIELDS = ['cuisine', 'mealType', 'cookingMethod', 'season', 'tools', 'tags', 'categories'];
 
@@ -49,6 +49,9 @@ final class RecipeRefinementService {
         )));
         $proposal = [];
         foreach (self::FIELDS as $field) {
+            if ($field === 'steps' && (!$this->hasNoSteps($recipe['steps'] ?? null) || !$this->hasSteps($analysis['steps'] ?? null))) {
+                continue;
+            }
             if (in_array($field, $clearFields, true)) {
                 $clearedValue = in_array($field, self::COLLECTION_FIELDS, true) ? [] : null;
                 if ($this->valuesDiffer($recipe[$field] ?? null, $clearedValue, $field)) {
@@ -88,7 +91,27 @@ final class RecipeRefinementService {
         if ($field === 'nutrition') {
             return $this->normalizedStructure($value);
         }
+        if ($field === 'steps') {
+            return $this->normalizedStructure($value);
+        }
         return $this->normalizedText($value);
+    }
+
+    private function hasNoSteps(mixed $steps): bool {
+        return !$this->hasSteps($steps);
+    }
+
+    private function hasSteps(mixed $steps): bool {
+        if (!is_array($steps)) {
+            return false;
+        }
+        foreach ($steps as $step) {
+            $text = is_array($step) ? ($step['text'] ?? null) : $step;
+            if ($this->normalizedText($text) !== null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function normalizedStructure(mixed $value): mixed {
