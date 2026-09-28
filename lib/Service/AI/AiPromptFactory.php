@@ -13,15 +13,15 @@ final class AiPromptFactory {
     }
 
     /** @param array<string, mixed> $recipe */
-    public function refinement(array $recipe, string $language): string {
+    public function refinement(array $recipe, string $language, array $taxonomy = []): string {
         $recipeJson = json_encode($recipe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $schema = <<<'JSON'
 {"title":"string","subtitle":"string|null","description":"string|null","author":"string|null","sourceName":"string|null","sourceUrl":"string|null","cuisine":"string|null","mealType":"string|null","cookingMethod":"string|null","season":"string|null","calories":null,"nutrition":{},"tools":[{"name":"string"}],"tags":[{"name":"string"}],"categories":[{"name":"string"}],"addCover":false,"coverSuggestion":"string|null"}
 JSON;
-        return "Review this existing recipe and propose only high-confidence editorial and organizational improvements. Return only valid JSON, no Markdown or commentary. You may read ingredients and procedure to understand the recipe, but NEVER propose or modify them, their quantities, times, servings, yield, steps, media, notes, status, visibility, or planner settings. Do not invent facts; leave a field unchanged by returning its current value or null when no useful improvement can be made. Normalize classifications concisely. Estimate calories per serving only when it can be reasonably inferred. Set addCover true only when the recipe has no cover and a representative food photo is appropriate; coverSuggestion must be a short search description, never a URL. Output language: {$language}. Use exactly this shape:\n{$schema}\n\nRECIPE:\n{$recipeJson}";
+        return "Review this existing recipe and propose only high-confidence editorial and organizational improvements. Return only valid JSON, no Markdown or commentary. You may read ingredients and procedure to understand the recipe, but NEVER propose or modify them, their quantities, times, servings, yield, steps, media, notes, status, visibility, or planner settings. Do not invent facts; leave a field unchanged by returning its current value or null when no useful improvement can be made. " . $this->classificationInstruction($taxonomy) . " Estimate calories per serving only when it can be reasonably inferred. Set addCover true only when the recipe has no cover and a representative food photo is appropriate; coverSuggestion must be a short search description, never a URL. Output language: {$language}. Use exactly this shape:\n{$schema}\n\nRECIPE:\n{$recipeJson}";
     }
 
-    public function recipe(string $text, string $language): string {
+    public function recipe(string $text, string $language, array $taxonomy = []): string {
         $schema = <<<'JSON'
 {
   "title": "string",
@@ -53,7 +53,18 @@ JSON;
   "categories": [{"name":"string"}]
 }
 JSON;
-        return "Extract one cooking recipe from the source below. Return only one valid JSON object, with no Markdown and no commentary. Preserve facts for ingredients, quantities, times, source and tools; never invent those details. When the source explicitly offers an ingredient replacement, place it in that ingredient's alternatives array instead of making it a separate main ingredient. Also enrich the recipe with useful editorial suggestions when the source does not state them: choose a concise category, cuisine, cooking method, meal type and 2-5 useful tags; estimate calories per serving from the ingredients when possible. For coverSuggestion, provide a short, specific photo-search description of the finished dish (for example, 'overhead photo of creamy mushroom risotto in a white bowl'); do not provide a URL. These are suggestions to review, so prefer null only when a meaningful suggestion is impossible. The description must be a brief description of the finished recipe result, not a repetition or list of ingredients or procedure; return null if no suitable description can be derived. Times are integer minutes, timerSeconds are seconds. Split ingredients and procedure into ordered arrays. Normalize units while retaining originalText. Output language should be {$language}. Use this exact shape:\n{$schema}\n\nSOURCE:\n{$text}";
+        return "Extract one cooking recipe from the source below. Return only one valid JSON object, with no Markdown and no commentary. Preserve facts for ingredients, quantities, times, source and tools; never invent those details. When the source explicitly offers an ingredient replacement, place it in that ingredient's alternatives array instead of making it a separate main ingredient. Also enrich the recipe with useful editorial suggestions when the source does not state them. " . $this->classificationInstruction($taxonomy) . " Estimate calories per serving from the ingredients when possible. For coverSuggestion, provide a short, specific photo-search description of the finished dish (for example, 'overhead photo of creamy mushroom risotto in a white bowl'); do not provide a URL. These are suggestions to review, so prefer null only when a meaningful suggestion is impossible. The description must be a brief description of the finished recipe result, not a repetition or list of ingredients or procedure; return null if no suitable description can be derived. Times are integer minutes, timerSeconds are seconds. Split ingredients and procedure into ordered arrays. Normalize units while retaining originalText. Output language should be {$language}. Use this exact shape:\n{$schema}\n\nSOURCE:\n{$text}";
+    }
+
+    /** @param array<string, mixed> $taxonomy */
+    private function classificationInstruction(array $taxonomy): string {
+        $choices = [];
+        foreach (['tags', 'categories', 'cuisine', 'mealType', 'cookingMethod'] as $field) {
+            $names = array_values(array_filter(array_map(static fn (mixed $item): string => trim((string)(is_array($item) ? ($item['name'] ?? '') : $item)), (array)($taxonomy[$field] ?? []))));
+            $choices[$field] = $names;
+        }
+        $catalog = json_encode($choices, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return "For tags, categories, cuisine, mealType and cookingMethod, select ONLY exact labels from this existing SmartCook vocabulary: {$catalog}. Never invent, translate, rephrase, or create a new classification. If no listed value is appropriate, return null for single-value fields and [] for tags/categories. ";
     }
 
     /** @param list<array<string, mixed>> $recipes @param array<string, mixed> $preferences */

@@ -78,6 +78,13 @@ final class RecipeController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/recipes/delete')]
+    public function deleteSelected(): JSONResponse {
+        $recipeIds = $this->recipeIds();
+        return $this->respond(fn (): array => ['changed' => $this->recipes->deleteMany($recipeIds)]);
+    }
+
+    #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/recipes/{id}/favorite')]
     public function favorite(int $id): JSONResponse {
         return $this->respond(function () use ($id): array {

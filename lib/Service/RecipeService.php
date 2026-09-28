@@ -42,6 +42,16 @@ final class RecipeService {
         $this->recipes->deleteRecipe($id);
     }
 
+    /** @param list<int> $ids */
+    public function deleteMany(array $ids): int {
+        $recipeIds = array_values(array_unique(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0)));
+        foreach ($recipeIds as $id) {
+            $this->access->owned($id);
+        }
+        $this->recipes->deleteRecipes($recipeIds);
+        return count($recipeIds);
+    }
+
     public function setFavorite(int $id, bool $favorite): void {
         $this->access->editable($id);
         $this->recipes->setFavorite($id, $favorite);

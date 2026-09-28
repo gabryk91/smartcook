@@ -22,7 +22,7 @@ final class AiProviderRegistry {
     }
 
     /** @return array<string, mixed> */
-    public function extract(string $userId, string $text, string $language, ?string $providerOverride = null): array {
+    public function extract(string $userId, string $text, string $language, ?string $providerOverride = null, array $taxonomy = []): array {
         $config = $this->settings->ai($userId);
         $providerId = $providerOverride !== null && $providerOverride !== '' ? $providerOverride : (string)$config['provider'];
         if ($providerId === 'disabled') {
@@ -30,6 +30,7 @@ final class AiProviderRegistry {
         }
         $config['provider'] = $providerId;
         $config['userId'] = $userId;
+        $config['taxonomy'] = $taxonomy;
         foreach ($this->providers as $provider) {
             if ($provider->supports($providerId)) {
                 return $provider->extractRecipe($text, $language, $config);
@@ -56,7 +57,7 @@ final class AiProviderRegistry {
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refine(string $userId, array $recipe, string $language): array {
+    public function refine(string $userId, array $recipe, string $language, array $taxonomy = []): array {
         $config = $this->settings->ai($userId);
         $providerId = (string)$config['provider'];
         if ($providerId === 'disabled') {
@@ -64,6 +65,7 @@ final class AiProviderRegistry {
         }
         $config['userId'] = $userId;
         $config['refinement'] = $recipe;
+        $config['taxonomy'] = $taxonomy;
         foreach ($this->providers as $provider) {
             if ($provider->supports($providerId)) {
                 return $provider->extractRecipe('', $language, $config);

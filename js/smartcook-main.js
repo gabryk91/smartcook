@@ -109,6 +109,9 @@ const fallbackTranslations = {
         'Select recipes, then assign or remove values from the lists below. Deleting a value removes it from every recipe.': 'Seleziona le ricette, quindi assegna o rimuovi i valori dagli elenchi sottostanti. Eliminando un valore viene rimosso da ogni ricetta.',
         'Assign to selected': 'Assegna alle selezionate',
         'Remove from selected': 'Rimuovi dalle selezionate',
+        'Delete selected recipes': 'Elimina ricette selezionate',
+        'Delete the selected recipes? This cannot be undone.': 'Eliminare le ricette selezionate? L’operazione non può essere annullata.',
+        'recipes deleted': 'ricette eliminate',
         'Filter recipes with this value': 'Filtra ricette con questo valore',
         'Filtered by': 'Filtrate per',
         'Clear filter': 'Rimuovi filtro',
@@ -1183,6 +1186,13 @@ async function renderImport(view) {
     let savedPreviews = new Set();
 	let commonImportTag = '';
     let activeExternalJobId = null;
+	let taxonomy = {};
+	try {
+		taxonomy = await working(() => request('/taxonomy'));
+	}
+	catch (_) {
+		// The preview remains usable if taxonomy suggestions cannot be loaded.
+	}
     const setImportBusy = (active, title = tr('Importing recipe'), detail = tr('Please wait while the source is analyzed.')) => {
         const modal = view.querySelector('[data-import-loading]');
         if (modal) {
@@ -1210,7 +1220,7 @@ async function renderImport(view) {
 				catch (error) {
 					previews[index].warnings = [...(preview.warnings || []), `${tr('AI refinement')}: ${error instanceof Error ? error.message : tr('Unexpected error')}`];
 				}
-				holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
+				holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
 				bindImportSave(holder);
 			}
 		}
@@ -1227,7 +1237,7 @@ async function renderImport(view) {
 				<label class="check-inline ai-toggle"><input data-import-ai type="checkbox"><span><b>${esc(tr('Use AI refinement'))}</b><small>${esc(tr('Optional fallback for incomplete or unstructured sources'))}</small></span></label>
 				<button class="primary" data-extract type="button">${esc(tr('Extract recipe data'))}</button>
 			</article>
-			<article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews, commonImportTag)}</article>
+			<article class="panel preview-panel" data-import-preview>${importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy)}</article>
 		<div class="blocking-modal" data-import-loading hidden role="dialog" aria-modal="true" aria-labelledby="smartcook-import-loading-title"><div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-import-loading-title" data-import-loading-title>${esc(tr('Importing recipe'))}</h2><p data-import-loading-detail>${esc(tr('Please wait while the source is analyzed.'))}</p></div></div>`;
         view.querySelectorAll('[data-import-kind]').forEach(button => button.addEventListener('click', () => { kind = button.dataset.importKind; previews = []; savedPreviews = new Set(); activeExternalJobId = null; paint(); }));
         const loadInbox = async () => {
@@ -1267,7 +1277,7 @@ async function renderImport(view) {
                     savedPreviews = new Set();
                     activeExternalJobId = job.id;
                     const previewHolder = view.querySelector('[data-import-preview]');
-                    previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
+                    previewHolder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
                     bindImportSave(previewHolder);
                     previewHolder.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }));
@@ -1336,7 +1346,7 @@ async function renderImport(view) {
             }
             showNotice(previews.length > 1 ? `${previews.length} ${tr('recipes extracted. Review them before saving.')}` : tr('Recipe data extracted. Review it before saving.'));
             const holder = view.querySelector('[data-import-preview]');
-            holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
+            holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
             bindImportSave(holder);
 			if (useAi)
 				await refinePreviews(holder, language, provider);
@@ -1409,7 +1419,7 @@ async function renderImport(view) {
             }
             if (failedRecipes.length) {
                 showNotice(`${tr('Some recipes could not be saved')}: ${failedRecipes.join('; ')}`, 'error');
-                holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag);
+                holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
                 bindImportSave(holder);
                 return;
             }
@@ -1454,11 +1464,15 @@ function previewIngredients(value) {
 function previewSteps(value) {
 	return String(value || '').split(/\r?\n/).map(text => text.trim()).filter(Boolean).map(text => ({ text }));
 }
-function importPreviewsHtml(previews, savedPreviews, commonImportTag = '') {
+function importTaxonomyOptions(items = []) {
+	return (items || []).map(item => String(item?.name || item || '').trim()).filter(Boolean).map(name => `<option value="${attr(name)}"></option>`).join('');
+}
+function importPreviewsHtml(previews, savedPreviews, commonImportTag = '', taxonomy = {}) {
     if (!previews.length)
         return `<div class="empty-preview"><div>${fa('file-lines')}</div><h2>${esc(tr('Preview appears here'))}</h2><p>${esc(tr('The source is never saved as a recipe until you review and confirm the extracted fields.'))}</p></div>`;
     const pending = previews.length - savedPreviews.size;
-    return `<div class="section-heading"><div><p class="eyebrow">${previews.length} ${esc(tr('recipes extracted. Review them before saving.'))}</p><h2>${esc(tr('Import previews'))}</h2></div><button class="primary" data-save-all-import type="button">${esc(pending ? tr('Save all recipes') : tr('View recipes'))}</button></div>${previews.length > 1 ? `<nav class="import-preview-index" aria-label="${attr(tr('Choose a recipe to review'))}"><strong>${esc(tr('Choose a recipe to review'))}</strong><div>${previews.map((item, index) => `<button class="secondary" data-open-import-preview="${index}" type="button">${index + 1}. ${esc(item.recipe.title || tr('Import preview'))}</button>`).join('')}</div></nav><label class="import-common-tag">${esc(tr('Apply this tag to every imported recipe'))}<input data-import-common-tag value="${attr(commonImportTag)}" autocomplete="new-password"></label>` : ''}${previews.map((item, index) => importPreviewHtml(item, savedPreviews.has(index), index)).join('')}`;
+    const lists = `<datalist id="smartcook-import-tags">${importTaxonomyOptions(taxonomy.tags)}</datalist><datalist id="smartcook-import-categories">${importTaxonomyOptions(taxonomy.categories)}</datalist><datalist id="smartcook-import-cuisine">${importTaxonomyOptions(taxonomy.cuisine)}</datalist><datalist id="smartcook-import-meal-type">${importTaxonomyOptions(taxonomy.mealType)}</datalist><datalist id="smartcook-import-cooking-method">${importTaxonomyOptions(taxonomy.cookingMethod)}</datalist>`;
+    return `${lists}<div class="section-heading"><div><p class="eyebrow">${previews.length} ${esc(tr('recipes extracted. Review them before saving.'))}</p><h2>${esc(tr('Import previews'))}</h2></div><button class="primary" data-save-all-import type="button">${esc(pending ? tr('Save all recipes') : tr('View recipes'))}</button></div>${previews.length > 1 ? `<nav class="import-preview-index" aria-label="${attr(tr('Choose a recipe to review'))}"><strong>${esc(tr('Choose a recipe to review'))}</strong><div>${previews.map((item, index) => `<button class="secondary" data-open-import-preview="${index}" type="button">${index + 1}. ${esc(item.recipe.title || tr('Import preview'))}</button>`).join('')}</div></nav><label class="import-common-tag">${esc(tr('Apply this tag to every imported recipe'))}<input data-import-common-tag value="${attr(commonImportTag)}" list="smartcook-import-tags" autocomplete="new-password"></label>` : ''}${previews.map((item, index) => importPreviewHtml(item, savedPreviews.has(index), index)).join('')}`;
 }
 function importPreviewHtml(preview, saved = false, index = 0) {
     const recipe = preview.recipe;
@@ -1480,7 +1494,7 @@ function importPreviewHtml(preview, saved = false, index = 0) {
 		${preview.warnings.length ? `<div class="warning-list">${preview.warnings.map(warning => `<p>${esc(warning)}</p>`).join('')}</div>` : ''}
 		${coverImage ? `<img class="import-cover-preview" src="${attr(coverImage)}" alt="">` : ''}
 		<label>${esc(tr('Title'))}<input data-preview-title value="${attr(recipe.title)}"></label><label>${esc(tr('Description'))}<textarea data-preview-description rows="3">${esc(recipe.description)}</textarea></label>
-		<div class="form-grid import-preview-fields"><label>${esc(tr('Tags'))}<input data-preview-tags value="${attr(tags.join(', '))}" autocomplete="new-password"></label><label>${esc(tr('Categories'))}<input data-preview-categories value="${attr(categories.join(', '))}" autocomplete="new-password"></label><label>${esc(tr('Cuisine'))}<input data-preview-cuisine value="${attr(recipe.cuisine)}"></label><label>${esc(tr('Meal type'))}<input data-preview-meal-type value="${attr(recipe.mealType)}"></label><label class="span-2">${esc(tr('Cooking method'))}<input data-preview-cooking-method value="${attr(recipe.cookingMethod)}"></label></div>
+		<div class="form-grid import-preview-fields"><label>${esc(tr('Tags'))}<input data-preview-tags value="${attr(tags.join(', '))}" list="smartcook-import-tags" autocomplete="new-password"></label><label>${esc(tr('Categories'))}<input data-preview-categories value="${attr(categories.join(', '))}" list="smartcook-import-categories" autocomplete="new-password"></label><label>${esc(tr('Cuisine'))}<input data-preview-cuisine value="${attr(recipe.cuisine)}" list="smartcook-import-cuisine"></label><label>${esc(tr('Meal type'))}<input data-preview-meal-type value="${attr(recipe.mealType)}" list="smartcook-import-meal-type"></label><label class="span-2">${esc(tr('Cooking method'))}<input data-preview-cooking-method value="${attr(recipe.cookingMethod)}" list="smartcook-import-cooking-method"></label></div>
 		<div class="preview-metrics"><span>${recipe.servings} ${esc(tr('servings'))}</span><span>${recipe.prepTime} min ${esc(tr('prep'))}</span><span>${recipe.cookTime} min ${esc(tr('cook'))}</span><span>${recipe.totalTime} min ${esc(tr('total'))}</span></div>
 		${classification.length ? `<section class="import-classification"><h3>${esc(tr('Imported classification'))}</h3><dl>${classification.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></section>` : ''}
 		${recipe.coverSuggestion ? `<section class="import-cover-suggestion"><span aria-hidden="true">${fa('wand-magic-sparkles')}</span><div><strong>${esc(tr('Suggested cover photo'))}</strong><p>${esc(recipe.coverSuggestion)}</p><small>${esc(tr('AI suggestion'))}</small></div></section>` : ''}
@@ -1734,7 +1748,7 @@ async function renderAdministration(view) {
     const recipeSelector = () => {
         const visibleRecipes = filteredRecipes();
         const selectedLabel = `${selectedRecipeIds.size} ${tr('recipes selected')}`;
-        return `<section class="panel taxonomy-recipe-selector"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Select recipes'))}</p><h2>${esc(tr('Recipe'))}</h2></div><span class="taxonomy-selection-summary"><strong>${esc(selectedLabel)}</strong><button class="ghost icon-button taxonomy-clear-filters" data-clear-recipe-filters type="button" aria-label="${attr(tr('Clear filters'))}" title="${attr(tr('Clear filters'))}">${fa('xmark')}</button></span></div><div class="toolbar taxonomy-admin-toolbar"><label class="search-field"><span>${fa('magnifying-glass')}</span><input data-admin-recipe-search value="${attr(recipeFilter)}" placeholder="${attr(tr('Filter recipes...'))}"></label><div class="taxonomy-filter">${taxonomyPicker('categories', taxonomy.categories || [], selectedCategories)}</div><div class="taxonomy-filter">${taxonomyPicker('tags', taxonomy.tags || [], selectedTags)}</div></div>${selectedTaxonomyValue ? `<p class="section-help">${esc(tr('Filtered by'))}: <strong>${esc(labels[selectedTaxonomyValue.kind])}: ${esc(selectedTaxonomyValue.name)}</strong> <button class="ghost" data-clear-taxonomy-filter type="button">${esc(tr('Clear filter'))}</button></p>` : ''}<label class="check-inline taxonomy-select-all"><input data-admin-select-all type="checkbox"${visibleRecipes.length > 0 && visibleRecipes.every(recipe => selectedRecipeIds.has(recipe.id)) ? ' checked' : ''}> ${esc(tr('Select filtered recipes'))}</label><div class="taxonomy-recipe-list">${visibleRecipes.map(recipe => `<label><input data-admin-recipe-id="${recipe.id}" type="checkbox"${selectedRecipeIds.has(recipe.id) ? ' checked' : ''}><span><strong>${esc(recipe.title)}</strong>${recipe.cuisine ? `<small>${esc(recipe.cuisine)}</small>` : ''}</span></label>`).join('') || `<p class="section-help">${esc(tr('No recipes found'))}</p>`}</div></section>`;
+        return `<section class="panel taxonomy-recipe-selector"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Select recipes'))}</p><h2>${esc(tr('Recipe'))}</h2></div><span class="taxonomy-selection-summary"><strong>${esc(selectedLabel)}</strong><button class="ghost icon-button taxonomy-clear-filters" data-clear-recipe-filters type="button" aria-label="${attr(tr('Clear filters'))}" title="${attr(tr('Clear filters'))}">${fa('xmark')}</button></span></div><div class="toolbar taxonomy-admin-toolbar"><label class="search-field"><span>${fa('magnifying-glass')}</span><input data-admin-recipe-search value="${attr(recipeFilter)}" placeholder="${attr(tr('Filter recipes...'))}"></label><div class="taxonomy-filter">${taxonomyPicker('categories', taxonomy.categories || [], selectedCategories)}</div><div class="taxonomy-filter">${taxonomyPicker('tags', taxonomy.tags || [], selectedTags)}</div><button class="danger ghost" data-delete-selected-recipes type="button"${selectedRecipeIds.size ? '' : ' disabled'}>${esc(tr('Delete selected recipes'))}</button></div>${selectedTaxonomyValue ? `<p class="section-help">${esc(tr('Filtered by'))}: <strong>${esc(labels[selectedTaxonomyValue.kind])}: ${esc(selectedTaxonomyValue.name)}</strong> <button class="ghost" data-clear-taxonomy-filter type="button">${esc(tr('Clear filter'))}</button></p>` : ''}<label class="check-inline taxonomy-select-all"><input data-admin-select-all type="checkbox"${visibleRecipes.length > 0 && visibleRecipes.every(recipe => selectedRecipeIds.has(recipe.id)) ? ' checked' : ''}> ${esc(tr('Select filtered recipes'))}</label><div class="taxonomy-recipe-list">${visibleRecipes.map(recipe => `<label><input data-admin-recipe-id="${recipe.id}" type="checkbox"${selectedRecipeIds.has(recipe.id) ? ' checked' : ''}><span><strong>${esc(recipe.title)}</strong>${recipe.cuisine ? `<small>${esc(recipe.cuisine)}</small>` : ''}</span></label>`).join('') || `<p class="section-help">${esc(tr('No recipes found'))}</p>`}</div></section>`;
     };
     const bindRecipeSelector = () => {
         view.querySelector('[data-admin-recipe-search]')?.addEventListener('input', event => { recipeFilter = event.target.value; render(); });
@@ -1900,6 +1914,14 @@ async function renderAdministration(view) {
         view.querySelector('[data-admin-select-all]')?.addEventListener('change', event => {
             visibleRecipes.forEach(recipe => event.target.checked ? selectedRecipeIds.add(recipe.id) : selectedRecipeIds.delete(recipe.id));
             render();
+        });
+        view.querySelector('[data-delete-selected-recipes]')?.addEventListener('click', async () => {
+            const recipeIds = [...selectedRecipeIds];
+            if (!recipeIds.length || !window.confirm(tr('Delete the selected recipes? This cannot be undone.'))) return;
+            const response = await working(() => request('/recipes/delete', { method: 'POST', json: { recipeIds } }));
+            showNotice(`${asNumber(response.changed)} ${tr('recipes deleted')}`);
+            selectedRecipeIds.clear();
+            await load();
         });
         view.querySelectorAll('[data-taxonomy-add]').forEach(form => form.addEventListener('submit', async event => {
             event.preventDefault();

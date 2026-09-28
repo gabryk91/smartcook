@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\SmartCook\Service\AI;
 
 use OCA\SmartCook\Exception\ValidationException;
+use OCA\SmartCook\Db\TaxonomyRepository;
 use OCA\SmartCook\Service\CoverImageSearchService;
 use OCA\SmartCook\Service\RecipeAccessService;
 use OCA\SmartCook\Service\RecipeService;
@@ -17,6 +18,7 @@ final class RecipeRefinementService {
         private RecipeAccessService $access,
         private RecipeService $recipes,
         private CoverImageSearchService $covers,
+        private TaxonomyRepository $taxonomy,
     ) {
     }
 
@@ -36,7 +38,9 @@ final class RecipeRefinementService {
     /** @return array<string, mixed> */
     public function analyzeOne(int $id): array {
         $recipe = $this->access->editable($id);
-        $analysis = $this->ai->refine((string)$recipe['ownerId'], $recipe, (string)($recipe['language'] ?? 'it'));
+        $taxonomy = $this->taxonomy->listForUser((string)$recipe['ownerId']);
+        $analysis = $this->ai->refine((string)$recipe['ownerId'], $recipe, (string)($recipe['language'] ?? 'it'), $taxonomy);
+        $analysis = $this->taxonomy->restrictRecipeClassifications($analysis, $taxonomy);
         $proposal = [];
         foreach (self::FIELDS as $field) {
             if (array_key_exists($field, $analysis) && $analysis[$field] !== null && $this->valuesDiffer($recipe[$field] ?? null, $analysis[$field], $field)) {

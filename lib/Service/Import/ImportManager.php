@@ -6,6 +6,7 @@ namespace OCA\SmartCook\Service\Import;
 
 use OCA\SmartCook\BackgroundJob\ProcessImportJob;
 use OCA\SmartCook\Db\ImportRepository;
+use OCA\SmartCook\Db\TaxonomyRepository;
 use OCA\SmartCook\Exception\ImportException;
 use OCA\SmartCook\Service\AI\AiProviderRegistry;
 use OCA\SmartCook\Service\DuplicateService;
@@ -30,6 +31,7 @@ final class ImportManager {
         private RecipeValidator $validator,
         private DuplicateService $duplicates,
         private SettingsService $settings,
+        private TaxonomyRepository $taxonomy,
         private ImportRepository $jobs,
         private IJobList $jobList,
     ) {
@@ -63,6 +65,7 @@ final class ImportManager {
         $recipe = $result->recipe;
         $strategy = $result->strategy;
         $warnings = $result->warnings;
+        $taxonomy = $this->taxonomy->listForUser($userId);
 
         if ($useAi) {
             try {
@@ -71,8 +74,10 @@ final class ImportManager {
                     mb_substr($result->sourceText, 0, 120000),
                     (string)($payload['language'] ?? $recipe['language'] ?? 'en'),
                     $provider,
+                    $taxonomy,
                 );
                 $aiRecipe = $this->normalizer->normalize($aiRecipe, $recipe['sourceUrl'] ?? null);
+                $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
                 $recipe = $this->merge($aiRecipe, $recipe);
                 $strategy .= '+ai';
             } catch (\Throwable $e) {
@@ -80,6 +85,7 @@ final class ImportManager {
             }
         }
 
+        $recipe = $this->taxonomy->canonicalizeRecipeClassifications($recipe, $taxonomy);
         $recipe = $this->validator->validate($recipe);
         return [
             'recipe' => $recipe,
@@ -96,9 +102,10 @@ final class ImportManager {
         if ($recipe === []) {
             throw new ImportException('No recipe preview was provided');
         }
-        $aiRecipe = $this->ai->extract($userId, mb_substr($this->recipeSource($recipe), 0, 120000), $language, $provider);
+        $aiRecipe = $this->ai->extract($userId, mb_substr($this->recipeSource($recipe), 0, 120000), $language, $provider, $this->taxonomy->listForUser($userId));
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
-        return $this->validator->validate($this->merge($aiRecipe, $recipe));
+        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $this->taxonomy->listForUser($userId));
+        return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $this->taxonomy->listForUser($userId)));
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */

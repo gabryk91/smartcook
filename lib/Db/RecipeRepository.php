@@ -204,13 +204,23 @@ final class RecipeRepository extends AbstractRepository {
     }
 
     public function deleteRecipe(int $id): void {
+        $this->deleteRecipes([$id]);
+    }
+
+    /** @param list<int> $ids */
+    public function deleteRecipes(array $ids): void {
+        if ($ids === []) {
+            return;
+        }
         $this->db->beginTransaction();
         try {
-            $this->taxonomy->deleteRecipeRelations($id);
-            foreach (['smartcook_steps', 'smartcook_media', 'smartcook_versions', 'smartcook_shares', 'smartcook_meals'] as $table) {
-                $this->deleteBy($table, 'recipe_id', $id);
+            foreach ($ids as $id) {
+                $this->taxonomy->deleteRecipeRelations($id);
+                foreach (['smartcook_steps', 'smartcook_media', 'smartcook_versions', 'smartcook_shares', 'smartcook_meals'] as $table) {
+                    $this->deleteBy($table, 'recipe_id', $id);
+                }
+                $this->deleteBy('smartcook_recipes', 'id', $id);
             }
-            $this->deleteBy('smartcook_recipes', 'id', $id);
             $this->db->commit();
         } catch (\Throwable $e) {
             $this->db->rollBack();

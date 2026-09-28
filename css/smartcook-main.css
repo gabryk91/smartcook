@@ -4296,6 +4296,28 @@ select:focus {
 		flex-direction: column;
 	}
 
+	.import-preview-card > summary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 8px 12px;
+	}
+
+	.import-preview-card > summary > div {
+		grid-column: 1 / -1;
+		min-width: 0;
+	}
+
+	.import-preview-card > summary::after {
+		grid-column: 2;
+		grid-row: 2;
+	}
+
+	.import-preview-summary {
+		grid-column: 1;
+		grid-row: 2;
+		white-space: normal;
+	}
+
 	[data-external-import-inbox] {
 		padding: 16px;
 	}

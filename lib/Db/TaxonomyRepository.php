@@ -144,6 +144,76 @@ final class TaxonomyRepository extends AbstractRepository {
         return $items;
     }
 
+    /**
+     * Keeps only classifications already present in the user's vocabulary and
+     * returns their stored spelling. This is intentionally strict: an AI
+     * suggestion must be an existing label, while manual import review can
+     * still add a genuinely missing value.
+     *
+     * @param array<string, mixed> $recipe
+     * @param array<string, mixed> $taxonomy
+     * @return array<string, mixed>
+     */
+    public function restrictRecipeClassifications(array $recipe, array $taxonomy): array {
+        foreach (['tags', 'categories', 'cuisine', 'mealType', 'cookingMethod'] as $field) {
+            $available = [];
+            foreach ((array)($taxonomy[$field] ?? []) as $item) {
+                $name = trim((string)(is_array($item) ? ($item['name'] ?? '') : $item));
+                $normalized = $this->normalizer->normalizeName($name);
+                if ($normalized !== '') {
+                    $available[$normalized] = $name;
+                }
+            }
+            if (in_array($field, ['tags', 'categories'], true)) {
+                $items = [];
+                foreach ((array)($recipe[$field] ?? []) as $item) {
+                    $name = trim((string)(is_array($item) ? ($item['name'] ?? '') : $item));
+                    $normalized = $this->normalizer->normalizeName($name);
+                    if ($normalized !== '' && isset($available[$normalized])) {
+                        $items[$normalized] = ['name' => $available[$normalized]];
+                    }
+                }
+                $recipe[$field] = array_values($items);
+                continue;
+            }
+            $name = trim((string)($recipe[$field] ?? ''));
+            $normalized = $this->normalizer->normalizeName($name);
+            $recipe[$field] = $normalized !== '' && isset($available[$normalized]) ? $available[$normalized] : null;
+        }
+        return $recipe;
+    }
+
+    /** @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed> */
+    public function canonicalizeRecipeClassifications(array $recipe, array $taxonomy): array {
+        foreach (['tags', 'categories', 'cuisine', 'mealType', 'cookingMethod'] as $field) {
+            $available = [];
+            foreach ((array)($taxonomy[$field] ?? []) as $item) {
+                $name = trim((string)(is_array($item) ? ($item['name'] ?? '') : $item));
+                $normalized = $this->normalizer->normalizeName($name);
+                if ($normalized !== '') {
+                    $available[$normalized] = $name;
+                    $available[$this->classificationKey($normalized)] = $name;
+                }
+            }
+            $canonical = fn (string $name): string => $available[$this->normalizer->normalizeName($name)] ?? $available[$this->classificationKey($this->normalizer->normalizeName($name))] ?? $name;
+            if (in_array($field, ['tags', 'categories'], true)) {
+                $recipe[$field] = array_map(static fn (mixed $item): array => ['name' => $canonical(trim((string)(is_array($item) ? ($item['name'] ?? '') : $item)))], (array)($recipe[$field] ?? []));
+            } else {
+                $value = trim((string)($recipe[$field] ?? ''));
+                $recipe[$field] = $value === '' ? null : $canonical($value);
+            }
+        }
+        return $recipe;
+    }
+
+    private function classificationKey(string $normalized): string {
+        return match ($normalized) {
+            'forno', 'al forno', 'baked', 'oven baked' => 'al forno',
+            'gluten free', 'senza glutine', 'celiaci', 'celiaco' => 'senza glutine',
+            default => $normalized,
+        };
+    }
+
     /** @return array<string, list<array<string, mixed>>> */
     public function listManagedForUser(string $userId): array {
         $items = $this->listForUser($userId);
