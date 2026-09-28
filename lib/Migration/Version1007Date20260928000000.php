@@ -6,13 +6,14 @@ namespace OCA\SmartCook\Migration;
 
 use Closure;
 use OCA\SmartCook\Service\DifficultyNormalizer;
+use OCP\IDBConnection;
 use OCP\DB\IQueryBuilder;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 final class Version1007Date20260928000000 extends SimpleMigrationStep {
     public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-        $db = \OC::$server->getDatabaseConnection();
+        $db = \OC::$server->get(IDBConnection::class);
         $select = $db->getQueryBuilder();
         $select->select('id', 'difficulty')->from('smartcook_recipes')
             ->where($select->expr()->isNotNull('difficulty'));
