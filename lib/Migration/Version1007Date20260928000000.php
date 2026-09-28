@@ -7,7 +7,7 @@ namespace OCA\SmartCook\Migration;
 use Closure;
 use OCA\SmartCook\Service\DifficultyNormalizer;
 use OCP\IDBConnection;
-use OCP\DB\IQueryBuilder;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
