@@ -12,7 +12,7 @@ use OCP\Migration\SimpleMigrationStep;
 
 final class Version1007Date20260928000000 extends SimpleMigrationStep {
     public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-        $db = $this->getDBConnection();
+        $db = \OC::$server->getDatabaseConnection();
         $select = $db->getQueryBuilder();
         $select->select('id', 'difficulty')->from('smartcook_recipes')
             ->where($select->expr()->isNotNull('difficulty'));
