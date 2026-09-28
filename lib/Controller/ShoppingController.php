@@ -43,6 +43,15 @@ final class ShoppingController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/shopping/{id}/recipes')]
+    public function addRecipes(int $id): JSONResponse {
+        return $this->respond(function () use ($id): array {
+            $selections = $this->request->getParam('recipes', []);
+            return ['list' => $this->shopping->addRecipes($id, is_array($selections) ? $selections : [])];
+        });
+    }
+
+    #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/shopping/{id}/items')]
     public function addItem(int $id): JSONResponse {
         return $this->respond(fn (): array => ['item' => $this->shopping->addItem($id, $this->payload('item'))], Http::STATUS_CREATED);

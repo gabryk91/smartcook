@@ -27,8 +27,13 @@ const fallbackTranslations = {
         'Could not copy the link': 'Impossibile copiare il link',
         'Add to today\'s plan': 'Aggiungi al piano di oggi',
         'Add to shopping list': 'Aggiungi alla lista della spesa',
+        'Choose where to add this recipe or create a new list.': 'Scegli dove aggiungere questa ricetta oppure crea una nuova lista.',
+        'Create a new list': 'Crea una nuova lista',
+        'Add to selected list': 'Aggiungi alla lista selezionata',
+        'Recipe added to shopping list': 'Ricetta aggiunta alla lista della spesa',
         'Generate one from your recipes': 'Generane una dalle tue ricette',
         'No items yet': 'Nessun articolo',
+        Items: 'Elementi',
         of: 'di',
         completed: 'completati',
         Completed: 'Completata',
@@ -827,6 +832,48 @@ function chooseCoverCandidate(recipeId, initialQuery, candidates) {
         modal.querySelector('[data-cover-search-query]')?.focus();
     });
 }
+function chooseShoppingList(recipe, lists) {
+    return new Promise(resolve => {
+        const modal = document.createElement('div');
+        modal.className = 'cover-picker-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'smartcook-shopping-list-title');
+        const close = (selection = null) => {
+            document.removeEventListener('keydown', onKeyDown);
+            modal.remove();
+            resolve(selection);
+        };
+        const onKeyDown = event => {
+            if (event.key === 'Escape')
+                close();
+        };
+        const listChoices = (lists || []).map(list => `<label class="check-inline shopping-list-choice"><input data-shopping-list-choice type="radio" name="smartcook-shopping-list" value="${asNumber(list.id)}"><span><strong>${esc(list.name)}</strong><small>${asNumber(list.itemCount)} ${esc(tr('Items'))}</small></span></label>`).join('');
+        modal.innerHTML = `<div class="cover-picker-card shopping-list-picker"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Shopping list'))}</p><h2 id="smartcook-shopping-list-title">${esc(tr('Select or create a list'))}</h2><p class="section-help">${esc(tr('Choose where to add this recipe or create a new list.'))}</p></div><button class="icon-button" data-close-shopping-list-picker type="button" aria-label="${attr(tr('Close'))}">${fa('xmark')}</button></div><div class="shopping-list-choices">${listChoices}<label class="check-inline shopping-list-choice"><input data-shopping-list-choice type="radio" name="smartcook-shopping-list" value="new" checked><span><strong>${esc(tr('Create a new list'))}</strong><small>${esc(recipe.title)}</small></span></label></div><label class="shopping-list-name">${esc(tr('List name'))}<input data-new-shopping-list-name value="${attr(`${tr('Shopping list')}: ${recipe.title}`)}"></label><div class="button-row"><button class="primary" data-confirm-shopping-list type="button">${esc(tr('Add to selected list'))}</button><button class="ghost" data-close-shopping-list-picker type="button">${esc(tr('Cancel'))}</button></div></div>`;
+        modal.querySelectorAll('[data-close-shopping-list-picker]').forEach(button => button.addEventListener('click', () => close()));
+        const updateNameField = () => {
+            const input = modal.querySelector('[data-new-shopping-list-name]');
+            if (input)
+                input.disabled = modal.querySelector('[data-shopping-list-choice]:checked')?.value !== 'new';
+        };
+        modal.querySelectorAll('[data-shopping-list-choice]').forEach(input => input.addEventListener('change', updateNameField));
+        updateNameField();
+        modal.querySelector('[data-confirm-shopping-list]')?.addEventListener('click', () => {
+            const selected = modal.querySelector('[data-shopping-list-choice]:checked')?.value;
+            if (selected === 'new') {
+                close({ name: modal.querySelector('[data-new-shopping-list-name]')?.value.trim() || `${tr('Shopping list')}: ${recipe.title}` });
+                return;
+            }
+            const listId = asNumber(selected);
+            if (listId > 0)
+                close({ listId });
+        });
+        modal.addEventListener('click', event => { if (event.target === modal) close(); });
+        document.body.append(modal);
+        document.addEventListener('keydown', onKeyDown);
+        modal.querySelector('[data-new-shopping-list-name]')?.focus();
+    });
+}
 async function renderRecipe(view, id) {
     const recipe = (await working(() => request(`/recipes/${id}`))).recipe;
     view.innerHTML = recipeViewer(recipe);
@@ -844,7 +891,17 @@ async function renderRecipe(view, id) {
         showNotice(tr('Meal added'));
     });
     view.querySelector('[data-add-to-shopping]')?.addEventListener('click', async () => {
-        await working(() => request('/shopping', { method: 'POST', json: { name: `${tr('Shopping list')}: ${recipe.title}`, recipes: [{ recipeId: recipe.id, servings: Math.max(1, asNumber(recipe.servings, 1)) }] } }));
+        const lists = (await working(() => request('/shopping'))).lists;
+        const selection = await chooseShoppingList(recipe, lists);
+        if (!selection)
+            return;
+        const recipes = [{ recipeId: recipe.id, servings: Math.max(1, asNumber(recipe.servings, 1)) }];
+        if (selection.listId) {
+            await working(() => request(`/shopping/${selection.listId}/recipes`, { method: 'POST', json: { recipes } }));
+            showNotice(tr('Recipe added to shopping list'));
+            return;
+        }
+        await working(() => request('/shopping', { method: 'POST', json: { name: selection.name, recipes } }));
         showNotice(tr('Shopping list created'));
     });
     view.querySelector('[data-refine-recipe]')?.addEventListener('click', async () => {

@@ -3504,6 +3504,27 @@ select:focus {
 	align-items: center;
 }
 
+.shopping-list-picker {
+	width: min(560px, 100%);
+}
+
+.shopping-list-choices {
+	display: grid;
+	gap: 8px;
+	margin-block: 20px;
+}
+
+.shopping-list-choice {
+	padding: 12px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: var(--smartcook-radius);
+}
+
+.shopping-list-name {
+	display: grid;
+	gap: 8px;
+}
+
 .cover-picker-search {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;

@@ -27,6 +27,16 @@ final class ShoppingService {
 
     /** @param list<array{recipeId:int,servings?:int}> $selections @return array<string, mixed> */
     public function fromRecipes(string $name, array $selections): array {
+        return $this->shopping->createList($this->userContext->userId(), $name, $this->ingredientsFromRecipes($selections), ['recipes' => $selections]);
+    }
+
+    /** @param list<array{recipeId:int,servings?:int}> $selections @return array<string, mixed> */
+    public function addRecipes(int $listId, array $selections): array {
+        return $this->shopping->addItems($listId, $this->userContext->userId(), $this->ingredientsFromRecipes($selections));
+    }
+
+    /** @param list<array{recipeId:int,servings?:int}> $selections @return list<array<string, mixed>> */
+    private function ingredientsFromRecipes(array $selections): array {
         $aggregated = [];
         foreach ($selections as $selection) {
             $recipe = $this->access->readable((int)$selection['recipeId']);
@@ -67,7 +77,7 @@ final class ShoppingService {
             }
         }
         unset($item);
-        return $this->shopping->createList($this->userContext->userId(), $name, array_values($aggregated), ['recipes' => $selections]);
+        return array_values($aggregated);
     }
 
     /** @return array<string, mixed> */

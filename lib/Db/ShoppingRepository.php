@@ -139,6 +139,35 @@ final class ShoppingRepository extends AbstractRepository {
         return $this->findItem($listId, $id) ?? throw new \RuntimeException('Shopping item could not be reloaded');
     }
 
+    /** @param list<array<string, mixed>> $items */
+    public function addItems(int $listId, string $userId, array $items): array {
+        $list = $this->getList($listId, $userId) ?? throw new \RuntimeException('Shopping list not found');
+        $this->db->beginTransaction();
+        try {
+            foreach (array_values($items) as $index => $item) {
+                $this->insert('smartcook_shop_items', [
+                    'list_id' => $listId,
+                    'name' => trim((string)$item['name']),
+                    'norm_name' => trim((string)($item['normalizedName'] ?? mb_strtolower((string)$item['name']))),
+                    'quantity' => $this->nullString($item['quantity'] ?? null),
+                    'amount' => isset($item['amount']) && $item['amount'] !== null ? (string)$item['amount'] : null,
+                    'unit' => $this->nullString($item['unit'] ?? null),
+                    'category' => $this->nullString($item['category'] ?? null),
+                    'checked' => false,
+                    'notes' => $this->nullString($item['notes'] ?? null),
+                    'sort_order' => count($list['items']) + $index,
+                ]);
+            }
+            $this->update('smartcook_shop_lists', $listId, ['updated_at' => time()]);
+            $updated = $this->getList($listId, $userId) ?? throw new \RuntimeException('Shopping list could not be reloaded');
+            $this->db->commit();
+            return $updated;
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
     public function deleteList(int $id, string $userId): void {
         if ($this->getList($id, $userId) === null) {
             return;
