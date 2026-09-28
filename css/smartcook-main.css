@@ -1222,8 +1222,13 @@ select:focus {
 }
 
 .card-meta-difficulty {
-	color: #1a8a4c;
+	color: var(--smartcook-accent);
 	font-weight: 650;
+}
+
+.card-meta-difficulty > span {
+	display: inline-flex;
+	gap: 2px;
 }
 
 .card-footer {

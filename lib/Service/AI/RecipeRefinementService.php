@@ -11,7 +11,7 @@ use OCA\SmartCook\Service\RecipeAccessService;
 use OCA\SmartCook\Service\RecipeService;
 
 final class RecipeRefinementService {
-    private const FIELDS = ['title', 'subtitle', 'description', 'author', 'sourceName', 'sourceUrl', 'cuisine', 'mealType', 'cookingMethod', 'season', 'calories', 'nutrition', 'tools', 'tags', 'categories'];
+    private const FIELDS = ['title', 'subtitle', 'description', 'author', 'sourceName', 'sourceUrl', 'difficulty', 'cuisine', 'mealType', 'cookingMethod', 'season', 'calories', 'nutrition', 'tools', 'tags', 'categories'];
     private const COLLECTION_FIELDS = ['tools', 'tags', 'categories'];
     private const CLEARABLE_FIELDS = ['cuisine', 'mealType', 'cookingMethod', 'season', 'tools', 'tags', 'categories'];
 

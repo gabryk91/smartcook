@@ -8,6 +8,7 @@ use OCA\SmartCook\Service\AI\AiJsonParser;
 use OCA\SmartCook\Service\Import\IngredientParser;
 use OCA\SmartCook\Service\Import\JsonLdRecipeExtractor;
 use OCA\SmartCook\Service\Import\RecipeNormalizer;
+use OCA\SmartCook\Service\DifficultyNormalizer;
 use OCA\SmartCook\Service\TextNormalizer;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ final class StructuredImportTest extends TestCase {
         $data = (new JsonLdRecipeExtractor())->extract($html);
         self::assertIsArray($data);
         $text = new TextNormalizer();
-        $recipe = (new RecipeNormalizer(new IngredientParser($text), $text))->normalize($data, 'https://example.test/r/pane');
+        $recipe = (new RecipeNormalizer(new IngredientParser($text), $text, new DifficultyNormalizer()))->normalize($data, 'https://example.test/r/pane');
         self::assertSame('Pane', $recipe['title']);
         self::assertSame('https://example.test/pane.jpg', $recipe['imagePath']);
 

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace OCA\SmartCook\Service\Import;
 
 use OCA\SmartCook\Service\TextNormalizer;
+use OCA\SmartCook\Service\DifficultyNormalizer;
 
 final class RecipeNormalizer {
-    public function __construct(private IngredientParser $ingredients, private TextNormalizer $normalizer) {
+    public function __construct(private IngredientParser $ingredients, private TextNormalizer $normalizer, private DifficultyNormalizer $difficulty) {
     }
 
     /** @param array<string, mixed> $data @return array<string, mixed> */
@@ -70,7 +71,7 @@ final class RecipeNormalizer {
             'restTime' => $this->normalizer->parseDuration($data['restTime'] ?? 0),
             'cookTime' => $this->normalizer->parseDuration($data['cookTime'] ?? 0),
             'totalTime' => $this->normalizer->parseDuration($data['totalTime'] ?? 0),
-            'difficulty' => $this->nullable($data['difficulty'] ?? null),
+            'difficulty' => $this->difficulty->normalize($data['difficulty'] ?? null),
             'costCents' => isset($data['costCents']) ? (int)$data['costCents'] : null,
             'currency' => $this->nullable($data['currency'] ?? null),
             'cuisine' => $this->first($data['recipeCuisine'] ?? $data['cuisine'] ?? null),

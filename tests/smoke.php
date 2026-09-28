@@ -12,6 +12,7 @@ use OCA\SmartCook\Service\Import\RecipeNormalizer;
 use OCA\SmartCook\Service\Import\TextRecipeParser;
 use OCA\SmartCook\Service\Ocr\NativePdfTextExtractor;
 use OCA\SmartCook\Service\TextNormalizer;
+use OCA\SmartCook\Service\DifficultyNormalizer;
 
 $checks = 0;
 
@@ -32,8 +33,9 @@ $expectNear = static function (float $expected, ?float $actual, float $delta, st
 };
 
 $text = new TextNormalizer();
+$difficulty = new DifficultyNormalizer();
 $ingredientParser = new IngredientParser($text);
-$normalizer = new RecipeNormalizer($ingredientParser, $text);
+$normalizer = new RecipeNormalizer($ingredientParser, $text, $difficulty);
 $recipeParser = new TextRecipeParser($ingredientParser, $normalizer, $text);
 
 $expectNear(2.5, $text->parseQuantity('2 1/2'), 0.0001, 'Mixed ASCII fraction');
@@ -41,6 +43,12 @@ $expectNear(1.5, $text->parseQuantity('1½'), 0.0001, 'Attached Unicode fraction
 $expectNear(2.5, $text->parseQuantity('2 ½'), 0.0001, 'Spaced Unicode fraction');
 $expectSame(90, $text->parseDuration('PT1H30M'), 'ISO 8601 duration');
 $expectSame(105, $text->parseDuration('1 ora e 45 minuti'), 'Italian duration');
+$expectSame('1', $difficulty->normalize('Facilissima'), 'Very easy difficulty');
+$expectSame('1', $difficulty->normalize('Bassa'), 'Low difficulty');
+$expectSame('2', $difficulty->normalize('Facile'), 'Easy difficulty');
+$expectSame('3', $difficulty->normalize('media'), 'Medium difficulty');
+$expectSame('4', $difficulty->normalize('Difficile'), 'Difficult difficulty');
+$expectSame('5', $difficulty->normalize('Molto difficile'), 'Very difficult difficulty');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
@@ -75,6 +83,7 @@ $expectSame(4, $recipe['servings'], 'Recipe servings');
 $expectSame(20, $recipe['prepTime'], 'Recipe preparation time');
 $expectSame(45, $recipe['cookTime'], 'Recipe cooking time');
 $expectSame(65, $recipe['totalTime'], 'Recipe total time fallback');
+$expectSame('3', $recipe['difficulty'], 'Recipe difficulty normalization');
 $expectSame(null, $recipe['description'], 'Recipe description is empty without a specific field');
 $expectSame(3, count($recipe['ingredients']), 'Recipe ingredient count');
 $expectSame(2, count($recipe['steps']), 'Recipe step count');

@@ -7,7 +7,7 @@ namespace OCA\SmartCook\Service;
 use OCA\SmartCook\Exception\ValidationException;
 
 final class RecipeValidator {
-    public function __construct(private TextNormalizer $normalizer) {
+    public function __construct(private TextNormalizer $normalizer, private DifficultyNormalizer $difficulty) {
     }
 
     /** @param array<string, mixed> $input @return array<string, mixed> */
@@ -34,6 +34,7 @@ final class RecipeValidator {
         $data['language'] = $this->language((string)($data['language'] ?? 'en'));
         $data['excludeFromPlanner'] = (bool)($data['excludeFromPlanner'] ?? false);
         $data['servings'] = max(1, min(10000, (int)($data['servings'] ?? 1)));
+        $data['difficulty'] = $this->difficulty->normalize($data['difficulty'] ?? null);
         foreach (['prepTime', 'restTime', 'cookTime', 'totalTime'] as $field) {
             if (array_key_exists($field, $data)) {
                 $data[$field] = max(0, min(525600, $this->normalizer->parseDuration($data[$field])));
