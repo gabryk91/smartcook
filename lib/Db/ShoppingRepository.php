@@ -144,7 +144,29 @@ final class ShoppingRepository extends AbstractRepository {
         $list = $this->getList($listId, $userId) ?? throw new \RuntimeException('Shopping list not found');
         $this->db->beginTransaction();
         try {
+            $existingByKey = [];
+            foreach ($list['items'] as $existing) {
+                $key = $existing['normalizedName'] . '|' . ($existing['unit'] ?? '');
+                $existingByKey[$key][] = $existing;
+            }
             foreach (array_values($items) as $index => $item) {
+                $key = trim((string)($item['normalizedName'] ?? $item['name'])) . '|' . ($item['unit'] ?? '');
+                $matches = $existingByKey[$key] ?? [];
+                if ($matches !== []) {
+                    $merged = array_shift($matches);
+                    foreach ($matches as $duplicate) {
+                        $merged = $this->mergeItemQuantities($merged, $duplicate);
+                        $this->deleteBy('smartcook_shop_items', 'id', (int)$duplicate['id']);
+                    }
+                    $merged = $this->mergeItemQuantities($merged, $item);
+                    $this->update('smartcook_shop_items', (int)$merged['id'], [
+                        'quantity' => $merged['quantity'],
+                        'amount' => $merged['amount'],
+                        'checked' => false,
+                    ]);
+                    $existingByKey[$key] = [$merged];
+                    continue;
+                }
                 $this->insert('smartcook_shop_items', [
                     'list_id' => $listId,
                     'name' => trim((string)$item['name']),
@@ -166,6 +188,21 @@ final class ShoppingRepository extends AbstractRepository {
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    /** @param array<string, mixed> $existing @param array<string, mixed> $incoming @return array<string, mixed> */
+    private function mergeItemQuantities(array $existing, array $incoming): array {
+        $existingAmount = $existing['amount'] ?? null;
+        $incomingAmount = $incoming['amount'] ?? null;
+        if ($existingAmount !== null && $incomingAmount !== null) {
+            $amount = round((float)$existingAmount + (float)$incomingAmount, 4);
+            $existing['amount'] = $amount;
+            $existing['quantity'] = rtrim(rtrim(number_format($amount, 4, '.', ''), '0'), '.');
+            return $existing;
+        }
+        $existing['amount'] = null;
+        $existing['quantity'] = $this->nullString(trim((string)($existing['quantity'] ?? '') . ' + ' . (string)($incoming['quantity'] ?? ''), ' +'));
+        return $existing;
     }
 
     public function deleteList(int $id, string $userId): void {
