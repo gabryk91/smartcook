@@ -126,6 +126,8 @@ const fallbackTranslations = {
         Current: 'Attuale',
         Proposed: 'Proposto',
         'AI refinement': 'Raffinamento AI',
+        'Analyzing recipe with AI': 'Analisi della ricetta con AI',
+        'Preparing your proposal...': 'Preparazione della proposta in corso...',
         '1 - Very easy': '1 - Facilissima',
         '2 - Easy': '2 - Facile',
         '3 - Medium': '3 - Media',
@@ -710,6 +712,16 @@ function difficultyIndicator(value) {
     if (!score) return '';
     return `<span class="card-meta-item card-meta-difficulty" aria-label="${attr(`${tr('Difficulty:')} ${score}/5`)}"><b>${esc(tr('Difficulty:'))}</b><span aria-hidden="true">${fa('bolt').repeat(score)}</span></span>`;
 }
+function showRefinementLoading() {
+    const modal = document.createElement('div');
+    modal.className = 'blocking-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'smartcook-refinement-loading-title');
+    modal.innerHTML = `<div class="blocking-modal-card"><div class="loading-spinner" aria-hidden="true"></div><h2 id="smartcook-refinement-loading-title">${esc(tr('Analyzing recipe with AI'))}</h2><p>${esc(tr('Preparing your proposal...'))}</p></div>`;
+    document.body.append(modal);
+    return () => modal.remove();
+}
 function reviewRecipeRefinement(recipe, proposal) {
     return new Promise(resolve => {
         const fields = Object.entries(proposal.proposal || {});
@@ -836,7 +848,13 @@ async function renderRecipe(view, id) {
         showNotice(tr('Shopping list created'));
     });
     view.querySelector('[data-refine-recipe]')?.addEventListener('click', async () => {
-        const response = await working(() => request('/recipes/refinement/analyze', { method: 'POST', json: { recipeIds: [recipe.id] } }));
+        const closeLoading = showRefinementLoading();
+        let response;
+        try {
+            response = await working(() => request('/recipes/refinement/analyze', { method: 'POST', json: { recipeIds: [recipe.id] } }));
+        } finally {
+            closeLoading();
+        }
         const approved = await reviewRecipeRefinement(recipe, response.proposals?.[0] || {});
         if (!approved || (!Object.keys(approved.fields).length && !approved.addCover))
             return;
