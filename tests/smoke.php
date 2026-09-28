@@ -41,6 +41,8 @@ $recipeParser = new TextRecipeParser($ingredientParser, $normalizer, $text);
 
 $expectNear(2.5, $text->parseQuantity('2 1/2'), 0.0001, 'Mixed ASCII fraction');
 $expectNear(1.5, $text->parseQuantity('1½'), 0.0001, 'Attached Unicode fraction');
+$expectSame('Primo piatto', $text->capitalizeLabel('primo piatto'), 'Taxonomy label capitalization');
+$expectSame('Èstate', $text->capitalizeLabel('èstate'), 'Taxonomy label Unicode capitalization');
 $expectNear(2.5, $text->parseQuantity('2 ½'), 0.0001, 'Spaced Unicode fraction');
 $expectSame(90, $text->parseDuration('PT1H30M'), 'ISO 8601 duration');
 $expectSame(105, $text->parseDuration('1 ora e 45 minuti'), 'Italian duration');

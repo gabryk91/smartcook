@@ -1559,7 +1559,7 @@ function importPreviewHtml(preview, saved = false, index = 0) {
 		[tr('Categories'), categories.join(' · ')],
 		[tr('Cuisine'), recipe.cuisine],
 		[tr('Cooking method'), recipe.cookingMethod],
-		[tr('Meal type'), mealLabel(recipe.mealType)],
+		[tr('Meal type'), recipe.mealType],
 		[tr('Calories'), asNumber(recipe.calories) > 0 ? `${asNumber(recipe.calories)} kcal` : ''],
 		[tr('Tags'), tags.map(tag => `#${tag}`).join(' · ')],
 	].filter(([, value]) => String(value || '').trim() !== '');

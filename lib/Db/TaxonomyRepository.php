@@ -228,7 +228,7 @@ final class TaxonomyRepository extends AbstractRepository {
 
     /** @return array<string, mixed> */
     public function addManaged(string $userId, string $kind, string $name): array {
-        $name = trim($name);
+        $name = $this->normalizer->capitalizeLabel($name);
         $normalized = $this->normalizer->normalizeName($name);
         if ($name === '' || $normalized === '') {
             throw new \InvalidArgumentException('A name is required');
@@ -335,7 +335,7 @@ final class TaxonomyRepository extends AbstractRepository {
         $seen = [];
         foreach ($items as $item) {
             $data = is_array($item) ? $item : ['name' => $item];
-            $name = trim((string)($data['name'] ?? ''));
+            $name = $this->normalizer->capitalizeLabel((string)($data['name'] ?? ''));
             $normalized = $this->normalizer->normalizeName($name);
             if ($name === '' || $normalized === '' || isset($seen[$normalized])) {
                 continue;

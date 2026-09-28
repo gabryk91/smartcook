@@ -47,6 +47,17 @@ final class TextNormalizer {
         return trim(preg_replace('/\s+/', ' ', $value) ?? $value);
     }
 
+    public function capitalizeLabel(string $value): string {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+        preg_match('/^./us', $value, $match);
+        $first = $match[0] ?? $value[0];
+        $upper = function_exists('mb_strtoupper') ? mb_strtoupper($first) : strtoupper(strtr($first, ['à' => 'À', 'è' => 'È', 'é' => 'É', 'ì' => 'Ì', 'ò' => 'Ò', 'ù' => 'Ù']));
+        return $upper . substr($value, strlen($first));
+    }
+
     public function normalizeUnit(?string $unit): ?string {
         if ($unit === null || trim($unit) === '') {
             return null;

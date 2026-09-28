@@ -35,6 +35,12 @@ final class RecipeValidator {
         $data['excludeFromPlanner'] = (bool)($data['excludeFromPlanner'] ?? false);
         $data['servings'] = max(1, min(10000, (int)($data['servings'] ?? 1)));
         $data['difficulty'] = $this->difficulty->normalize($data['difficulty'] ?? null);
+        foreach (['cuisine', 'mealType', 'cookingMethod', 'season'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $value = trim((string)$data[$field]);
+                $data[$field] = $value === '' ? null : $this->normalizer->capitalizeLabel($value);
+            }
+        }
         foreach (['prepTime', 'restTime', 'cookTime', 'totalTime'] as $field) {
             if (array_key_exists($field, $data)) {
                 $data[$field] = max(0, min(525600, $this->normalizer->parseDuration($data[$field])));
@@ -180,7 +186,7 @@ final class RecipeValidator {
 
     /** @return list<array<string, mixed>> */
     private function named(mixed $values): array {
-        return array_map(static fn (string $name): array => ['name' => $name], $this->normalizer->normalizeStringList($values));
+        return array_map(fn (string $name): array => ['name' => $this->normalizer->capitalizeLabel($name)], $this->normalizer->normalizeStringList($values));
     }
 
     private function nullableString(mixed $value): ?string {
