@@ -12,6 +12,8 @@ use OCA\SmartCook\Service\RecipeService;
 
 final class RecipeRefinementService {
     private const FIELDS = ['title', 'subtitle', 'description', 'author', 'sourceName', 'sourceUrl', 'cuisine', 'mealType', 'cookingMethod', 'season', 'calories', 'nutrition', 'tools', 'tags', 'categories'];
+    private const COLLECTION_FIELDS = ['tools', 'tags', 'categories'];
+    private const CLEARABLE_FIELDS = ['cuisine', 'mealType', 'cookingMethod', 'season', 'tools', 'tags', 'categories'];
 
     public function __construct(
         private AiProviderRegistry $ai,
@@ -41,8 +43,19 @@ final class RecipeRefinementService {
         $taxonomy = $this->taxonomy->listForUser((string)$recipe['ownerId']);
         $analysis = $this->ai->refine((string)$recipe['ownerId'], $recipe, (string)($recipe['language'] ?? 'it'), $taxonomy);
         $analysis = $this->taxonomy->restrictRecipeClassifications($analysis, $taxonomy);
+        $clearFields = array_values(array_intersect(self::CLEARABLE_FIELDS, array_filter(
+            (array)($analysis['clearFields'] ?? []),
+            static fn (mixed $field): bool => is_string($field),
+        )));
         $proposal = [];
         foreach (self::FIELDS as $field) {
+            if (in_array($field, $clearFields, true)) {
+                $clearedValue = in_array($field, self::COLLECTION_FIELDS, true) ? [] : null;
+                if ($this->valuesDiffer($recipe[$field] ?? null, $clearedValue, $field)) {
+                    $proposal[$field] = $clearedValue;
+                }
+                continue;
+            }
             if (array_key_exists($field, $analysis) && $analysis[$field] !== null && $this->valuesDiffer($recipe[$field] ?? null, $analysis[$field], $field)) {
                 $proposal[$field] = $analysis[$field];
             }
