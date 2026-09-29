@@ -150,6 +150,17 @@ $expectSame('https://cdn.example.test/pasta-al-forno.jpg', $instagramSource['ima
 $instagramRecipe = $recipeParser->parse($instagramSource['description'], ['language' => 'it']);
 $expectSame(2, count($instagramRecipe['ingredients']), 'Instagram caption ingredients');
 $expectSame(2, count($instagramRecipe['steps']), 'Instagram caption steps');
+$emojiIngredient = $ingredientParser->parse('🧅 1 cipolla dolce');
+$expectSame('cipolla dolce', $emojiIngredient['name'], 'Emoji-prefixed Instagram ingredient name');
+$expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram ingredient quantity');
+
+$instagramCanonicalSource = (new FacebookDescriptionExtractor())->extract(<<<'HTML'
+<!doctype html><html><head>
+<meta property="og:description" content="Chips di cipolla&#10;&#10;1 cipolla dolce&#10;50 g provolone grattugiato&#10;2 cucchiai di parmigiano&#10;&#10;Cuocere in forno a 180&#176; per 20 minuti.">
+</head><body><script>window.__data={"text":"Ricetta non pertinente con una lista di ingredienti molto pi&#249; lunga del reel richiesto"};</script></body></html>
+HTML);
+$expect(str_contains($instagramCanonicalSource['description'], 'Chips di cipolla'), 'Instagram canonical metadata extraction');
+$expect(!str_contains($instagramCanonicalSource['description'], 'non pertinente'), 'Instagram ignores unrelated preloaded post text');
 
 $ai = (new AiJsonParser())->parse("```json\n{\"title\":\"Torta\",\"ingredients\":[]}\n```");
 $expectSame('Torta', $ai['title'], 'AI fenced JSON parsing');

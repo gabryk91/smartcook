@@ -17,15 +17,21 @@ final class FacebookDescriptionExtractor {
 
         $title = $this->meta($xpath, 'property', 'og:title') ?? $this->meta($xpath, 'name', 'title') ?? '';
         $image = $this->meta($xpath, 'property', 'og:image') ?? $this->meta($xpath, 'property', 'og:image:url');
-        $candidates = array_filter([
+        $metadataCandidates = array_filter([
             $this->meta($xpath, 'property', 'og:description'),
             $this->meta($xpath, 'name', 'description'),
         ]);
-        preg_match_all('/"(?:message|caption|description|text)":"((?:\\\\.|[^"\\\\])*)"/su', $html, $matches);
-        foreach ($matches[1] ?? [] as $encoded) {
-            $decoded = json_decode('"' . $encoded . '"', true);
-            if (is_string($decoded) && trim($decoded) !== '') {
-                $candidates[] = trim($decoded);
+        // Social pages include JSON for several unrelated posts in the initial
+        // payload. Their longest `text` field can belong to a different reel.
+        // Open Graph metadata is the canonical preview for the requested URL.
+        $candidates = $metadataCandidates;
+        if ($candidates === []) {
+            preg_match_all('/"(?:message|caption|description|text)"\s*:\s*"((?:\\\\.|[^"\\\\])*)"/su', $html, $matches);
+            foreach ($matches[1] ?? [] as $encoded) {
+                $decoded = json_decode('"' . $encoded . '"', true);
+                if (is_string($decoded) && trim($decoded) !== '') {
+                    $candidates[] = trim($decoded);
+                }
             }
         }
         $description = '';

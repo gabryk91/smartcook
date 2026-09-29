@@ -20,7 +20,7 @@ final class IngredientParser {
 
     /** @return array<string, mixed> */
     public function parse(string $line, int $sortOrder = 0): array {
-        $original = trim(preg_replace('/^(?:[\s*•·–—-]+|\d+[.)]\s+)/u', '', trim($line)) ?? trim($line));
+        $original = $this->withoutLeadingMarkers($line);
         $line = $original;
         $optional = preg_match('/\b(optional|facoltativ[oaie])\b/i', $line) === 1;
         $group = null;
@@ -65,7 +65,7 @@ final class IngredientParser {
     }
 
     public function looksLikeIngredient(string $line): bool {
-        $line = trim($line);
+        $line = $this->withoutLeadingMarkers($line);
         if ($line === '' || mb_strlen($line) > 240) {
             return false;
         }
@@ -73,6 +73,13 @@ final class IngredientParser {
             return true;
         }
         return preg_match('/\b(?:kg|g|gr|mg|ml|cl|dl|l|cup|cups|tbsp|tsp|cucchiai?|cucchiaini?|grammi?|litri?|oz|lb|pezzi?|spicchi?)\b/iu', $line) === 1;
+    }
+
+    private function withoutLeadingMarkers(string $line): string {
+        $line = trim($line);
+        // Captions commonly use food emoji as bullets (for example "🧅 1 cipolla").
+        // Keep letters, numbers and fraction characters while removing presentation-only prefixes.
+        return trim(preg_replace('/^[^\p{L}\p{N}¼½¾⅓⅔⅛⅜⅝⅞]+/u', '', $line) ?? $line);
     }
 
     /** @return array<string, mixed> */

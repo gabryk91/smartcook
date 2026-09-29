@@ -67,7 +67,9 @@ final class ImportManager {
         $warnings = $result->warnings;
         $taxonomy = $this->taxonomy->listForUser($userId);
 
-        if ($useAi) {
+        if ($useAi && !$this->hasSocialRecipeEvidence($result)) {
+            $warnings[] = 'AI refinement was skipped because the social post does not expose enough recipe data. Add the ingredients or instructions as text to import it safely.';
+        } elseif ($useAi) {
             try {
                 $aiRecipe = $this->ai->extract(
                     $userId,
@@ -206,5 +208,15 @@ final class ImportManager {
             "Ingredients:\n" . implode("\n", array_filter($ingredients)),
             "Procedure:\n" . implode("\n", array_filter($steps)),
         ]));
+    }
+
+    private function hasSocialRecipeEvidence(ImportResult $result): bool {
+        if (!in_array($result->strategy, ['instagram-caption', 'facebook-description'], true)) {
+            return true;
+        }
+
+        $ingredients = (array)($result->recipe['ingredients'] ?? []);
+        $steps = (array)($result->recipe['steps'] ?? []);
+        return count($ingredients) >= 2 || (count($ingredients) >= 1 && count($steps) >= 1);
     }
 }
