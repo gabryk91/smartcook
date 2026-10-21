@@ -3678,30 +3678,74 @@ select:focus {
 }
 
 .recipe-view-meta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px 26px;
+	display: grid;
+	grid-template-columns: max-content max-content minmax(0, 1fr);
+	gap: 12px;
 	margin: 30px 0 34px;
-	padding: 15px 0;
-	border-block: 1px solid var(--smartcook-border);
 	color: var(--smartcook-muted);
+}
+
+.recipe-view-meta:not(:has(.recipe-view-calories)) {
+	grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.recipe-view-metric {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px 18px;
+	border: 1px solid var(--smartcook-border);
+	border-radius: var(--smartcook-radius);
+	background: var(--smartcook-surface-soft);
+}
+
+.recipe-view-metric-label {
+	color: var(--smartcook-muted);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.25;
 }
 
 .recipe-view-meta strong {
 	color: var(--smartcook-text);
-	font-size: 18px;
+	font-size: 24px;
+	line-height: 1.1;
 }
 
-.recipe-view-servings {
-	display: inline-flex;
+.recipe-view-meta strong small {
+	color: var(--smartcook-muted);
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.recipe-view-servings-controls {
+	display: flex;
 	align-items: center;
-	flex-wrap: wrap;
-	gap: 8px;
+	justify-content: space-between;
+	gap: 14px;
+}
+
+.recipe-view-servings-controls strong {
+	min-width: 2ch;
+	text-align: center;
 }
 
 .recipe-view-servings .stepper-btn {
-	width: 36px;
-	height: 36px;
+	width: 40px;
+	height: 40px;
+	border: 1px solid var(--smartcook-border);
+	box-shadow: none;
+}
+
+.recipe-view-servings .stepper-btn:hover:not(:disabled) {
+	border-color: var(--smartcook-accent);
+}
+
+.recipe-view-servings .stepper-btn:focus-visible {
+	outline: 2px solid var(--smartcook-accent);
+	outline-offset: 2px;
 }
 
 .recipe-view-servings .stepper-btn:disabled {
@@ -3709,35 +3753,55 @@ select:focus {
 	cursor: default;
 }
 
-.recipe-view-time-marker {
-	position: relative;
-	width: 18px;
-	height: 18px;
-	margin-inline: 2px -10px;
-	border: 2px solid var(--smartcook-muted);
-	border-radius: 50%;
-	align-self: center;
+.recipe-view-time-group {
+	display: grid;
+	min-width: 0;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	border: 1px solid var(--smartcook-border);
+	border-radius: var(--smartcook-radius);
+	background: var(--smartcook-surface-soft);
 }
 
-.recipe-view-time-marker::before,
-.recipe-view-time-marker::after {
-	position: absolute;
-	left: 50%;
-	bottom: 50%;
-	width: 2px;
-	border-radius: 2px;
-	background: var(--smartcook-muted);
-	content: '';
-	transform-origin: bottom center;
+.recipe-view-time-group .recipe-view-metric {
+	padding: 14px 12px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
 }
 
-.recipe-view-time-marker::before {
-	height: 6px;
+.recipe-view-time-group .recipe-view-metric + .recipe-view-metric {
+	border-inline-start: 1px solid var(--smartcook-border);
 }
 
-.recipe-view-time-marker::after {
-	height: 5px;
-	transform: rotate(125deg);
+@media (max-width: 760px) {
+	.recipe-view-meta,
+	.recipe-view-meta:not(:has(.recipe-view-calories)) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.recipe-view-time-group {
+		grid-column: 1 / -1;
+	}
+
+	.recipe-view-meta:not(:has(.recipe-view-calories)) .recipe-view-servings {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (max-width: 560px) {
+	.recipe-view-meta,
+	.recipe-view-meta:not(:has(.recipe-view-calories)) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.recipe-view-time-group,
+	.recipe-view-meta:not(:has(.recipe-view-calories)) .recipe-view-servings {
+		grid-column: auto;
+	}
+
+	.recipe-view-time-group .recipe-view-metric {
+		padding-inline: 8px;
+	}
 }
 
 .recipe-view-content {

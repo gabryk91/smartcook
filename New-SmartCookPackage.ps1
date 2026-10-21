@@ -4,6 +4,7 @@ param(
     [string]$CertificateKeyPath = (Join-Path $env:USERPROFILE '.nextcloud\certificates\smartcook.key'),
     [string]$OpenSslPath = 'C:\Program Files\OpenSSL-Win64\bin\openssl.exe',
     [string]$GitHubRepository = 'gabryk91/smartcook',
+    [string]$GitHubAccount = 'gabryk91',
     [switch]$ConfigureGitHubReleaseSecrets,
     [securestring]$AppStoreToken,
     [string]$GitHubEnvironment = 'release',
@@ -36,11 +37,45 @@ if ($ConfigureGitHubReleaseSecrets -and $PublishGitHubRelease) {
     throw 'Usa ConfigureGitHubReleaseSecrets e PublishGitHubRelease in esecuzioni separate.'
 }
 
+function Assert-GitHubAccount {
+    param(
+        [string]$GhPath,
+        [string]$ExpectedAccount
+    )
+
+    $activeAccount = (& $GhPath api user --jq .login 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $activeAccount -ine $ExpectedAccount) {
+        if ($env:GH_TOKEN -or $env:GITHUB_TOKEN) {
+            throw 'GH_TOKEN o GITHUB_TOKEN forza una credenziale diversa. Rimuovi la variabile dalla sessione e riprova.'
+        }
+
+        Write-Host "Account GitHub attivo '$activeAccount'; richiesto '$ExpectedAccount'. Avvio il login nel browser..."
+        & $GhPath auth login --hostname github.com --git-protocol https --web
+        if ($LASTEXITCODE -ne 0) {
+            throw "Login GitHub non completato. Accedi con l'account '$ExpectedAccount' e riprova."
+        }
+
+        & $GhPath auth switch --hostname github.com --user $ExpectedAccount
+        if ($LASTEXITCODE -ne 0) {
+            throw "L'account GitHub '$ExpectedAccount' non è disponibile dopo il login. Verifica l'account selezionato nel browser."
+        }
+
+        $activeAccount = (& $GhPath api user --jq .login 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $activeAccount -ine $ExpectedAccount) {
+            throw "Account GitHub attivo '$activeAccount'; richiesto '$ExpectedAccount'. Pubblicazione interrotta."
+        }
+    }
+
+    Write-Host "Account GitHub verificato: $activeAccount"
+}
+
 if ($ConfigureGitHubReleaseSecrets) {
     $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
     if ($null -eq $ghCommand) {
-        throw 'GitHub CLI non trovato. Installa GitHub CLI e completa "gh auth login" prima di configurare i segreti.'
+        throw 'GitHub CLI non trovato. Installa GitHub CLI prima di configurare i segreti.'
     }
+
+    Assert-GitHubAccount -GhPath $ghCommand.Source -ExpectedAccount $GitHubAccount
 
     if ($null -eq $AppStoreToken) {
         $AppStoreToken = Read-Host -AsSecureString 'Incolla il token API di apps.nextcloud.com'
@@ -73,7 +108,7 @@ if ($PublishGitHubRelease) {
     $gitCommand = Get-Command git -ErrorAction SilentlyContinue
     $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
     if ($null -eq $gitCommand -or $null -eq $ghCommand) {
-        throw 'Per pubblicare la release sono richiesti Git e GitHub CLI, con "gh auth login" già completato.'
+        throw 'Per pubblicare la release sono richiesti Git e GitHub CLI.'
     }
 
     $pendingChanges = (& $gitCommand.Source -C $projectRoot status --porcelain)
@@ -87,6 +122,12 @@ if ($PublishGitHubRelease) {
     $releaseBranch = (& $gitCommand.Source -C $projectRoot branch --show-current).Trim()
     if ([string]::IsNullOrWhiteSpace($releaseBranch)) {
         throw 'Non è possibile pubblicare una release da un HEAD detached.'
+    }
+
+    Assert-GitHubAccount -GhPath $ghCommand.Source -ExpectedAccount $GitHubAccount
+    & $ghCommand.Source auth setup-git --hostname github.com
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Impossibile configurare Git per usare le credenziali GitHub verificate.'
     }
 }
 
@@ -242,8 +283,9 @@ docker exec -u www-data Nextcloud php occ maintenance:mode --off
 Per pubblicare automaticamente anche su GitHub e App Store Nextcloud esegui:
   .\New-SmartCookPackage.ps1 -PublishGitHubRelease
 
-Lo script richiede una cartella di lavoro pulita, crea il commit della versione
-$nextVersion, lo invia a GitHub e pubblica la release v$nextVersion.
+Lo script richiede una cartella di lavoro pulita, verifica l'account GitHub
+$GitHubAccount (avviando il login nel browser se necessario), crea il commit
+della versione $nextVersion, lo invia a GitHub e pubblica la release v$nextVersion.
 Il workflow GitHub "Publish Nextcloud App Store release" allega automaticamente
    $storeArchiveName alla release e lo pubblica nell'App Store Nextcloud.
 Verifica l'esito del workflow GitHub e la pubblicazione su:
