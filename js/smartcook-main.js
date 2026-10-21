@@ -674,6 +674,27 @@ function stepRow(item = { text: '' }, index = 0, total = 1) {
     const timer = timerParts(item.timerSeconds);
     return `<div class="step-row" data-step-row><span class="step-number">${index + 1}</span><textarea data-step-text rows="3" placeholder="${attr(tr('Describe this step...'))}">${esc(item.text)}</textarea><div class="step-extras"><input data-step-timer type="number" min="0" step="any" value="${attr(timer.value)}" placeholder="${attr(tr('Timer quantity'))}"><select data-step-timer-unit aria-label="${attr(tr('Timer unit'))}"><option value="minutes"${timer.unit === 'minutes' ? ' selected' : ''}>${esc(tr('minutes'))}</option><option value="hours"${timer.unit === 'hours' ? ' selected' : ''}>${esc(tr('hours'))}</option></select><input data-step-temp type="number" value="${attr(item.temperature)}" placeholder="${attr(tr('Temperature'))}"><select data-step-temp-unit><option value="C"${item.temperatureUnit === 'C' ? ' selected' : ''}>C</option><option value="F"${item.temperatureUnit === 'F' ? ' selected' : ''}>F</option></select></div><div class="step-move-actions"><button class="icon-button" data-move-step="up" type="button" aria-label="${attr(tr('Move step up'))}" title="${attr(tr('Move step up'))}"${index === 0 ? ' disabled' : ''}>${fa('arrow-up')}</button><button class="icon-button" data-move-step="down" type="button" aria-label="${attr(tr('Move step down'))}" title="${attr(tr('Move step down'))}"${index === total - 1 ? ' disabled' : ''}>${fa('arrow-down')}</button></div><button class="icon-button danger" data-remove-row type="button" aria-label="${attr(tr('Remove'))}">${fa('xmark')}</button></div>`;
 }
+function scaledQuantity(quantity, factor) {
+    const original = String(quantity ?? '').trim();
+    if (!original || factor === 1)
+        return original;
+    const fractions = { '¼': .25, '½': .5, '¾': .75, '⅓': 1 / 3, '⅔': 2 / 3, '⅛': .125, '⅜': .375, '⅝': .625, '⅞': .875 };
+    const match = original.match(/^(\d+(?:[.,]\d+)?)?(?:\s*(\d+)\/(\d+)|\s*([¼½¾⅓⅔⅛⅜⅝⅞]))?$/);
+    if (!match || (!match[1] && !match[2] && !match[4]))
+        return original;
+    const denominator = Number(match[3]);
+    if (match[2] && !denominator)
+        return original;
+    const amount = Number((match[1] || '0').replace(',', '.')) + (match[2] ? Number(match[2]) / denominator : 0) + (fractions[match[4]] || 0);
+    return Number((amount * factor).toFixed(6)).toLocaleString(undefined, { maximumFractionDigits: 6 });
+}
+function recipeIngredientItems(recipe, factor = 1) {
+    return recipe.ingredients.map(item => {
+        const measure = [scaledQuantity(item.quantity, factor), displayUnit(item.unit)].filter(Boolean).join(' ');
+        const alternatives = (item.alternatives || []).map(alternative => [scaledQuantity(alternative.quantity, factor), displayUnit(alternative.unit), alternative.name].filter(Boolean).join(' ')).filter(Boolean);
+        return `<li><span>${esc(measure)}</span><strong>${esc(item.name)}</strong>${item.optional ? `<em>${esc(tr('Optional'))}</em>` : ''}${item.notes ? `<small>${esc(item.notes)}</small>` : ''}${alternatives.length ? `<small class="recipe-ingredient-alternatives">${esc(tr('Alternatives'))}: ${esc(alternatives.join(' · '))}</small>` : ''}</li>`;
+    }).join('');
+}
 function recipeViewer(recipe) {
     const image = recipeImageUrl(recipe.imagePath);
 	const sourceUrl = safeExternalUrl(recipe.sourceUrl);
@@ -681,11 +702,7 @@ function recipeViewer(recipe) {
 	const categories = (recipe.categories || []).map(category => String(category?.name || category || '').trim()).filter(Boolean);
 	const categoryLabel = categories.join(' · ') || tr('Uncategorized');
 	const calories = asNumber(recipe.calories);
-    const ingredientItems = recipe.ingredients.map(item => {
-        const measure = [item.quantity, displayUnit(item.unit)].filter(Boolean).join(' ');
-		const alternatives = (item.alternatives || []).map(alternative => [alternative.quantity, displayUnit(alternative.unit), alternative.name].filter(Boolean).join(' ')).filter(Boolean);
-        return `<li><span>${esc(measure)}</span><strong>${esc(item.name)}</strong>${item.optional ? `<em>${esc(tr('Optional'))}</em>` : ''}${item.notes ? `<small>${esc(item.notes)}</small>` : ''}${alternatives.length ? `<small class="recipe-ingredient-alternatives">${esc(tr('Alternatives'))}: ${esc(alternatives.join(' · '))}</small>` : ''}</li>`;
-    }).join('');
+    const ingredientItems = recipeIngredientItems(recipe);
     const steps = recipe.steps.map((step, index) => {
         const details = [];
         if (step.timerSeconds) {
@@ -698,7 +715,7 @@ function recipeViewer(recipe) {
     }).join('');
     return `<div class="recipe-view-shell"><article class="recipe-view panel">
         <header class="recipe-view-header"><div class="recipe-view-image-wrap">${image ? `<img class="recipe-view-image" src="${attr(image)}" alt="">` : `<div class="recipe-view-image image-placeholder" aria-hidden="true"><span>${esc(recipe.title.slice(0, 1).toUpperCase())}</span></div><button class="cover-search-button" data-find-cover type="button" title="${attr(tr('Find cover image'))}" aria-label="${attr(tr('Find cover image'))}">${fa('wand-magic-sparkles')}</button>`}</div><div class="recipe-view-heading"><p class="eyebrow">${esc(categoryLabel)}</p><h2>${esc(recipe.title)}</h2>${recipe.subtitle ? `<p class="recipe-view-subtitle">${esc(recipe.subtitle)}</p>` : ''}${recipe.description ? `<p class="recipe-view-description">${esc(recipe.description)}</p>` : ''}${sourceUrl ? `<div class="recipe-view-actions"><a class="secondary recipe-source-link" href="${attr(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${attr(tr('Open source'))}">${fa('arrow-up-right-from-square')}${esc(tr('Open source'))}${sourceLabel ? `: ${esc(sourceLabel)}` : ''}</a></div>` : ''}</div></header>
-        <div class="recipe-view-meta"><span><strong>${asNumber(recipe.servings)}</strong> ${esc(tr('servings'))}</span>${calories > 0 ? `<span><strong>${calories}</strong> ${esc(tr('kcal x 1 serving'))}</span>` : ''}<span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
+        <div class="recipe-view-meta"><span class="recipe-view-servings"><button class="stepper-btn" data-recipe-servings-step="-1" type="button" aria-label="${attr(`${tr('Decrease')} ${tr('servings')}`)}"${asNumber(recipe.servings) <= 1 ? ' disabled' : ''}>${fa('minus')}</button><strong data-recipe-servings aria-live="polite">${Math.max(1, asNumber(recipe.servings, 1))}</strong> ${esc(tr('servings'))}<button class="stepper-btn" data-recipe-servings-step="1" type="button" aria-label="${attr(`${tr('Increase')} ${tr('servings')}`)}">${fa('plus')}</button></span>${calories > 0 ? `<span><strong>${calories}</strong> ${esc(tr('kcal x 1 serving'))}</span>` : ''}<span class="recipe-view-time-marker" aria-hidden="true"></span><span><strong>${asNumber(recipe.prepTime)}</strong> ${esc(tr('prep'))}</span><span><strong>${asNumber(recipe.cookTime)}</strong> ${esc(tr('cook'))}</span><span><strong>${asNumber(recipe.totalTime)}</strong> ${esc(tr('total'))}</span></div>
         <div class="recipe-view-content"><section><h3>${esc(tr('Ingredients'))}</h3><ul class="recipe-view-ingredients">${ingredientItems || `<li>${esc(tr('No data yet'))}</li>`}</ul></section><section><h3>${esc(tr('Procedure'))}</h3><ol class="recipe-view-steps">${steps || `<li>${esc(tr('No data yet'))}</li>`}</ol></section></div>
     </article>${recipe.id ? `<div class="recipe-view-footer-actions"><details class="recipe-view-download"><summary>${esc(tr('Download'))}${fa('chevron-down', 'recipe-dropdown-icon')}</summary><div><a href="${attr(exportUrl(recipe.id, 'json'))}">JSON-LD</a><a href="${attr(exportUrl(recipe.id, 'markdown'))}">Markdown</a><a href="${attr(exportUrl(recipe.id, 'html'))}">HTML</a></div></details><details class="recipe-view-actions-menu"><summary>${esc(tr('Actions'))}${fa('chevron-down', 'recipe-dropdown-icon')}</summary><div><button data-share-recipe type="button">${fa('share-nodes')}<span>${esc(tr('Share'))}</span></button>${recipe.excludeFromPlanner ? '' : `<button data-add-to-today type="button">${fa('calendar-plus')}<span>${esc(tr('Add to today\'s plan'))}</span></button>`}<button data-add-to-shopping type="button">${fa('cart-plus')}<span>${esc(tr('Add to shopping list'))}</span></button><button data-refine-recipe type="button">${fa('wand-magic-sparkles')}<span>${esc(tr('Optimize organization with AI'))}</span></button><a href="#/recipes/${recipe.id}/edit">${fa('pen-to-square')}<span>${esc(tr('Edit recipe'))}</span></a></div></details></div>` : ''}</div>`;
 }
@@ -832,7 +849,7 @@ function chooseCoverCandidate(recipeId, initialQuery, candidates) {
         modal.querySelector('[data-cover-search-query]')?.focus();
     });
 }
-function chooseShoppingList(recipe, lists) {
+function chooseShoppingList(recipe, lists, initialServings = recipe.servings) {
     return new Promise(resolve => {
         const modal = document.createElement('div');
         modal.className = 'cover-picker-modal';
@@ -849,7 +866,7 @@ function chooseShoppingList(recipe, lists) {
                 close();
         };
         const listChoices = (lists || []).map(list => `<label class="check-inline shopping-list-choice"><input data-shopping-list-choice type="radio" name="smartcook-shopping-list" value="${asNumber(list.id)}"><span><strong>${esc(list.name)}</strong><small>${asNumber(list.itemCount)} ${esc(tr('Items'))}</small></span></label>`).join('');
-        modal.innerHTML = `<div class="cover-picker-card shopping-list-picker"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Shopping list'))}</p><h2 id="smartcook-shopping-list-title">${esc(tr('Select or create a list'))}</h2><p class="section-help">${esc(tr('Choose where to add this recipe or create a new list.'))}</p></div><button class="icon-button" data-close-shopping-list-picker type="button" aria-label="${attr(tr('Close'))}">${fa('xmark')}</button></div><div class="shopping-list-choices">${listChoices}<label class="check-inline shopping-list-choice"><input data-shopping-list-choice type="radio" name="smartcook-shopping-list" value="new" checked><span><strong>${esc(tr('Create a new list'))}</strong><small>${esc(recipe.title)}</small></span></label></div><div class="form-grid"><label class="shopping-list-name">${esc(tr('List name'))}<input data-new-shopping-list-name value="${attr(`${tr('Shopping list')}: ${recipe.title}`)}"></label><label>${esc(tr('Servings'))}<input data-shopping-servings type="number" min="1" step="1" value="${asNumber(recipe.servings, 1)}"></label></div><div class="button-row"><button class="primary" data-confirm-shopping-list type="button">${esc(tr('Add to selected list'))}</button><button class="ghost" data-close-shopping-list-picker type="button">${esc(tr('Cancel'))}</button></div></div>`;
+        modal.innerHTML = `<div class="cover-picker-card shopping-list-picker"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Shopping list'))}</p><h2 id="smartcook-shopping-list-title">${esc(tr('Select or create a list'))}</h2><p class="section-help">${esc(tr('Choose where to add this recipe or create a new list.'))}</p></div><button class="icon-button" data-close-shopping-list-picker type="button" aria-label="${attr(tr('Close'))}">${fa('xmark')}</button></div><div class="shopping-list-choices">${listChoices}<label class="check-inline shopping-list-choice"><input data-shopping-list-choice type="radio" name="smartcook-shopping-list" value="new" checked><span><strong>${esc(tr('Create a new list'))}</strong><small>${esc(recipe.title)}</small></span></label></div><div class="form-grid"><label class="shopping-list-name">${esc(tr('List name'))}<input data-new-shopping-list-name value="${attr(`${tr('Shopping list')}: ${recipe.title}`)}"></label><label>${esc(tr('Servings'))}<input data-shopping-servings type="number" min="1" step="1" value="${asNumber(initialServings, 1)}"></label></div><div class="button-row"><button class="primary" data-confirm-shopping-list type="button">${esc(tr('Add to selected list'))}</button><button class="ghost" data-close-shopping-list-picker type="button">${esc(tr('Cancel'))}</button></div></div>`;
         modal.querySelectorAll('[data-close-shopping-list-picker]').forEach(button => button.addEventListener('click', () => close()));
         const updateNameField = () => {
             const input = modal.querySelector('[data-new-shopping-list-name]');
@@ -878,6 +895,15 @@ function chooseShoppingList(recipe, lists) {
 async function renderRecipe(view, id) {
     const recipe = (await working(() => request(`/recipes/${id}`))).recipe;
     view.innerHTML = recipeViewer(recipe);
+    const baseServings = Math.max(1, asNumber(recipe.servings, 1));
+    let selectedServings = baseServings;
+    view.querySelectorAll('[data-recipe-servings-step]').forEach(button => button.addEventListener('click', () => {
+        selectedServings = Math.max(1, selectedServings + Number(button.dataset.recipeServingsStep));
+        view.querySelector('[data-recipe-servings]').textContent = selectedServings;
+        view.querySelector('[data-recipe-servings-step="-1"]').disabled = selectedServings === 1;
+        if (recipe.ingredients.length)
+            view.querySelector('.recipe-view-ingredients').innerHTML = recipeIngredientItems(recipe, selectedServings / baseServings);
+    }));
     view.querySelector('[data-find-cover]')?.addEventListener('click', async () => {
         const response = await working(() => request(`/recipes/${recipe.id}/cover/search`, { method: 'POST', json: { query: recipe.title, page: 1 } }));
         const candidate = await chooseCoverCandidate(recipe.id, recipe.title, response.candidates);
@@ -888,12 +914,12 @@ async function renderRecipe(view, id) {
         await renderRecipe(view, id);
     });
     view.querySelector('[data-add-to-today]')?.addEventListener('click', async () => {
-        await working(() => request('/planner', { method: 'POST', json: { meal: { date: dateIso(new Date()), recipeId: recipe.id, slot: 'dinner', servings: Math.max(1, asNumber(recipe.servings, 1)) } } }));
+        await working(() => request('/planner', { method: 'POST', json: { meal: { date: dateIso(new Date()), recipeId: recipe.id, slot: 'dinner', servings: selectedServings } } }));
         showNotice(tr('Meal added'));
     });
     view.querySelector('[data-add-to-shopping]')?.addEventListener('click', async () => {
         const lists = (await working(() => request('/shopping'))).lists;
-        const selection = await chooseShoppingList(recipe, lists);
+        const selection = await chooseShoppingList(recipe, lists, selectedServings);
         if (!selection)
             return;
         const recipes = [{ recipeId: recipe.id, servings: selection.servings }];

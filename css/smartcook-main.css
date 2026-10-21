@@ -3692,6 +3692,23 @@ select:focus {
 	font-size: 18px;
 }
 
+.recipe-view-servings {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.recipe-view-servings .stepper-btn {
+	width: 36px;
+	height: 36px;
+}
+
+.recipe-view-servings .stepper-btn:disabled {
+	opacity: .45;
+	cursor: default;
+}
+
 .recipe-view-time-marker {
 	position: relative;
 	width: 18px;
