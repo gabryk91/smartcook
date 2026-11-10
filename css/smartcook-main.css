@@ -2811,8 +2811,15 @@ select:focus {
 	font-size: 20px;
 }
 
-.import-cover-suggestion p {
-	margin: 4px 0;
+.import-cover-suggestion label {
+	display: grid;
+	flex: 1;
+	min-width: 0;
+	gap: 4px;
+}
+
+.import-cover-suggestion input {
+	width: 100%;
 }
 
 .planner-week-button {

@@ -37,7 +37,7 @@ final class Notifier implements INotifier {
         } else {
             throw new UnknownNotificationException();
         }
-        $notification->setLink($this->urlGenerator->linkToRoute('smartcook.page.index') . '#/import');
+        $notification->setLink($this->urlGenerator->linkToRouteAbsolute('smartcook.page.index') . '#/import');
         $notification->setIcon($this->urlGenerator->imagePath(Application::APP_ID, 'app.svg'));
         return $notification;
     }

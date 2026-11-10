@@ -20,7 +20,7 @@ final class TextRecipeParser {
 
     /** @return array<string, mixed> */
     public function parse(string $source, array $hints = []): array {
-        $source = $this->text->compactText($source);
+        $source = $this->text->compactText($this->prepareSocialCaption($source));
         $lines = array_values(array_filter(array_map('trim', preg_split('/\n+/', $source) ?: []), static fn (string $line): bool => $line !== ''));
         $title = trim((string)($hints['title'] ?? ''));
         if ($title === '') {
@@ -54,7 +54,7 @@ final class TextRecipeParser {
         }
         $ingredients = [];
         $group = null;
-        foreach ($sections['ingredients'] as $line) {
+        foreach ($this->ingredientLines($sections['ingredients']) as $line) {
             if (str_ends_with($line, ':') && !$this->ingredients->looksLikeIngredient($line)) {
                 $group = rtrim($line, ':');
                 continue;
@@ -64,7 +64,7 @@ final class TextRecipeParser {
             $ingredients[] = $parsed;
         }
         $steps = [];
-        foreach ($sections['steps'] as $line) {
+        foreach ($this->stepLines($sections['steps']) as $line) {
             $line = trim(preg_replace('/^(?:\d+[.)]|[-*•])\s*/u', '', $line) ?? $line);
             if ($line !== '') {
                 $steps[] = ['text' => $line, 'sortOrder' => count($steps)];
@@ -104,7 +104,7 @@ final class TextRecipeParser {
 
     private function header(string $line): ?string {
         $normalized = $this->text->normalizeName(rtrim($line, ':'));
-        if (in_array($normalized, self::INGREDIENT_HEADERS, true)) {
+        if (in_array($normalized, self::INGREDIENT_HEADERS, true) || preg_match('/^(?:ingredienti|ingredients) (?:per|for)\b/iu', $normalized) === 1) {
             return 'ingredients';
         }
         if (in_array($normalized, self::STEP_HEADERS, true)) {
@@ -114,6 +114,46 @@ final class TextRecipeParser {
             return 'tools';
         }
         return null;
+    }
+
+    private function prepareSocialCaption(string $source): string {
+        $emojiPrefix = '[\\p{So}\\p{Sk}\\x{FE0F}\\x{200D}]+\\s*';
+        $ingredientHeader = '(?:ingredienti|ingredients)(?:\\s+(?:per|for)\\s+[^:\\n]+)?\\s*:';
+        $stepHeader = '(?:procedimento|preparazione|istruzioni|instructions|directions|method|preparation)\\s*:';
+        foreach ([$ingredientHeader, $stepHeader] as $header) {
+            $source = preg_replace('/(?:^|\\n)\\s*(' . $header . ')\\s*/imu', "\n$1\n", $source) ?? $source;
+            $source = preg_replace('/' . $emojiPrefix . '(' . $header . ')\\s*/iu', "\n$1\n", $source) ?? $source;
+        }
+        return $source;
+    }
+
+    /** @param list<string> $lines @return list<string> */
+    private function ingredientLines(array $lines): array {
+        $result = [];
+        foreach ($lines as $line) {
+            $line = preg_replace('/\\s+(?=[\\x{1F000}-\\x{1FAFF}])/u', "\n", $line) ?? $line;
+            foreach (preg_split('/(?:\\n|\\s*;\\s*)/u', $line) ?: [] as $part) {
+                $part = trim($part);
+                if ($part !== '') {
+                    $result[] = $part;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /** @param list<string> $lines @return list<string> */
+    private function stepLines(array $lines): array {
+        $result = [];
+        foreach ($lines as $line) {
+            foreach (preg_split('/(?:\\n|\\s*;\\s*(?=[-*•]))/u', $line) ?: [] as $part) {
+                $part = trim($part);
+                if ($part !== '') {
+                    $result[] = $part;
+                }
+            }
+        }
+        return $result;
     }
 
     /** @param list<string> $labels */

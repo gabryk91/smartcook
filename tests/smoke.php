@@ -154,6 +154,14 @@ $emojiIngredient = $ingredientParser->parse('🧅 1 cipolla dolce');
 $expectSame('cipolla dolce', $emojiIngredient['name'], 'Emoji-prefixed Instagram ingredient name');
 $expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram ingredient quantity');
 
+$youtubeCaptionRecipe = $recipeParser->parse('🧾 Ingredienti per ~1 porzione: 🍠 100g Barbabietola; 🧀 150g Feta 🔄 150g Feta Light; 🫒 +20g Olio e.v.o. 🔄 1 cucchiaio (~10g); 🍯 15g Miele 🧂 q.b. aceto balsamico, sale ed erba cipollina. 👨‍🍳 Preparazione: - lava bene e sbuccia una barbabietola; - affettala finemente con una mandolina;', ['language' => 'it']);
+$expectSame(7, count($youtubeCaptionRecipe['ingredients']), 'YouTube social caption ingredients');
+$expectNear(100.0, $youtubeCaptionRecipe['ingredients'][0]['amount'], 0.0001, 'YouTube social caption beetroot quantity');
+$expectNear(150.0, $youtubeCaptionRecipe['ingredients'][1]['amount'], 0.0001, 'YouTube social caption feta quantity');
+$expectNear(20.0, $youtubeCaptionRecipe['ingredients'][3]['amount'], 0.0001, 'YouTube social caption oil quantity');
+$expectNear(15.0, $youtubeCaptionRecipe['ingredients'][5]['amount'], 0.0001, 'YouTube social caption honey quantity');
+$expectSame(2, count($youtubeCaptionRecipe['steps']), 'YouTube social caption steps');
+
 $instagramCanonicalSource = (new FacebookDescriptionExtractor())->extract(<<<'HTML'
 <!doctype html><html><head>
 <meta property="og:description" content="Chips di cipolla&#10;&#10;1 cipolla dolce&#10;50 g provolone grattugiato&#10;2 cucchiai di parmigiano&#10;&#10;Cuocere in forno a 180&#176; per 20 minuti.">
