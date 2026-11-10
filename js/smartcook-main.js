@@ -71,6 +71,8 @@ const fallbackTranslations = {
         'AI meal planner': 'Pianificatore pasti AI',
         'Use reasoning': 'Usa ragionamento',
         'Only used by Ollama. Disabling it speeds up structured recipe extraction.': 'Usato solo da Ollama. Disattivarlo velocizza l’estrazione strutturata delle ricette.',
+        'Process AI refinement in background': 'Esegui il raffinamento AI in background',
+        'You can leave this page while the refinement is running.': 'Puoi lasciare questa pagina mentre il raffinamento è in corso.',
         'Cookbook assistant': 'Assistente del ricettario',
         'Ask your cookbook': 'Chiedi al tuo ricettario',
         'Ask about recipes, available ingredients or meal ideas.': 'Chiedi informazioni su ricette, ingredienti disponibili o idee per i pasti.',
@@ -97,6 +99,15 @@ const fallbackTranslations = {
         'Waiting for processing': 'In attesa di elaborazione',
         'Processing import': 'Importazione in elaborazione',
         'Import failed': 'Importazione non riuscita',
+        'AI refinement queued': 'Raffinamento AI in coda',
+        'AI refinement in progress': 'Raffinamento AI in corso',
+        'AI refinement failed': 'Raffinamento AI non riuscito',
+        'Queued': 'In coda',
+        'Preparing AI refinement': 'Preparazione del raffinamento AI',
+        'Finalizing AI refinement': 'Finalizzazione del raffinamento AI',
+        'Complete': 'Completato',
+        'Failed': 'Non riuscito',
+        'AI refinement was queued. You can leave this page and open the preview when it is complete.': 'Il raffinamento AI è stato messo in coda. Puoi lasciare questa pagina e aprire l’anteprima quando sarà concluso.',
         'No received imports yet': 'Nessuna importazione ricevuta',
         Administration: 'Amministrazione',
         'Manage recipe lists': 'Gestisci gli elenchi delle ricette',
@@ -1348,11 +1359,18 @@ async function renderImport(view) {
 	let commonImportTag = '';
     let activeExternalJobId = null;
 	let taxonomy = {};
+	let importSettings = { aiAsyncRefinement: false };
 	try {
 		taxonomy = await working(() => request('/taxonomy'));
 	}
 	catch (_) {
 		// The preview remains usable if taxonomy suggestions cannot be loaded.
+	}
+	try {
+		importSettings = (await request('/settings')).settings || importSettings;
+	}
+	catch (_) {
+		// Keep synchronous import available when settings cannot be read.
 	}
     const setImportBusy = (active, title = tr('Importing recipe'), detail = tr('Please wait while the source is analyzed.')) => {
         const modal = view.querySelector('[data-import-loading]');
@@ -1389,7 +1407,12 @@ async function renderImport(view) {
 			setImportBusy(false);
 		}
 	};
+    let inboxPollTimer = null;
     const paint = () => {
+		if (inboxPollTimer !== null) {
+			window.clearTimeout(inboxPollTimer);
+			inboxPollTimer = null;
+		}
         view.innerHTML = `<section class="panel" data-external-import-inbox><div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div><p>${esc(tr('Loading...'))}</p></section>
 			<article class="panel form-section">
 				<div class="source-tabs">${[['url', 'URL'], ['text', tr('Text')], ['markdown', 'Markdown'], ['json', 'JSON'], ['file', tr('File / OCR')]].map(([id, label]) => `<button type="button" data-import-kind="${id}" class="${kind === id ? 'active' : ''}">${esc(label)}</button>`).join('')}</div>
@@ -1408,6 +1431,14 @@ async function renderImport(view) {
             try {
                 const jobs = (await request('/import/jobs?limit=50')).jobs || [];
                 inbox.innerHTML = externalImportInboxHtml(jobs);
+				const hasActiveJob = jobs.some(job => job.status === 'queued' || job.status === 'running');
+				if (hasActiveJob) {
+					inboxPollTimer = window.setTimeout(async () => {
+						if (!view.isConnected || !location.hash.startsWith('#/import'))
+							return;
+						await loadInbox();
+					}, 3000);
+				}
                 inbox.querySelector('[data-refresh-external-imports]')?.addEventListener('click', loadInbox);
                 inbox.querySelectorAll('[data-delete-external-import]').forEach(button => button.addEventListener('click', async () => {
                     if (!window.confirm(tr('Delete this received import?')))
@@ -1452,6 +1483,7 @@ async function renderImport(view) {
         view.querySelector('[data-extract]')?.addEventListener('click', async () => {
             const language = view.querySelector('[data-import-language]')?.value || 'en';
             const useAi = view.querySelector('[data-import-ai]')?.checked || false;
+			const asyncRefinement = useAi && importSettings.aiAsyncRefinement === true;
             const provider = view.querySelector('[data-import-provider]')?.value || '';
             if (kind === 'file') {
                 const files = Array.from(view.querySelector('[data-import-file]')?.files || []);
@@ -1468,7 +1500,7 @@ async function renderImport(view) {
                         const form = new FormData();
                         form.append('file', file);
                         form.append('language', language);
-                        form.append('useAi', String(useAi));
+                        form.append('useAi', String(useAi && !asyncRefinement));
                         if (provider)
                             form.append('provider', provider);
                         try {
@@ -1497,7 +1529,7 @@ async function renderImport(view) {
                 }
                 setImportBusy(true);
                 try {
-                    const response = await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi, provider: provider || null } }));
+                    const response = await working(() => request('/import/preview', { method: 'POST', json: { kind, payload: kind === 'url' ? { url, language } : { text, language }, useAi: useAi && !asyncRefinement, provider: provider || null } }));
                     previews = response.previews || [response];
                     savedPreviews = new Set();
                 }
@@ -1505,6 +1537,22 @@ async function renderImport(view) {
                     setImportBusy(false);
                 }
             }
+			if (asyncRefinement) {
+				setImportBusy(true, tr('AI refinement'), tr('Preparing AI refinement'));
+				try {
+					await request('/import/refinement/queue', { method: 'POST', json: { previews, language, provider: provider || null } });
+					previews = [];
+					savedPreviews = new Set();
+					const holder = view.querySelector('[data-import-preview]');
+					holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
+					showNotice(tr('AI refinement was queued. You can leave this page and open the preview when it is complete.'));
+					await loadInbox();
+				}
+				finally {
+					setImportBusy(false);
+				}
+				return;
+			}
             showNotice(previews.length > 1 ? `${previews.length} ${tr('recipes extracted. Review them before saving.')}` : tr('Recipe data extracted. Review it before saving.'));
             const holder = view.querySelector('[data-import-preview]');
             holder.innerHTML = importPreviewsHtml(previews, savedPreviews, commonImportTag, taxonomy);
@@ -1599,15 +1647,18 @@ async function renderImport(view) {
 }
 function externalImportInboxHtml(jobs) {
     // Keep pre-upgrade remote jobs visible too, so failed entries can be removed.
-    const entries = jobs.filter(job => ['url', 'text'].includes(job.kind));
+    const entries = jobs.filter(job => ['url', 'text', 'refinement'].includes(job.kind));
     return `<div class="section-heading"><div><p class="eyebrow">${esc(tr('Received imports'))}</p></div><button class="ghost" data-refresh-external-imports type="button">${esc(tr('Refresh'))}</button></div>${entries.length ? `<div class="version-list">${entries.map(job => {
-        const status = job.status === 'complete' ? tr('Open preview') : job.status === 'failed' ? tr('Import failed') : job.status === 'running' ? tr('Processing import') : tr('Waiting for processing');
+        const isRefinement = job.kind === 'refinement';
+        const status = job.status === 'complete' ? tr('Open preview') : job.status === 'failed' ? (isRefinement ? tr('AI refinement failed') : tr('Import failed')) : job.status === 'running' ? (isRefinement ? tr('AI refinement in progress') : tr('Processing import')) : (isRefinement ? tr('AI refinement queued') : tr('Waiting for processing'));
         const source = String(job.sourceRef || job.payload?.text || job.payload?.url || job.kind).slice(0, 180);
         const error = job.status === 'failed' && job.error ? `<small>${esc(job.error)}</small>` : '';
+		const progress = Math.max(0, Math.min(100, Number(job.progress) || 0));
+		const stage = job.status === 'queued' || job.status === 'running' ? `<small>${esc(tr(job.stage || status))} · ${progress}%</small><span class="import-job-progress" aria-label="${attr(`${progress}%`)}"><span style="width:${progress}%"></span></span>` : '';
         const mainAction = job.status === 'complete' && job.result?.recipe
             ? `<button class="primary" data-open-external-import="${attr(job.id)}" type="button">${esc(tr('Open preview'))}</button>`
-            : job.status !== 'running' ? `<button class="primary" data-select-external-import="${attr(job.id)}" type="button">${esc(tr('Select import'))}</button>` : '';
-        return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${error}</div><div class="button-row">${mainAction}<button class="ghost danger" data-delete-external-import="${attr(job.id)}" type="button">${esc(tr('Delete import'))}</button></div></div>`;
+            : !isRefinement && job.status !== 'running' ? `<button class="primary" data-select-external-import="${attr(job.id)}" type="button">${esc(tr('Select import'))}</button>` : '';
+        return `<div class="version-item"><div><strong>${esc(source)}</strong><small>${esc(new Date(job.createdAt * 1000).toLocaleString())} · ${esc(status)}</small>${stage}${error}</div><div class="button-row">${mainAction}<button class="ghost danger" data-delete-external-import="${attr(job.id)}" type="button">${esc(tr('Delete import'))}</button></div></div>`;
     }).join('')}</div>` : `<p>${esc(tr('No received imports yet'))}</p>`}`;
 }
 function previewNames(value) {
@@ -2175,7 +2226,7 @@ async function renderSettings(view) {
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Optional intelligence'))}</p><h2>${esc(tr('AI provider'))}</h2></div><span class="status-pill ${settings.aiProvider !== 'disabled' ? 'enabled' : ''}">${esc(settings.aiProvider === 'disabled' ? tr('Disabled') : tr('Enabled'))}</span></div><div class="form-grid">
 			<label>${esc(tr('Provider'))}<select data-setting="aiProvider"><option value="disabled">${esc(tr('Disabled'))}</option><option value="nextcloud">Nextcloud Assistant</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option><option value="ollama">Ollama</option><option value="localai">LocalAI</option><option value="mistral">Mistral</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option><option value="custom">${esc(tr('Custom OpenAI-compatible'))}</option></select></label>
 			<label>${esc(tr('Model'))}<input data-setting="aiModel" value="${attr(settings.aiModel)}"></label><label class="span-2">${esc(tr('Endpoint'))}<input data-setting="aiEndpoint" type="url" value="${attr(settings.aiEndpoint)}" placeholder="https://..."><small>${esc(tr('Leave empty for the provider default. Ollama and LocalAI use local defaults.'))}</small></label>
-			<label>${esc(tr('API key'))}<input data-setting="aiApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasAiApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="aiApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label><label class="check-inline"><input data-setting="aiUseThinking" type="checkbox"${settings.aiUseThinking ? ' checked' : ''}><span><b>${esc(tr('Use reasoning'))}</b><small>${esc(tr('Only used by Ollama. Disabling it speeds up structured recipe extraction.'))}</small></span></label><label>${esc(tr('Temperature'))}<input data-setting="aiTemperature" type="number" min="0" max="2" step="0.1" value="${settings.aiTemperature}"></label><label>${esc(tr('Timeout'))}<input data-setting="aiTimeout" type="number" min="10" max="300" value="${settings.aiTimeout}"><small>${esc(tr('seconds'))}</small></label>
+			<label>${esc(tr('API key'))}<input data-setting="aiApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasAiApiKey ? tr('Key already stored; leave blank to keep it') : tr('API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="aiApiKey" type="checkbox"> ${esc(tr('Remove stored key'))}</label><label class="check-inline"><input data-setting="aiUseThinking" type="checkbox"${settings.aiUseThinking ? ' checked' : ''}><span><b>${esc(tr('Use reasoning'))}</b><small>${esc(tr('Only used by Ollama. Disabling it speeds up structured recipe extraction.'))}</small></span></label><label class="check-inline"><input data-setting="aiAsyncRefinement" type="checkbox"${settings.aiAsyncRefinement ? ' checked' : ''}><span><b>${esc(tr('Process AI refinement in background'))}</b><small>${esc(tr('You can leave this page while the refinement is running.'))}</small></span></label><label>${esc(tr('Temperature'))}<input data-setting="aiTemperature" type="number" min="0" max="2" step="0.1" value="${settings.aiTemperature}"></label><label>${esc(tr('Timeout'))}<input data-setting="aiTimeout" type="number" min="10" max="300" value="${settings.aiTimeout}"><small>${esc(tr('seconds'))}</small></label>
 		</div><div class="info-box"><b>Nextcloud Assistant</b><p>${esc(tr('Uses the language-model provider already configured by the instance administrator and requires no duplicate API key.'))}</p></div></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('Cover image'))}</p></div></div><div class="form-grid"><label>${esc(tr('Image search provider'))}<select data-setting="coverImageProvider"><option value="google">Google</option><option value="pexels">Pexels</option><option value="unsplash">Unsplash</option></select></label><label class="span-2">${esc(tr('Programmable Search engine ID'))}<input data-setting="googleImageSearchEngineId" value="${attr(settings.googleImageSearchEngineId)}"></label><label>${esc(tr('Google API key'))}<input data-setting="googleImageSearchApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasGoogleImageSearchApiKey ? tr('Key already stored; leave blank to keep it') : tr('Google API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="googleImageSearchApiKey" type="checkbox"> ${esc(tr('Remove stored Google key'))}</label><label>${esc(tr('Pexels API key'))}<input data-setting="pexelsApiKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasPexelsApiKey ? tr('Key already stored; leave blank to keep it') : tr('Pexels API key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="pexelsApiKey" type="checkbox"> ${esc(tr('Remove stored Pexels key'))}</label><label>${esc(tr('Unsplash access key'))}<input data-setting="unsplashAccessKey" type="password" autocomplete="new-password" placeholder="${attr(settings.hasUnsplashAccessKey ? tr('Key already stored; leave blank to keep it') : tr('Unsplash access key'))}"></label><label class="check-inline secret-clear"><input data-setting-clear="unsplashAccessKey" type="checkbox"> ${esc(tr('Remove stored Unsplash key'))}</label></div><p class="section-help">${esc(tr('Uses the selected provider with the recipe title and saves the first suitable result as the cover.'))}</p></section>
 		<section class="panel form-section"><div class="section-heading"><div><p class="eyebrow">${esc(tr('AI meal planner'))}</p></div></div><div class="form-grid"><label class="span-2">${esc(tr('Planner prompt'))}<textarea data-setting="aiPlannerPrompt" rows="3">${esc(settings.aiPlannerPrompt)}</textarea></label><label class="span-2">${esc(tr('Dietary preferences and constraints'))}<textarea data-setting="plannerPreferences" rows="3" placeholder="${attr(tr('Example: vegetarian, no peanuts, low salt'))}">${esc(settings.plannerPreferences)}</textarea></label><label>${esc(tr('Maximum cooking time per meal'))}<input data-setting="plannerCookingTime" type="number" min="5" max="600" value="${settings.plannerCookingTime}"><small>${esc(tr('minutes'))}</small></label><label>${esc(tr('Default servings'))}<input data-setting="plannerServings" type="number" min="1" max="30" value="${settings.plannerServings}"></label></div></section>

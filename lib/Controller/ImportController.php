@@ -79,6 +79,17 @@ final class ImportController extends BaseController {
     }
 
     #[NoAdminRequired]
+    #[FrontpageRoute(verb: 'POST', url: '/import/refinement/queue')]
+    public function enqueueRefinement(): JSONResponse {
+        return $this->respond(function (): array {
+            $previews = $this->payload('previews');
+            $language = (string)$this->request->getParam('language', 'en');
+            $provider = $this->request->getParam('provider', null);
+            return ['job' => $this->imports->enqueueRefinement($this->userContext->userId(), $previews, $language, is_string($provider) ? $provider : null)];
+        }, Http::STATUS_ACCEPTED);
+    }
+
+    #[NoAdminRequired]
     #[FrontpageRoute(verb: 'POST', url: '/import/jobs/{id}/process')]
     public function process(int $id): JSONResponse {
         return $this->respond(fn (): array => ['job' => $this->imports->processForUser($this->userContext->userId(), $id)]);

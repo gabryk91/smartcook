@@ -123,6 +123,19 @@ final class ImportManager {
         return $job;
     }
 
+    /** @param list<array<string, mixed>> $previews @return array<string, mixed> */
+    public function enqueueRefinement(string $userId, array $previews, string $language, ?string $provider): array {
+        $previews = array_values(array_filter($previews, static fn (mixed $preview): bool => is_array($preview) && is_array($preview['recipe'] ?? null)));
+        if ($previews === []) {
+            throw new ImportException('No recipe previews were provided for AI refinement');
+        }
+        $firstRecipe = $previews[0]['recipe'];
+        $sourceRef = isset($firstRecipe['sourceUrl']) ? (string)$firstRecipe['sourceUrl'] : (string)($firstRecipe['title'] ?? 'Recipe refinement');
+        $job = $this->jobs->createJob($userId, 'refinement', $sourceRef, true, $provider, ['previews' => $previews, 'language' => $language]);
+        $this->jobList->add(ProcessImportJob::class, ['jobId' => $job['id']]);
+        return $job;
+    }
+
     /** @return array<string, mixed> */
     public function processJob(int $jobId): array {
         $job = $this->jobs->getJob($jobId);
@@ -132,9 +145,11 @@ final class ImportManager {
         if ($job['status'] === 'complete' && is_array($job['result'])) {
             return $job['result'];
         }
-        $this->jobs->markRunning($jobId);
+        $this->jobs->markRunning($jobId, $job['kind'] === 'refinement' ? 'Preparing AI refinement' : 'Preparing import');
         try {
-            $result = $this->preview($job['userId'], $job['kind'], $job['payload'], $job['useAi'], $job['provider'], false);
+            $result = $job['kind'] === 'refinement'
+                ? $this->processRefinementJob($jobId, $job)
+                : $this->preview($job['userId'], $job['kind'], $job['payload'], $job['useAi'], $job['provider'], false);
             $this->jobs->markComplete($jobId, $result);
             return $result;
         } catch (\Throwable $e) {
@@ -162,6 +177,34 @@ final class ImportManager {
     public function deleteForUser(string $userId, int $id): void {
         $this->job($userId, $id);
         $this->jobs->deleteForUser($id, $userId);
+    }
+
+    /** @param array<string, mixed> $job @return array<string, mixed> */
+    private function processRefinementJob(int $jobId, array $job): array {
+        $previews = array_values(array_filter((array)($job['payload']['previews'] ?? []), static fn (mixed $preview): bool => is_array($preview) && is_array($preview['recipe'] ?? null)));
+        if ($previews === []) {
+            throw new ImportException('No recipe previews were provided for AI refinement');
+        }
+        $language = (string)($job['payload']['language'] ?? 'en');
+        $total = count($previews);
+        foreach ($previews as $index => $preview) {
+            $position = $index + 1;
+            $progress = 10 + (int)floor(($index / $total) * 80);
+            $this->jobs->updateProgress($jobId, "Refining recipe {$position} of {$total}", $progress);
+            try {
+                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null);
+                $previews[$index]['strategy'] = (string)($preview['strategy'] ?? 'import') . '+ai';
+            } catch (\Throwable $e) {
+                $warnings = (array)($preview['warnings'] ?? []);
+                $warnings[] = 'AI refinement: ' . $e->getMessage();
+                $previews[$index]['warnings'] = array_values(array_unique($warnings));
+            }
+            $this->jobs->updateProgress($jobId, "Validated recipe {$position} of {$total}", 10 + (int)floor(($position / $total) * 80));
+        }
+        $this->jobs->updateProgress($jobId, 'Finalizing AI refinement', 95);
+        $primary = $previews[0];
+        $primary['previews'] = $previews;
+        return $primary;
     }
 
     private function importer(string $kind): ImporterInterface {

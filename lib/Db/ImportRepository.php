@@ -19,6 +19,8 @@ final class ImportRepository extends AbstractRepository {
             'kind' => $kind,
             'source_ref' => $sourceRef,
             'status' => 'queued',
+            'progress' => 0,
+            'stage' => 'Queued',
             'use_ai' => $useAi,
             'provider' => $provider,
             'payload' => $this->encode($payload),
@@ -52,13 +54,19 @@ final class ImportRepository extends AbstractRepository {
         return $row === null ? null : $this->map($row);
     }
 
-    public function markRunning(int $id): void {
-        $this->update('smartcook_imports', $id, ['status' => 'running', 'updated_at' => time(), 'error' => null]);
+    public function markRunning(int $id, string $stage = 'Processing import', int $progress = 5): void {
+        $this->update('smartcook_imports', $id, ['status' => 'running', 'stage' => $stage, 'progress' => max(0, min(99, $progress)), 'updated_at' => time(), 'error' => null]);
+    }
+
+    public function updateProgress(int $id, string $stage, int $progress): void {
+        $this->update('smartcook_imports', $id, ['stage' => $stage, 'progress' => max(0, min(99, $progress)), 'updated_at' => time()]);
     }
 
     public function markComplete(int $id, array $result): void {
         $this->update('smartcook_imports', $id, [
             'status' => 'complete',
+            'stage' => 'Complete',
+            'progress' => 100,
             'result' => $this->encode($result),
             'error' => null,
             'updated_at' => time(),
@@ -68,6 +76,7 @@ final class ImportRepository extends AbstractRepository {
     public function markFailed(int $id, string $error): void {
         $this->update('smartcook_imports', $id, [
             'status' => 'failed',
+            'stage' => 'Failed',
             'error' => mb_substr($error, 0, 4000),
             'updated_at' => time(),
         ]);
@@ -96,6 +105,8 @@ final class ImportRepository extends AbstractRepository {
             'kind' => (string)$row['kind'],
             'sourceRef' => $row['source_ref'],
             'status' => (string)$row['status'],
+            'progress' => isset($row['progress']) ? (int)$row['progress'] : 0,
+            'stage' => isset($row['stage']) ? (string)$row['stage'] : '',
             'useAi' => (bool)$row['use_ai'],
             'provider' => $row['provider'],
             'payload' => $this->decode($row['payload'], []),

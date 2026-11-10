@@ -17,6 +17,7 @@ final class SettingsService {
         'aiEndpoint' => '',
         'aiModel' => '',
         'aiUseThinking' => '0',
+        'aiAsyncRefinement' => '0',
         'aiTemperature' => '0.1',
         'aiTimeout' => '90',
         'aiPlannerPrompt' => 'Organizza una settimana varia e realistica usando esclusivamente le ricette disponibili.',
@@ -45,6 +46,7 @@ final class SettingsService {
         $result['aiTemperature'] = (float)$result['aiTemperature'];
         $result['aiTimeout'] = (int)$result['aiTimeout'];
         $result['aiUseThinking'] = filter_var($result['aiUseThinking'], FILTER_VALIDATE_BOOLEAN);
+        $result['aiAsyncRefinement'] = filter_var($result['aiAsyncRefinement'], FILTER_VALIDATE_BOOLEAN);
         $result['plannerCookingTime'] = (int)$result['plannerCookingTime'];
         $result['plannerServings'] = (int)$result['plannerServings'];
         $result['maxImportBytes'] = (int)$result['maxImportBytes'];
@@ -87,6 +89,8 @@ final class SettingsService {
             } elseif ($key === 'aiTimeout') {
                 $value = (string)max(10, min(300, (int)$value));
             } elseif ($key === 'aiUseThinking') {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+            } elseif ($key === 'aiAsyncRefinement') {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
             } elseif ($key === 'maxImportBytes') {
                 $value = (string)max(100000, min(20000000, (int)$value));

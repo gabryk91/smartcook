@@ -2489,6 +2489,24 @@ select:focus {
 	color: var(--smartcook-muted);
 }
 
+.import-job-progress {
+	display: block;
+	width: 100%;
+	height: 6px;
+	margin-top: 4px;
+	overflow: hidden;
+	border-radius: var(--smartcook-radius, 12px);
+	background: var(--smartcook-surface-soft);
+}
+
+.import-job-progress > span {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--smartcook-accent);
+	transition: width 180ms ease;
+}
+
 .share-list input {
 	margin-block-start: 6px;
 	font-size: 12px;
