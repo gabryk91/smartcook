@@ -63,6 +63,7 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
                 'model' => $model,
                 'prompt' => "You are a precise culinary data extraction engine.\n\n" . $prompt,
                 'stream' => false,
+                'think' => (bool)($config['useThinking'] ?? false),
                 'options' => ['temperature' => $temperature],
             ]
             : [
