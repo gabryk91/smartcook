@@ -93,6 +93,7 @@ final class ImportManager {
             'recipe' => $recipe,
             'strategy' => $strategy,
             'warnings' => array_values(array_unique($warnings)),
+            'refinementSource' => mb_substr($result->sourceText, 0, 120000),
             // Duplicate lookup relies on the active web session. Background jobs
             // run without one, so they intentionally defer this optional hint.
             'duplicates' => $includeDuplicates ? $this->duplicates->find($recipe) : [],
@@ -100,20 +101,16 @@ final class ImportManager {
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider): array {
+    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider, ?string $source = null): array {
         if ($recipe === []) {
             throw new ImportException('No recipe preview was provided');
         }
         $taxonomy = $this->taxonomy->listForUser($userId);
         // The deterministic importer has already preserved quantities and removed
-        // caption boilerplate. Ask AI only to refine that compact preview instead
-        // of re-extracting the entire social post.
-        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider);
+        // caption boilerplate. AI receives the original source too, but retains
+        // the deterministic preview when it has more reliable quantities.
+        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $source);
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
-        $aiRecipe = array_intersect_key($aiRecipe, array_flip([
-            'title', 'description', 'difficulty', 'cuisine', 'mealType',
-            'cookingMethod', 'tags', 'categories', 'coverSuggestion',
-        ]));
         if (($aiRecipe['title'] ?? null) === 'Imported recipe') {
             unset($aiRecipe['title']);
         }
@@ -203,13 +200,14 @@ final class ImportManager {
             $progress = 10 + (int)floor(($index / $total) * 80);
             $this->jobs->updateProgress($jobId, "Refining recipe {$position} of {$total}", $progress);
             try {
-                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null);
+                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null, is_string($preview['refinementSource'] ?? null) ? $preview['refinementSource'] : null);
                 $previews[$index]['strategy'] = (string)($preview['strategy'] ?? 'import') . '+ai';
             } catch (\Throwable $e) {
                 $warnings = (array)($preview['warnings'] ?? []);
                 $warnings[] = 'AI refinement: ' . $e->getMessage();
                 $previews[$index]['warnings'] = array_values(array_unique($warnings));
             }
+            unset($previews[$index]['refinementSource']);
             $this->jobs->updateProgress($jobId, "Validated recipe {$position} of {$total}", 10 + (int)floor(($position / $total) * 80));
         }
         $this->jobs->updateProgress($jobId, 'Finalizing AI refinement', 95);
