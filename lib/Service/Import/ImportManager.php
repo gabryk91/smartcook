@@ -108,8 +108,15 @@ final class ImportManager {
         // The deterministic importer has already preserved quantities and removed
         // caption boilerplate. Ask AI only to refine that compact preview instead
         // of re-extracting the entire social post.
-        $aiRecipe = $this->ai->refine($userId, $recipe, $language, $taxonomy, $provider);
+        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider);
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
+        $aiRecipe = array_intersect_key($aiRecipe, array_flip([
+            'title', 'description', 'difficulty', 'cuisine', 'mealType',
+            'cookingMethod', 'tags', 'categories', 'coverSuggestion',
+        ]));
+        if (($aiRecipe['title'] ?? null) === 'Imported recipe') {
+            unset($aiRecipe['title']);
+        }
         $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
         return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $taxonomy));
     }

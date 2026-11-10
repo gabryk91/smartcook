@@ -75,6 +75,25 @@ final class AiProviderRegistry {
         throw new ImportException('Unsupported AI provider: ' . $providerId);
     }
 
+    /** @param array<string, mixed> $recipe @return array<string, mixed> */
+    public function refineImport(string $userId, array $recipe, string $language, array $taxonomy = [], ?string $providerOverride = null): array {
+        $config = $this->settings->ai($userId);
+        $providerId = $providerOverride !== null && $providerOverride !== '' ? $providerOverride : (string)$config['provider'];
+        if ($providerId === 'disabled') {
+            throw new ImportException('AI refinement is disabled');
+        }
+        $config['provider'] = $providerId;
+        $config['userId'] = $userId;
+        $config['importRefinement'] = $recipe;
+        $config['taxonomy'] = $taxonomy;
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($providerId)) {
+                return $provider->extractRecipe('', $language, $config);
+            }
+        }
+        throw new ImportException('Unsupported AI provider: ' . $providerId);
+    }
+
     /** @param list<array<string, mixed>> $recipes @return array<string, mixed> */
     public function answer(string $userId, string $question, array $recipes, string $language): array {
         $config = $this->settings->ai($userId);

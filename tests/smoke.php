@@ -55,6 +55,9 @@ $expectSame('5', $difficulty->normalize('Molto difficile'), 'Very difficult diff
 $refinementPrompt = (new AiPromptFactory())->refinement(['title' => 'Pasta', 'ingredients' => [['name' => 'Pasta']], 'steps' => []], 'it');
 $expect(str_contains($refinementPrompt, '"steps"'), 'AI refinement schema includes procedure proposal');
 $expect(str_contains($refinementPrompt, 'has no non-empty procedure'), 'AI refinement limits procedure generation to missing procedures');
+$importRefinementPrompt = (new AiPromptFactory())->importRefinement(['title' => 'Imported recipe', 'ingredients' => [['name' => 'Feta']], 'steps' => [['text' => 'Servire']]], 'it', ['tags' => [['name' => 'Bilanciato']], 'categories' => [['name' => 'Antipasti']]]);
+$expect(str_contains($importRefinementPrompt, 'Always provide a concise factual description'), 'Import refinement requires a description');
+$expect(str_contains($importRefinementPrompt, 'Antipasti'), 'Import refinement receives the existing taxonomy');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
