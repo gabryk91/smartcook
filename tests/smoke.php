@@ -154,7 +154,8 @@ $emojiIngredient = $ingredientParser->parse('🧅 1 cipolla dolce');
 $expectSame('cipolla dolce', $emojiIngredient['name'], 'Emoji-prefixed Instagram ingredient name');
 $expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram ingredient quantity');
 
-$youtubeCaptionRecipe = $recipeParser->parse('🧾 Ingredienti per ~1 porzione: 🍠 100g Barbabietola; 🧀 150g Feta 🔄 150g Feta Light; 🫒 +20g Olio e.v.o. 🔄 1 cucchiaio (~10g); 🍯 15g Miele 🧂 q.b. aceto balsamico, sale ed erba cipollina. 👨‍🍳 Preparazione: - lava bene e sbuccia una barbabietola; - affettala finemente con una mandolina;', ['language' => 'it']);
+$youtubeCaptionRecipe = $recipeParser->parse('🧾 Ingredienti per ~1 porzione: 🍠 100g Barbabietola; 🧀 150g Feta 🔄 150g Feta Light; 🫒 +20g Olio e.v.o. 🔄 1 cucchiaio (~10g); 🍯 15g Miele 🧂 q.b. aceto balsamico, sale ed erba cipollina. 👨‍🍳 Preparazione: - lava bene e sbuccia una barbabietola; - affettala finemente con una mandolina; 🔥 Valori nutrizionali - per UNA porzione: ~391kcal. ⚠️ Considerazioni: ottima prima dell’allenamento. #pranzo #dieta', ['language' => 'it', 'title' => '9 novembre 2026']);
+$expectSame('Barbabietola e Feta', $youtubeCaptionRecipe['title'], 'YouTube social caption fallback title');
 $expectSame(7, count($youtubeCaptionRecipe['ingredients']), 'YouTube social caption ingredients');
 $expectNear(100.0, $youtubeCaptionRecipe['ingredients'][0]['amount'], 0.0001, 'YouTube social caption beetroot quantity');
 $expectNear(150.0, $youtubeCaptionRecipe['ingredients'][1]['amount'], 0.0001, 'YouTube social caption feta quantity');

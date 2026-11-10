@@ -93,9 +93,6 @@ final class ImportManager {
             'recipe' => $recipe,
             'strategy' => $strategy,
             'warnings' => array_values(array_unique($warnings)),
-            // The asynchronous refinement must receive the original source, not
-            // the lossy deterministic preview reconstructed in recipeSource().
-            'refinementSource' => mb_substr($result->sourceText, 0, 120000),
             // Duplicate lookup relies on the active web session. Background jobs
             // run without one, so they intentionally defer this optional hint.
             'duplicates' => $includeDuplicates ? $this->duplicates->find($recipe) : [],
@@ -103,15 +100,18 @@ final class ImportManager {
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider, ?string $source = null): array {
+    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider): array {
         if ($recipe === []) {
             throw new ImportException('No recipe preview was provided');
         }
-        $source = trim((string)$source);
-        $aiRecipe = $this->ai->extract($userId, mb_substr($source !== '' ? $source : $this->recipeSource($recipe), 0, 120000), $language, $provider, $this->taxonomy->listForUser($userId));
+        $taxonomy = $this->taxonomy->listForUser($userId);
+        // The deterministic importer has already preserved quantities and removed
+        // caption boilerplate. Ask AI only to refine that compact preview instead
+        // of re-extracting the entire social post.
+        $aiRecipe = $this->ai->refine($userId, $recipe, $language, $taxonomy, $provider);
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
-        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $this->taxonomy->listForUser($userId));
-        return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $this->taxonomy->listForUser($userId)));
+        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
+        return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $taxonomy));
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */
@@ -196,14 +196,13 @@ final class ImportManager {
             $progress = 10 + (int)floor(($index / $total) * 80);
             $this->jobs->updateProgress($jobId, "Refining recipe {$position} of {$total}", $progress);
             try {
-                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null, is_string($preview['refinementSource'] ?? null) ? $preview['refinementSource'] : null);
+                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null);
                 $previews[$index]['strategy'] = (string)($preview['strategy'] ?? 'import') . '+ai';
             } catch (\Throwable $e) {
                 $warnings = (array)($preview['warnings'] ?? []);
                 $warnings[] = 'AI refinement: ' . $e->getMessage();
                 $previews[$index]['warnings'] = array_values(array_unique($warnings));
             }
-            unset($previews[$index]['refinementSource']);
             $this->jobs->updateProgress($jobId, "Validated recipe {$position} of {$total}", 10 + (int)floor(($position / $total) * 80));
         }
         $this->jobs->updateProgress($jobId, 'Finalizing AI refinement', 95);
@@ -234,28 +233,6 @@ final class ImportManager {
             }
         }
         return $primary;
-    }
-
-    /** @param array<string, mixed> $recipe */
-    private function recipeSource(array $recipe): string {
-        $ingredients = array_map(static function (mixed $item): string {
-            if (!is_array($item)) {
-                return (string)$item;
-            }
-            return trim(implode(' ', array_filter([
-                isset($item['quantity']) ? (string)$item['quantity'] : '',
-                (string)($item['unit'] ?? ''),
-                (string)($item['name'] ?? ''),
-                (string)($item['notes'] ?? ''),
-            ])));
-        }, (array)($recipe['ingredients'] ?? []));
-        $steps = array_map(static fn (mixed $step): string => is_array($step) ? (string)($step['text'] ?? '') : (string)$step, (array)($recipe['steps'] ?? []));
-        return trim(implode("\n\n", [
-            (string)($recipe['title'] ?? ''),
-            (string)($recipe['description'] ?? ''),
-            "Ingredients:\n" . implode("\n", array_filter($ingredients)),
-            "Procedure:\n" . implode("\n", array_filter($steps)),
-        ]));
     }
 
     private function hasSocialRecipeEvidence(ImportResult $result): bool {

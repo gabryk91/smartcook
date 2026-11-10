@@ -57,12 +57,13 @@ final class AiProviderRegistry {
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refine(string $userId, array $recipe, string $language, array $taxonomy = []): array {
+    public function refine(string $userId, array $recipe, string $language, array $taxonomy = [], ?string $providerOverride = null): array {
         $config = $this->settings->ai($userId);
-        $providerId = (string)$config['provider'];
+        $providerId = $providerOverride !== null && $providerOverride !== '' ? $providerOverride : (string)$config['provider'];
         if ($providerId === 'disabled') {
             throw new ImportException('AI refinement is disabled');
         }
+        $config['provider'] = $providerId;
         $config['userId'] = $userId;
         $config['refinement'] = $recipe;
         $config['taxonomy'] = $taxonomy;

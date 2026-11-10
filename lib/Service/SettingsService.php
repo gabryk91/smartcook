@@ -87,7 +87,7 @@ final class SettingsService {
             if ($key === 'aiTemperature') {
                 $value = (string)max(0.0, min(2.0, (float)$value));
             } elseif ($key === 'aiTimeout') {
-                $value = (string)max(10, min(300, (int)$value));
+                $value = (string)max(10, min(1800, (int)$value));
             } elseif ($key === 'aiUseThinking') {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
             } elseif ($key === 'aiAsyncRefinement') {

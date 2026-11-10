@@ -72,6 +72,9 @@ final class IngredientParser {
         if (preg_match('/^(?:\d+(?:[.,]\d+)?|\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞]|q\.?\s*b\.?|quanto basta|to taste)\b/iu', $line) === 1) {
             return true;
         }
+        if (preg_match('/^\d+\s*(?:kg|g|gr|mg|ml|cl|dl|l|cup|cups|tbsp|tsp|cucchiai?|cucchiaini?|grammi?|litri?|oz|lb|pezzi?|spicchi?)\b/iu', $line) === 1) {
+            return true;
+        }
         return preg_match('/\b(?:kg|g|gr|mg|ml|cl|dl|l|cup|cups|tbsp|tsp|cucchiai?|cucchiaini?|grammi?|litri?|oz|lb|pezzi?|spicchi?)\b/iu', $line) === 1;
     }
 

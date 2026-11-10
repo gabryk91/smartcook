@@ -23,10 +23,14 @@ final class TextRecipeParser {
         $source = $this->text->compactText($this->prepareSocialCaption($source));
         $lines = array_values(array_filter(array_map('trim', preg_split('/\n+/', $source) ?: []), static fn (string $line): bool => $line !== ''));
         $title = trim((string)($hints['title'] ?? ''));
-        if ($title === '') {
+        $dateTitle = $this->isDateTitle($title);
+        if ($dateTitle) {
+            $title = '';
+        }
+        if ($title === '' && !$dateTitle) {
             $title = $this->firstTitle($lines);
         }
-        $sections = ['intro' => [], 'ingredients' => [], 'steps' => [], 'tools' => []];
+        $sections = ['intro' => [], 'ingredients' => [], 'steps' => [], 'tools' => [], 'ignore' => []];
         $section = 'intro';
         foreach ($lines as $line) {
             $header = $this->header($line);
@@ -62,6 +66,9 @@ final class TextRecipeParser {
             $parsed = $this->ingredients->parse($line, count($ingredients));
             $parsed['group'] = $group;
             $ingredients[] = $parsed;
+        }
+        if ($title === '') {
+            $title = $this->fallbackTitle($ingredients);
         }
         $steps = [];
         foreach ($this->stepLines($sections['steps']) as $line) {
@@ -113,6 +120,9 @@ final class TextRecipeParser {
         if (in_array($normalized, self::TOOL_HEADERS, true)) {
             return 'tools';
         }
+        if (preg_match('/^(?:valori nutrizionali|nutrition|considerazioni|considerations|note|notes|hashtag)/iu', $normalized) === 1) {
+            return 'ignore';
+        }
         return null;
     }
 
@@ -124,7 +134,28 @@ final class TextRecipeParser {
             $source = preg_replace('/(?:^|\\n)\\s*(' . $header . ')\\s*/imu', "\n$1\n", $source) ?? $source;
             $source = preg_replace('/' . $emojiPrefix . '(' . $header . ')\\s*/iu', "\n$1\n", $source) ?? $source;
         }
-        return $source;
+        $stopHeader = '(?:valori nutrizionali|nutrition|considerazioni|considerations)(?:[^:\\n]*)\\s*:';
+        $source = preg_replace('/(?:^|\\n)\\s*(' . $stopHeader . ')\\s*/imu', "\n$1\n", $source) ?? $source;
+        return preg_replace('/' . $emojiPrefix . '(' . $stopHeader . ')\\s*/iu', "\n$1\n", $source) ?? $source;
+    }
+
+    /** @param list<array<string, mixed>> $ingredients */
+    private function fallbackTitle(array $ingredients): string {
+        $names = [];
+        foreach ($ingredients as $ingredient) {
+            $name = trim((string)($ingredient['name'] ?? ''));
+            if ($name !== '' && !str_starts_with(mb_strtolower($name), 'q.b.')) {
+                $names[] = $name;
+            }
+            if (count($names) === 2) {
+                break;
+            }
+        }
+        return count($names) >= 2 ? $names[0] . ' e ' . $names[1] : ($names[0] ?? 'Imported recipe');
+    }
+
+    private function isDateTitle(string $title): bool {
+        return preg_match('/^\\d{1,2}\\s+(?:gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\\s+\\d{4}$/iu', $title) === 1;
     }
 
     /** @param list<string> $lines @return list<string> */
