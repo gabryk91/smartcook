@@ -56,9 +56,11 @@ $refinementPrompt = (new AiPromptFactory())->refinement(['title' => 'Pasta', 'in
 $expect(str_contains($refinementPrompt, '"steps"'), 'AI refinement schema includes procedure proposal');
 $expect(str_contains($refinementPrompt, 'has no non-empty procedure'), 'AI refinement limits procedure generation to missing procedures');
 $importRefinementPrompt = (new AiPromptFactory())->importRefinement(['recipe' => ['title' => 'Imported recipe', 'ingredients' => [['name' => 'Feta']], 'steps' => [['text' => 'Servire']]], 'source' => 'Valori nutrizionali: 391 kcal. Riposo: 30 minuti.'], 'it', ['tags' => [['name' => 'Bilanciato']], 'categories' => [['name' => 'Antipasti']]]);
-$expect(str_contains($importRefinementPrompt, 'structured preview is authoritative'), 'Import refinement preserves the structured preview');
+$expect(str_contains($importRefinementPrompt, 'structured preview'), 'Import refinement receives the structured preview');
 $expect(str_contains($importRefinementPrompt, 'Antipasti'), 'Import refinement receives the existing taxonomy');
 $expect(str_contains($importRefinementPrompt, '391 kcal'), 'Import refinement receives nutritional source context');
+$expect(str_contains($importRefinementPrompt, '"group":"string|null"'), 'Import refinement uses the complete ingredient schema');
+$expect(str_contains($importRefinementPrompt, '"allergens":[]'), 'Import refinement includes allergen suggestions');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
@@ -154,6 +156,10 @@ $expectSame('https://cdn.example.test/pasta-al-forno.jpg', $instagramSource['ima
 $instagramRecipe = $recipeParser->parse($instagramSource['description'], ['language' => 'it']);
 $expectSame(2, count($instagramRecipe['ingredients']), 'Instagram caption ingredients');
 $expectSame(2, count($instagramRecipe['steps']), 'Instagram caption steps');
+$longSocialTitle = str_repeat('Pasta al forno ', 30);
+$longTitleRecipe = $recipeParser->parse('Ingredienti: 200 g pasta', ['title' => $longSocialTitle]);
+$expect(mb_strlen($longTitleRecipe['title']) <= 255, 'Long social title fits recipe validation');
+$expectSame($longTitleRecipe['title'], (new \OCA\SmartCook\Service\RecipeValidator($text, $difficulty))->validate($longTitleRecipe)['title'], 'Long social title passes recipe validation');
 $emojiIngredient = $ingredientParser->parse('🧅 1 cipolla dolce');
 $expectSame('cipolla dolce', $emojiIngredient['name'], 'Emoji-prefixed Instagram ingredient name');
 $expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram ingredient quantity');

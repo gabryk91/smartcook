@@ -54,7 +54,7 @@ final class RecipeNormalizer {
 
         $recipeSourceUrl = $sourceUrl ?? $this->nullable($data['url'] ?? $data['sourceUrl'] ?? null);
         $recipe = [
-            'title' => trim((string)($data['name'] ?? $data['title'] ?? $data['headline'] ?? 'Imported recipe')),
+            'title' => trim(mb_substr(trim((string)($data['name'] ?? $data['title'] ?? $data['headline'] ?? 'Imported recipe')), 0, 255)),
             'subtitle' => $this->nullable($data['subtitle'] ?? null),
             'description' => $this->nullable($this->plain($data['description'] ?? null)),
             'language' => (string)($data['inLanguage'] ?? $data['language'] ?? 'en'),
