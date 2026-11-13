@@ -62,7 +62,8 @@ final class ImportController extends BaseController {
             }
             $language = (string)$this->request->getParam('language', 'en');
             $provider = $this->request->getParam('provider', null);
-            return ['recipe' => $this->imports->refinePreview($this->userContext->userId(), $recipe, $language, is_string($provider) ? $provider : null)];
+            $source = $this->request->getParam('source', null);
+            return ['recipe' => $this->imports->refinePreview($this->userContext->userId(), $recipe, $language, is_string($provider) ? $provider : null, is_string($source) ? $source : null)];
         });
     }
 

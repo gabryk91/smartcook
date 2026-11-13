@@ -65,7 +65,7 @@ final class ImportManager {
         $recipe = $result->recipe;
         $strategy = $result->strategy;
         $warnings = $result->warnings;
-        $taxonomy = $this->taxonomy->listForUser($userId);
+        $taxonomy = $this->importTaxonomy($userId);
 
         if ($useAi && !$this->hasSocialRecipeEvidence($result)) {
             $warnings[] = 'AI refinement was skipped because the social post does not expose enough recipe data. Add the ingredients or instructions as text to import it safely.';
@@ -78,6 +78,7 @@ final class ImportManager {
                     $provider,
                     $taxonomy,
                 );
+                $this->assertAiTitle($aiRecipe);
                 $aiRecipe = $this->normalizer->normalize($aiRecipe, $recipe['sourceUrl'] ?? null);
                 $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
                 $recipe = $this->merge($aiRecipe, $recipe);
@@ -105,14 +106,17 @@ final class ImportManager {
         if ($recipe === []) {
             throw new ImportException('No recipe preview was provided');
         }
-        $taxonomy = $this->taxonomy->listForUser($userId);
+        $taxonomy = $this->importTaxonomy($userId);
         // The deterministic importer has already preserved quantities and removed
         // caption boilerplate. AI receives the original source too, but retains
         // the deterministic preview when it has more reliable quantities.
         $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $source);
+        $this->assertAiTitle($aiRecipe);
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
-        if (($aiRecipe['title'] ?? null) === 'Imported recipe') {
-            unset($aiRecipe['title']);
+        foreach (['ingredients', 'steps'] as $field) {
+            if (($recipe[$field] ?? []) !== []) {
+                $aiRecipe[$field] = $recipe[$field];
+            }
         }
         $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
         return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $taxonomy));
@@ -248,5 +252,22 @@ final class ImportManager {
         $ingredients = (array)($result->recipe['ingredients'] ?? []);
         $steps = (array)($result->recipe['steps'] ?? []);
         return count($ingredients) >= 2 || (count($ingredients) >= 1 && count($steps) >= 1);
+    }
+
+    /** @return array<string, mixed> */
+    private function importTaxonomy(string $userId): array {
+        $taxonomy = $this->taxonomy->listForUser($userId);
+        if (($taxonomy['categories'] ?? []) === []) {
+            $taxonomy['categories'] = array_map(static fn (string $name): array => ['name' => $name], ['Antipasti', 'Primi', 'Secondi', 'Contorni', 'Dolci', 'Bevande']);
+        }
+        return $taxonomy;
+    }
+
+    /** @param array<string, mixed> $recipe */
+    private function assertAiTitle(array $recipe): void {
+        $title = trim((string)($recipe['title'] ?? ''));
+        if ($title === '' || mb_strtolower($title) === 'imported recipe' || mb_strlen($title) > 160 || preg_match('/\b(?:ingredienti|ingredients|procedimento|preparazione|instructions|directions)\b[^:\n]{0,80}:/iu', $title) === 1) {
+            throw new ImportException('AI did not return a usable recipe title');
+        }
     }
 }

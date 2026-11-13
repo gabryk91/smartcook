@@ -1392,7 +1392,7 @@ async function renderImport(view) {
 			for (const [position, { preview, index }] of pending.entries()) {
 				setImportBusy(true, tr('AI refinement'), `${tr('Recipe')} ${position + 1} ${tr('of')} ${pending.length}: ${preview.recipe.title}`);
 				try {
-					const response = await request('/import/refine', { method: 'POST', json: { recipe: preview.recipe, language, provider: provider || null } });
+					const response = await request('/import/refine', { method: 'POST', json: { recipe: preview.recipe, source: preview.refinementSource || null, language, provider: provider || null } });
 					previews[index].recipe = response.recipe;
 					previews[index].strategy = `${preview.strategy}+ai`;
 				}

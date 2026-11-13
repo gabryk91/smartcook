@@ -61,6 +61,10 @@ $expect(str_contains($importRefinementPrompt, 'Antipasti'), 'Import refinement r
 $expect(str_contains($importRefinementPrompt, '391 kcal'), 'Import refinement receives nutritional source context');
 $expect(str_contains($importRefinementPrompt, '"group":"string|null"'), 'Import refinement uses the complete ingredient schema');
 $expect(str_contains($importRefinementPrompt, '"allergens":[]'), 'Import refinement includes allergen suggestions');
+$expect(str_contains($importRefinementPrompt, 'single best category'), 'AI import asks for the best fitting category');
+$expect(str_contains($importRefinementPrompt, 'short name of the finished dish'), 'AI import asks for a concise dish title');
+$expect(str_contains($importRefinementPrompt, 'preview title is only a rough parser suggestion'), 'AI refinement reviews the parser title');
+$expect(str_contains($importRefinementPrompt, 'Always return a reviewed title'), 'AI refinement always proposes a title');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
