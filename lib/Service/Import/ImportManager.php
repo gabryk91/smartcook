@@ -15,6 +15,9 @@ use OCA\SmartCook\Service\SettingsService;
 use OCP\BackgroundJob\IJobList;
 
 final class ImportManager {
+    // Slow local models (e.g. Ollama on CPU) need far more than the interactive timeout.
+    private const BACKGROUND_AI_TIMEOUT = 900;
+
     /** @var list<ImporterInterface> */
     private array $importers;
 
@@ -71,17 +74,7 @@ final class ImportManager {
             $warnings[] = 'AI refinement was skipped because the social post does not expose enough recipe data. Add the ingredients or instructions as text to import it safely.';
         } elseif ($useAi) {
             try {
-                $aiRecipe = $this->ai->extract(
-                    $userId,
-                    mb_substr($result->sourceText, 0, 120000),
-                    (string)($payload['language'] ?? $recipe['language'] ?? 'en'),
-                    $provider,
-                    $taxonomy,
-                );
-                $this->assertAiTitle($aiRecipe);
-                $aiRecipe = $this->normalizer->normalize($aiRecipe, $recipe['sourceUrl'] ?? null);
-                $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
-                $recipe = $this->merge($aiRecipe, $recipe);
+                $recipe = $this->extractWithAi($userId, $recipe, $result->sourceText, (string)($payload['language'] ?? $recipe['language'] ?? 'en'), $provider, $taxonomy, 0);
                 $strategy .= '+ai';
             } catch (\Throwable $e) {
                 $warnings[] = 'AI extraction failed: ' . $e->getMessage();
@@ -101,8 +94,17 @@ final class ImportManager {
         ];
     }
 
+    /** @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed> */
+    private function extractWithAi(string $userId, array $recipe, string $sourceText, string $language, ?string $provider, array $taxonomy, int $minTimeout): array {
+        $aiRecipe = $this->ai->extract($userId, mb_substr($sourceText, 0, 120000), $language, $provider, $taxonomy, $minTimeout);
+        $this->assertAiTitle($aiRecipe);
+        $aiRecipe = $this->normalizer->normalize($aiRecipe, $recipe['sourceUrl'] ?? null);
+        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
+        return $this->merge($aiRecipe, $recipe);
+    }
+
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider, ?string $source = null): array {
+    public function refinePreview(string $userId, array $recipe, string $language, ?string $provider, ?string $source = null, bool $background = false): array {
         if ($recipe === []) {
             throw new ImportException('No recipe preview was provided');
         }
@@ -110,7 +112,18 @@ final class ImportManager {
         // The deterministic importer has already preserved quantities and removed
         // caption boilerplate. AI receives the original source too, but retains
         // the deterministic preview when it has more reliable quantities.
-        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $source);
+        $minTimeout = $background ? self::BACKGROUND_AI_TIMEOUT : 0;
+        $sourceText = trim((string)$source);
+        if ($sourceText !== '') {
+            // Same full-extraction prompt used by the synchronous import: it reads the
+            // original post and returns title, description and every classification.
+            try {
+                return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->extractWithAi($userId, $recipe, $sourceText, $language, $provider, $taxonomy, $minTimeout), $taxonomy));
+            } catch (\Throwable $e) {
+                // Fall back to the review prompt below.
+            }
+        }
+        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $source, $minTimeout);
         $this->assertAiTitle($aiRecipe);
         $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
         foreach (['ingredients', 'steps'] as $field) {
@@ -204,7 +217,7 @@ final class ImportManager {
             $progress = 10 + (int)floor(($index / $total) * 80);
             $this->jobs->updateProgress($jobId, "Refining recipe {$position} of {$total}", $progress);
             try {
-                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null, is_string($preview['refinementSource'] ?? null) ? $preview['refinementSource'] : null);
+                $previews[$index]['recipe'] = $this->refinePreview((string)$job['userId'], $preview['recipe'], $language, is_string($job['provider'] ?? null) ? $job['provider'] : null, is_string($preview['refinementSource'] ?? null) ? $preview['refinementSource'] : null, true);
                 $previews[$index]['strategy'] = (string)($preview['strategy'] ?? 'import') . '+ai';
             } catch (\Throwable $e) {
                 $warnings = (array)($preview['warnings'] ?? []);

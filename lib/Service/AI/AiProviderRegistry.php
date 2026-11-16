@@ -22,8 +22,9 @@ final class AiProviderRegistry {
     }
 
     /** @return array<string, mixed> */
-    public function extract(string $userId, string $text, string $language, ?string $providerOverride = null, array $taxonomy = []): array {
+    public function extract(string $userId, string $text, string $language, ?string $providerOverride = null, array $taxonomy = [], int $minTimeout = 0): array {
         $config = $this->settings->ai($userId);
+        $config['timeout'] = max((int)($config['timeout'] ?? 90), $minTimeout);
         $providerId = $providerOverride !== null && $providerOverride !== '' ? $providerOverride : (string)$config['provider'];
         if ($providerId === 'disabled') {
             throw new ImportException('AI extraction is disabled');
@@ -76,8 +77,9 @@ final class AiProviderRegistry {
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
-    public function refineImport(string $userId, array $recipe, string $language, array $taxonomy = [], ?string $providerOverride = null, ?string $source = null): array {
+    public function refineImport(string $userId, array $recipe, string $language, array $taxonomy = [], ?string $providerOverride = null, ?string $source = null, int $minTimeout = 0): array {
         $config = $this->settings->ai($userId);
+        $config['timeout'] = max((int)($config['timeout'] ?? 90), $minTimeout);
         $providerId = $providerOverride !== null && $providerOverride !== '' ? $providerOverride : (string)$config['provider'];
         if ($providerId === 'disabled') {
             throw new ImportException('AI refinement is disabled');
