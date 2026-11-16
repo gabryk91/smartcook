@@ -35,7 +35,7 @@ final class RecipeNormalizer {
         $ingredients = [];
         foreach (is_array($ingredientRows) ? array_values($ingredientRows) : [] as $index => $ingredient) {
             $ingredients[] = is_array($ingredient)
-                ? array_merge(['sortOrder' => $index], $ingredient)
+                ? $this->cleanIngredient(array_merge(['sortOrder' => $index], $ingredient), $index)
                 : $this->ingredients->parse((string)$ingredient, $index);
         }
 
@@ -94,6 +94,44 @@ final class RecipeNormalizer {
             $recipe['totalTime'] = $recipe['prepTime'] + $recipe['restTime'] + $recipe['cookTime'];
         }
         return $recipe;
+    }
+
+    /**
+     * AI output often puts the unit inside the quantity ("385g") or omits the quantity
+     * although the original line states it. Repair both so the editor keeps the amounts.
+     *
+     * @param array<string, mixed> $item @return array<string, mixed>
+     */
+    private function cleanIngredient(array $item, int $index): array {
+        $name = trim((string)($item['name'] ?? ''));
+        $quantity = isset($item['quantity']) ? trim((string)$item['quantity']) : '';
+        $unit = isset($item['unit']) ? trim((string)$item['unit']) : '';
+        if ($quantity !== '' && preg_match('/^([\d.,\/\s¼½¾⅓⅔⅛⅜⅝⅞-]+?)\s*([\p{L}.]+)$/u', $quantity, $m) === 1) {
+            $quantity = trim($m[1]);
+            if ($unit === '') {
+                $unit = trim($m[2], '.');
+            }
+        }
+        $original = trim((string)($item['originalText'] ?? ''));
+        if ($quantity === '' && $original !== '' && $name !== '') {
+            if (preg_match('/^\W*(?:q\.?\s*b\.?|quanto basta|to taste)/iu', $original) === 1 && mb_stripos($original, $name) !== false) {
+                $quantity = 'q.b.';
+                $unit = 'to_taste';
+            } else {
+                $parsed = $this->ingredients->parse($original, $index);
+                $parsedName = mb_strtolower((string)$parsed['name']);
+                if (($parsed['quantity'] ?? null) !== null && $parsedName !== '' && (str_contains($parsedName, mb_strtolower($name)) || str_contains(mb_strtolower($name), $parsedName))) {
+                    $quantity = (string)$parsed['quantity'];
+                    $unit = $unit !== '' ? $unit : (string)($parsed['unit'] ?? '');
+                }
+            }
+        }
+        $item['quantity'] = $quantity !== '' ? $quantity : null;
+        $item['unit'] = $unit !== '' ? $unit : null;
+        if (($item['amount'] ?? null) === null && $quantity !== '' && $quantity !== 'q.b.') {
+            $item['amount'] = $this->normalizer->parseQuantity($quantity);
+        }
+        return $item;
     }
 
     public function imageUrl(mixed $image, ?string $sourceUrl = null): ?string {
