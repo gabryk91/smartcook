@@ -64,7 +64,10 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
                 'prompt' => "You are a precise culinary data extraction engine.\n\n" . $prompt,
                 'stream' => false,
                 'think' => (bool)($config['useThinking'] ?? false),
-                'options' => ['temperature' => $temperature],
+                'format' => 'json',
+                'keep_alive' => (string)($config['keepAlive'] ?? '30m'),
+                // Ollama defaults to a 4k window and silently drops the start of longer prompts.
+                'options' => ['temperature' => $temperature, 'num_ctx' => max(4096, (int)($config['contextSize'] ?? 8192))],
             ]
             : [
                 'model' => $model,
@@ -74,7 +77,7 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
                     ['role' => 'user', 'content' => $prompt],
                 ],
             ];
-        if (!$nativeOllama && in_array($provider, ['openai', 'openrouter', 'mistral'], true)) {
+        if (!$nativeOllama && in_array($provider, ['openai', 'openrouter', 'mistral', 'ollama', 'localai'], true)) {
             $payload['response_format'] = ['type' => 'json_object'];
         }
         $response = $this->clients->newClient()->post($nativeOllama ? $endpoint : $endpoint . '/chat/completions', [

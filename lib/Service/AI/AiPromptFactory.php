@@ -21,13 +21,46 @@ JSON;
         return "Review this existing recipe and propose only high-confidence editorial and organizational improvements. Return only valid JSON, no Markdown or commentary. You may read ingredients and procedure to understand the recipe, but NEVER modify ingredients, their quantities, times, servings, yield, an existing procedure, media, notes, status, visibility, or planner settings. Only when the recipe has no non-empty procedure, you may propose steps: write a concise, practical procedure based solely on the listed ingredients and reliable common cooking methods. Do not introduce unlisted ingredients, exact times, temperatures, or equipment; use null for unavailable step metadata. Return steps as null when a safe, useful procedure cannot be inferred. Do not invent facts; leave a field unchanged by returning its current value or null when no useful improvement can be made. To remove a superfluous field, list its name in clearFields and leave its normal value unchanged. Use clearFields only when a current value adds no distinct way to find the recipe, such as a tag that duplicates a category, meal type, cuisine or cooking method. For difficulty, use only an integer from 1 to 5: 1 very easy, 2 easy, 3 medium, 4 difficult, 5 very difficult. " . $this->classificationInstruction($taxonomy) . " Estimate calories per serving only when it can be reasonably inferred. Set addCover true only when the recipe has no cover and a representative food photo is appropriate; coverSuggestion must be a short search description, never a URL. Output language: {$language}. Use exactly this shape:\n{$schema}\n\nRECIPE:\n{$recipeJson}";
     }
 
-    /** @param array<string, mixed> $recipe */
+    /**
+     * Editorial pass for an already parsed import. Ingredients and steps stay deterministic;
+     * a small model only has to name, describe, time and classify the dish.
+     *
+     * @param array<string, mixed> $recipe
+     * @param array<string, mixed> $taxonomy
+     */
     public function importRefinement(array $recipe, string $language, array $taxonomy = []): string {
         $source = trim((string)($recipe['source'] ?? ''));
         $recipe = is_array($recipe['recipe'] ?? null) ? $recipe['recipe'] : $recipe;
-        $recipeJson = json_encode($recipe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $context = "Refine the entire recipe using the original source and structured preview. The preview title is only a rough parser suggestion, never the final title: independently identify the finished dish from the source, ingredients and procedure, then write your own concise, accurate recipe title. Always return a reviewed title even when the preview already has one; never copy a caption, ingredient list, section heading or placeholder as the title. The original source is authoritative when it clearly states a fact. Preserve reliable ingredient quantities, units, alternatives and procedure from the structured preview when the source does not clarify them. The preview may contain parser mistakes or placeholder values; correct these from the source. Ignore promotions, links, hashtags and calls to action. Distinguish resting time from cooking time. Use exact existing classification labels only when they genuinely fit.\n\nSTRUCTURED PREVIEW:\n{$recipeJson}\n\nORIGINAL SOURCE:\n{$source}";
-        return $this->recipe($context, $language, $taxonomy);
+        $ingredients = [];
+        foreach ((array)($recipe['ingredients'] ?? []) as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $line = trim(implode(' ', array_filter([(string)($item['quantity'] ?? ''), (string)($item['unit'] ?? '') === 'to_taste' ? '' : (string)($item['unit'] ?? ''), (string)($item['name'] ?? '')], static fn (string $part): bool => trim($part) !== '')));
+            if ($line !== '') {
+                $ingredients[] = '- ' . $line;
+            }
+        }
+        $steps = [];
+        foreach ((array)($recipe['steps'] ?? []) as $index => $step) {
+            $text = trim((string)(is_array($step) ? ($step['text'] ?? '') : $step));
+            if ($text !== '') {
+                $steps[] = ((int)$index + 1) . '. ' . mb_substr($text, 0, 400);
+            }
+        }
+        $schema = '{"title":"string","description":"string","servings":1,"prepTime":0,"restTime":0,"cookTime":0,"difficulty":1,"calories":0,"cuisine":"string|null","mealType":"string|null","cookingMethod":"string|null","season":"string|null","categories":[{"name":"string"}],"tags":[{"name":"string"}],"tools":[{"name":"string"}],"coverSuggestion":"string"}';
+        $knownIngredients = $ingredients === [] ? '(none extracted)' : implode("\n", array_slice($ingredients, 0, 60));
+        $knownSteps = $steps === [] ? '(none extracted)' : implode("\n", array_slice($steps, 0, 40));
+        $source = mb_substr($source, 0, 8000);
+        return "You are the editor of a cookbook app. The SOURCE below is a social post or web page that contains ONE recipe. The ingredients and steps have already been extracted correctly and are final: do NOT output them. Your job is to fill in the editorial data with the JSON object described below, using the source AND your general culinary knowledge of the named dish.\n\n"
+            . "RULES\n"
+            . "1. title: the short name of the finished dish (fewer than 80 characters), taken from the source or recognized from ingredients and method. No emoji, hashtags, quantities, the words 'ingredients' or 'recipe', or promotional text. Never copy the whole caption.\n"
+            . "2. description: 2 or 3 warm, discursive sentences in the output language, like the introduction of a good cookbook. Say what the dish is, its origin or tradition when you recognize it (for example that a Kürtőskalács is a Hungarian chimney cake roasted over embers), and its taste and texture. Do not list ingredients or steps, do not write generic filler like 'easy recipe', and do not invent facts about this specific recipe.\n"
+            . "3. prepTime, restTime, cookTime: integer minutes. Use the times written in the source; when missing, estimate them from the steps (prepTime = hands-on work, restTime = resting, rising, cooling or marinating, cookTime = baking, frying or boiling). Use 0 only when the step does not exist. servings: integer, from the source or estimated. difficulty: integer 1 (very easy) to 5 (very difficult). calories: kcal per serving, taken from the source when stated, otherwise a reasonable estimate.\n"
+            . "4. " . $this->classificationInstruction($taxonomy) . "\n"
+            . "5. tools: kitchen equipment actually mentioned or clearly required (empty array if none). coverSuggestion: a short English photo-search phrase describing the finished dish, never a URL.\n"
+            . "6. Output language for title, description and coverSuggestion text: {$language}. Return ONLY one valid JSON object, no Markdown, no commentary, with exactly this shape:\n{$schema}\n\n"
+            . "ALREADY EXTRACTED INGREDIENTS:\n{$knownIngredients}\n\nALREADY EXTRACTED STEPS:\n{$knownSteps}\n\nSOURCE:\n{$source}";
     }
 
     public function recipe(string $text, string $language, array $taxonomy = []): string {

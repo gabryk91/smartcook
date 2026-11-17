@@ -94,13 +94,74 @@ final class ImportManager {
         ];
     }
 
-    /** @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed> */
+    /**
+     * Deterministic data stays authoritative for ingredients and steps. The AI only adds the
+     * editorial layer (title, description, times, classification); it extracts the whole recipe
+     * only when the parser found no ingredients or no steps.
+     *
+     * @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed>
+     */
     private function extractWithAi(string $userId, array $recipe, string $sourceText, string $language, ?string $provider, array $taxonomy, int $minTimeout): array {
-        $aiRecipe = $this->ai->extract($userId, mb_substr($sourceText, 0, 120000), $language, $provider, $taxonomy, $minTimeout);
-        $this->assertAiTitle($aiRecipe);
-        $aiRecipe = $this->normalizer->normalize($aiRecipe, $recipe['sourceUrl'] ?? null);
-        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
-        return $this->merge($aiRecipe, $recipe);
+        $sourceText = mb_substr(trim($sourceText), 0, 120000);
+        $full = ($recipe['ingredients'] ?? []) === [] || ($recipe['steps'] ?? []) === [];
+        $attempts = 0;
+        while (true) {
+            try {
+                $ai = $full
+                    ? $this->ai->extract($userId, $sourceText, $language, $provider, $taxonomy, $minTimeout)
+                    : $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $sourceText, $minTimeout);
+                break;
+            } catch (ImportException $e) {
+                // Small local models occasionally emit broken JSON; one more try is cheap.
+                if (++$attempts >= 2 || !str_contains($e->getMessage(), 'valid JSON')) {
+                    throw $e;
+                }
+            }
+        }
+        $ai = $this->normalizer->normalize($ai, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
+        $ai = $this->taxonomy->restrictRecipeClassifications($ai, $taxonomy);
+        return $this->mergeEditorial($recipe, $ai, $full);
+    }
+
+    /** @param array<string, mixed> $recipe @param array<string, mixed> $ai @return array<string, mixed> */
+    private function mergeEditorial(array $recipe, array $ai, bool $full): array {
+        $title = trim((string)($ai['title'] ?? ''));
+        if (!$this->usableTitle($title)) {
+            $title = $this->usableTitle((string)($recipe['title'] ?? '')) ? (string)$recipe['title'] : $title;
+        }
+        $recipe['title'] = $title !== '' ? $title : (string)($recipe['title'] ?? 'Imported recipe');
+        foreach (['subtitle', 'description', 'cuisine', 'mealType', 'cookingMethod', 'season', 'coverSuggestion', 'yieldText', 'notes'] as $field) {
+            if (($ai[$field] ?? null) !== null && $ai[$field] !== '') {
+                $recipe[$field] = $ai[$field];
+            }
+        }
+        foreach (['difficulty', 'calories'] as $field) {
+            if (($ai[$field] ?? null) !== null && $ai[$field] !== '' && $ai[$field] !== 0) {
+                $recipe[$field] = $ai[$field];
+            }
+        }
+        if ((int)($recipe['servings'] ?? 0) <= 1 && (int)($ai['servings'] ?? 0) > 1) {
+            $recipe['servings'] = (int)$ai['servings'];
+        }
+        foreach (['prepTime', 'restTime', 'cookTime'] as $field) {
+            if ((int)($recipe[$field] ?? 0) === 0 && (int)($ai[$field] ?? 0) > 0) {
+                $recipe[$field] = (int)$ai[$field];
+            }
+        }
+        $recipe['totalTime'] = max((int)($recipe['totalTime'] ?? 0), (int)$recipe['prepTime'] + (int)$recipe['restTime'] + (int)$recipe['cookTime']);
+        foreach (['tools', 'tags', 'categories'] as $field) {
+            if (($ai[$field] ?? []) !== []) {
+                $recipe[$field] = $ai[$field];
+            }
+        }
+        if ($full) {
+            foreach (['ingredients', 'steps'] as $field) {
+                if (($recipe[$field] ?? []) === [] && ($ai[$field] ?? []) !== []) {
+                    $recipe[$field] = $ai[$field];
+                }
+            }
+        }
+        return $recipe;
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
@@ -109,30 +170,25 @@ final class ImportManager {
             throw new ImportException('No recipe preview was provided');
         }
         $taxonomy = $this->importTaxonomy($userId);
-        // The deterministic importer has already preserved quantities and removed
-        // caption boilerplate. AI receives the original source too, but retains
-        // the deterministic preview when it has more reliable quantities.
         $minTimeout = $background ? self::BACKGROUND_AI_TIMEOUT : 0;
         $sourceText = trim((string)$source);
-        if ($sourceText !== '') {
-            // Same full-extraction prompt used by the synchronous import: it reads the
-            // original post and returns title, description and every classification.
-            try {
-                return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->extractWithAi($userId, $recipe, $sourceText, $language, $provider, $taxonomy, $minTimeout), $taxonomy));
-            } catch (\Throwable $e) {
-                // Fall back to the review prompt below.
-            }
+        if ($sourceText === '') {
+            $sourceText = $this->recipeAsSource($recipe);
         }
-        $aiRecipe = $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $source, $minTimeout);
-        $this->assertAiTitle($aiRecipe);
-        $aiRecipe = $this->normalizer->normalize($aiRecipe, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
-        foreach (['ingredients', 'steps'] as $field) {
-            if (($recipe[$field] ?? []) !== []) {
-                $aiRecipe[$field] = $recipe[$field];
-            }
+        $merged = $this->extractWithAi($userId, $recipe, $sourceText, $language, $provider, $taxonomy, $minTimeout);
+        return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($merged, $taxonomy));
+    }
+
+    /** @param array<string, mixed> $recipe */
+    private function recipeAsSource(array $recipe): string {
+        $lines = [(string)($recipe['title'] ?? '')];
+        foreach ((array)($recipe['ingredients'] ?? []) as $item) {
+            $lines[] = is_array($item) ? trim((string)($item['originalText'] ?? $item['name'] ?? '')) : (string)$item;
         }
-        $aiRecipe = $this->taxonomy->restrictRecipeClassifications($aiRecipe, $taxonomy);
-        return $this->validator->validate($this->taxonomy->canonicalizeRecipeClassifications($this->merge($aiRecipe, $recipe), $taxonomy));
+        foreach ((array)($recipe['steps'] ?? []) as $step) {
+            $lines[] = is_array($step) ? (string)($step['text'] ?? '') : (string)$step;
+        }
+        return implode("\n", array_filter($lines, static fn (string $line): bool => trim($line) !== ''));
     }
 
     /** @param array<string, mixed> $payload @return array<string, mixed> */
@@ -276,11 +332,9 @@ final class ImportManager {
         return $taxonomy;
     }
 
-    /** @param array<string, mixed> $recipe */
-    private function assertAiTitle(array $recipe): void {
-        $title = trim((string)($recipe['title'] ?? ''));
-        if ($title === '' || mb_strtolower($title) === 'imported recipe' || mb_strlen($title) > 160 || preg_match('/\b(?:ingredienti|ingredients|procedimento|preparazione|instructions|directions)\b[^:\n]{0,80}:/iu', $title) === 1) {
-            throw new ImportException('AI did not return a usable recipe title');
-        }
+    private function usableTitle(string $title): bool {
+        $title = trim($title);
+        return $title !== '' && mb_strtolower($title) !== 'imported recipe' && mb_strlen($title) <= 120
+            && preg_match('/\b(?:ingredienti|ingredients|procedimento|preparazione|instructions|directions)\b[^:\n]{0,80}:/iu', $title) !== 1;
     }
 }

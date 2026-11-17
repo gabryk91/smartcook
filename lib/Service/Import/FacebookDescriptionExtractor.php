@@ -46,6 +46,34 @@ final class FacebookDescriptionExtractor {
         return ['title' => $title, 'description' => $description, 'image' => $image];
     }
 
+    /**
+     * Social pages expose the same caption in og:title and og:description. Keep a single copy,
+     * otherwise ingredients and steps are parsed (and later sent to the AI) twice.
+     *
+     * @return array{title:string,text:string}
+     */
+    public function compose(string $title, string $description): array {
+        $title = trim($title);
+        $description = trim($description);
+        $description = preg_replace('/^[\d.,\sKkMm]+(?:likes?|mi piace)\b[^:]{0,250}:\s*["“]/iu', '', $description) ?? $description;
+        $description = trim(preg_replace('/["”]\.?\s*$/u', '', $description) ?? $description);
+        if ($title === '') {
+            return ['title' => '', 'text' => $description];
+        }
+        $key = static fn (string $value): string => trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', mb_strtolower($value)) ?? '');
+        $titleKey = $key($title);
+        $descriptionKey = $key($description);
+        $probe = mb_substr($titleKey, 0, 40);
+        $descriptionProbe = mb_substr($descriptionKey, 0, 40);
+        $same = mb_strlen($titleKey) > 120
+            || ($probe !== '' && str_contains($descriptionKey, $probe))
+            || ($descriptionProbe !== '' && str_contains($titleKey, $descriptionProbe));
+        if ($same) {
+            return ['title' => '', 'text' => mb_strlen($title) > mb_strlen($description) ? $title : $description];
+        }
+        return ['title' => $title, 'text' => $title . "\n\n" . $description];
+    }
+
     private function meta(\DOMXPath $xpath, string $attribute, string $value): ?string {
         $node = $xpath->query('//meta[translate(@' . $attribute . ',"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="' . mb_strtolower($value) . '"]/@content')->item(0);
         $content = trim((string)($node?->nodeValue ?? ''));

@@ -63,10 +63,13 @@ final class TextRecipeParser {
                 $group = rtrim($line, ':');
                 continue;
             }
-            $parsed = $this->ingredients->parse($line, count($ingredients));
-            $parsed['group'] = $group;
-            $ingredients[] = $parsed;
+            foreach ($this->expandToTaste($line) as $single) {
+                $parsed = $this->ingredients->parse($single, count($ingredients));
+                $parsed['group'] = $group;
+                $ingredients[] = $parsed;
+            }
         }
+        $title = $this->cleanTitle($title);
         if ($title === '') {
             $title = $this->fallbackTitle($ingredients);
         }
@@ -97,6 +100,29 @@ final class TextRecipeParser {
             'tools' => $tools,
         ];
         return $this->normalizer->normalize($data, $hints['sourceUrl'] ?? null);
+    }
+
+    /**
+     * Captions often write "q.b. burro, zucchero ed erba cipollina" as one line.
+     *
+     * @return list<string>
+     */
+    private function expandToTaste(string $line): array {
+        if (preg_match('/^\W*(?:q\.?\s*b\.?|quanto basta)\s+(.+)$/iu', $line, $m) !== 1) {
+            return [$line];
+        }
+        $parts = preg_split('/\s*,\s*|\s+ed\s+/iu', rtrim(trim($m[1]), '.')) ?: [];
+        $parts = array_values(array_filter(array_map('trim', $parts), static fn (string $part): bool => $part !== ''));
+        if (count($parts) < 2) {
+            return [$line];
+        }
+        return array_map(static fn (string $part): string => 'q.b. ' . $part, $parts);
+    }
+
+    private function cleanTitle(string $title): string {
+        $title = preg_replace('/\s*[\p{So}\x{FE0F}\x{200D}]*\s*(?:ingredienti|ingredients)\b.*$/isu', '', $title) ?? $title;
+        $title = preg_replace('/^[^\p{L}\p{N}]+|[^\p{L}\p{N})!?]+$/u', '', trim($title)) ?? $title;
+        return trim($title);
     }
 
     /** @param list<string> $lines */

@@ -22,9 +22,10 @@ final class FacebookImporter {
         if ($source['description'] === '') {
             throw new ImportException('The Facebook post or reel description could not be read. Make sure the content is public.');
         }
-        $text = trim(($source['title'] !== '' ? $source['title'] . "\n\n" : '') . $source['description']);
+        $composed = $this->description->compose($source['title'], $source['description']);
+        $text = $composed['text'];
         $recipe = $this->parser->parse($text, [
-            'title' => $source['title'],
+            'title' => $composed['title'],
             'image' => $source['image'],
             'sourceUrl' => $download['finalUrl'],
             'language' => $payload['language'] ?? 'en',

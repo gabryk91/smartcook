@@ -56,15 +56,14 @@ $refinementPrompt = (new AiPromptFactory())->refinement(['title' => 'Pasta', 'in
 $expect(str_contains($refinementPrompt, '"steps"'), 'AI refinement schema includes procedure proposal');
 $expect(str_contains($refinementPrompt, 'has no non-empty procedure'), 'AI refinement limits procedure generation to missing procedures');
 $importRefinementPrompt = (new AiPromptFactory())->importRefinement(['recipe' => ['title' => 'Imported recipe', 'ingredients' => [['name' => 'Feta']], 'steps' => [['text' => 'Servire']]], 'source' => 'Valori nutrizionali: 391 kcal. Riposo: 30 minuti.'], 'it', ['tags' => [['name' => 'Bilanciato']], 'categories' => [['name' => 'Antipasti']]]);
-$expect(str_contains($importRefinementPrompt, 'structured preview'), 'Import refinement receives the structured preview');
+$expect(str_contains($importRefinementPrompt, 'ALREADY EXTRACTED INGREDIENTS'), 'Import refinement receives the extracted ingredients');
 $expect(str_contains($importRefinementPrompt, 'Antipasti'), 'Import refinement receives the existing taxonomy');
 $expect(str_contains($importRefinementPrompt, '391 kcal'), 'Import refinement receives nutritional source context');
-$expect(str_contains($importRefinementPrompt, '"group":"string|null"'), 'Import refinement uses the complete ingredient schema');
-$expect(str_contains($importRefinementPrompt, '"allergens":[]'), 'Import refinement includes allergen suggestions');
+$expect(str_contains($importRefinementPrompt, 'do NOT output them'), 'Import refinement does not regenerate ingredients and steps');
 $expect(str_contains($importRefinementPrompt, 'single best category'), 'AI import asks for the best fitting category');
 $expect(str_contains($importRefinementPrompt, 'short name of the finished dish'), 'AI import asks for a concise dish title');
-$expect(str_contains($importRefinementPrompt, 'preview title is only a rough parser suggestion'), 'AI refinement reviews the parser title');
-$expect(str_contains($importRefinementPrompt, 'Always return a reviewed title'), 'AI refinement always proposes a title');
+$expect(str_contains($importRefinementPrompt, 'Hungarian chimney cake'), 'AI import asks for a discursive description');
+$expect(str_contains($importRefinementPrompt, 'prepTime, restTime, cookTime'), 'AI import asks for times');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
@@ -170,7 +169,7 @@ $expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram i
 
 $youtubeCaptionRecipe = $recipeParser->parse('🧾 Ingredienti per ~1 porzione: 🍠 100g Barbabietola; 🧀 150g Feta 🔄 150g Feta Light; 🫒 +20g Olio e.v.o. 🔄 1 cucchiaio (~10g); 🍯 15g Miele 🧂 q.b. aceto balsamico, sale ed erba cipollina. 👨‍🍳 Preparazione: - lava bene e sbuccia una barbabietola; - affettala finemente con una mandolina; 🔥 Valori nutrizionali - per UNA porzione: ~391kcal. ⚠️ Considerazioni: ottima prima dell’allenamento. #pranzo #dieta', ['language' => 'it', 'title' => '9 novembre 2026']);
 $expectSame('Barbabietola e Feta', $youtubeCaptionRecipe['title'], 'YouTube social caption fallback title');
-$expectSame(7, count($youtubeCaptionRecipe['ingredients']), 'YouTube social caption ingredients');
+$expectSame(9, count($youtubeCaptionRecipe['ingredients']), 'YouTube social caption ingredients (q.b. list split)');
 $expectNear(100.0, $youtubeCaptionRecipe['ingredients'][0]['amount'], 0.0001, 'YouTube social caption beetroot quantity');
 $expectNear(150.0, $youtubeCaptionRecipe['ingredients'][1]['amount'], 0.0001, 'YouTube social caption feta quantity');
 $expectNear(20.0, $youtubeCaptionRecipe['ingredients'][3]['amount'], 0.0001, 'YouTube social caption oil quantity');

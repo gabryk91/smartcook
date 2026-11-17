@@ -22,8 +22,9 @@ final class InstagramImporter {
         if ($source['description'] === '') {
             throw new ImportException('The Instagram post or reel caption could not be read. Make sure the content is public.');
         }
-        $title = $this->title($source['title']);
-        $text = trim(($title !== '' ? $title . "\n\n" : '') . $source['description']);
+        $composed = $this->description->compose($this->title($source['title']), $source['description']);
+        $title = $composed['title'];
+        $text = $composed['text'];
         $recipe = $this->parser->parse($text, [
             'title' => $title,
             'image' => $source['image'],
