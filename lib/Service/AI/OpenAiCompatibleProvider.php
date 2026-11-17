@@ -65,9 +65,10 @@ final class OpenAiCompatibleProvider implements AiProviderInterface {
                 'stream' => false,
                 'think' => (bool)($config['useThinking'] ?? false),
                 'format' => 'json',
-                'keep_alive' => (string)($config['keepAlive'] ?? '30m'),
+                'keep_alive' => (string)($config['keepAlive'] ?? '1m'),
                 // Ollama defaults to a 4k window and silently drops the start of longer prompts.
-                'options' => ['temperature' => $temperature, 'num_ctx' => max(4096, (int)($config['contextSize'] ?? 8192))],
+                // num_thread keeps CPU-only NAS hosts responsive: by default Ollama uses every core.
+                'options' => ['temperature' => $temperature, 'num_ctx' => max(4096, (int)($config['contextSize'] ?? 8192)), 'num_thread' => max(1, (int)($config['threads'] ?? 4))],
             ]
             : [
                 'model' => $model,
