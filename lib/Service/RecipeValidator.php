@@ -104,6 +104,9 @@ final class RecipeValidator {
             if ($name === '' && $original === '') {
                 continue;
             }
+            if (mb_strlen($name !== '' ? $name : $original) > 255) {
+                throw new ValidationException('Recipe validation failed', ['ingredients' => 'Ingredient ' . ($index + 1) . ' has a name longer than 255 characters; check whether procedure text was entered as an ingredient']);
+            }
             $quantity = isset($ingredient['quantity']) ? trim((string)$ingredient['quantity']) : null;
             $result[] = [
                 'name' => $name !== '' ? $name : $original,

@@ -163,6 +163,17 @@ $longSocialTitle = str_repeat('Pasta al forno ', 30);
 $longTitleRecipe = $recipeParser->parse('Ingredienti: 200 g pasta', ['title' => $longSocialTitle]);
 $expect(mb_strlen($longTitleRecipe['title']) <= 255, 'Long social title fits recipe validation');
 $expectSame($longTitleRecipe['title'], (new \OCA\SmartCook\Service\RecipeValidator($text, $difficulty))->validate($longTitleRecipe)['title'], 'Long social title passes recipe validation');
+$joinedProcedure = str_repeat('Taglia ogni carota e disponi i bastoncini sulla carta forno. ', 6);
+$joinedRecipe = $recipeParser->parse("Bastoncini di carote\nIngredienti:\n2 carote\n{$joinedProcedure}", ['language' => 'it']);
+$expectSame(1, count($joinedRecipe['ingredients']), 'Long joined procedure is not stored as an ingredient');
+$expect(str_contains($joinedRecipe['steps'][0]['text'] ?? '', 'Taglia ogni carota'), 'Joined procedure remains available as a step');
+$longIngredientRejected = false;
+try {
+    (new \OCA\SmartCook\Service\RecipeValidator($text, $difficulty))->validate(['title' => 'Carote', 'ingredients' => [['name' => $joinedProcedure]]]);
+} catch (\OCA\SmartCook\Exception\ValidationException $e) {
+    $longIngredientRejected = isset($e->getErrors()['ingredients']);
+}
+$expect($longIngredientRejected, 'Oversized ingredient names are rejected before database insertion');
 $emojiIngredient = $ingredientParser->parse('🧅 1 cipolla dolce');
 $expectSame('cipolla dolce', $emojiIngredient['name'], 'Emoji-prefixed Instagram ingredient name');
 $expectNear(1.0, $emojiIngredient['amount'], 0.0001, 'Emoji-prefixed Instagram ingredient quantity');

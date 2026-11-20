@@ -1619,7 +1619,8 @@ async function renderImport(view) {
                         }
                     }
                     catch (error) {
-                        failedRecipes.push(`${preview.recipe.title}: ${error instanceof Error ? error.message : tr('Unexpected error')}`);
+                        const detail = error instanceof ApiError ? Object.values(error.fields).filter(Boolean).join('; ') : '';
+                        failedRecipes.push(`${preview.recipe.title}: ${error instanceof Error ? error.message : tr('Unexpected error')}${detail ? ` — ${detail}` : ''}`);
                     }
                 }
             }

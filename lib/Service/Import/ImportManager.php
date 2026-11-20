@@ -95,15 +95,21 @@ final class ImportManager {
     }
 
     /**
-     * Deterministic data stays authoritative for ingredients and steps. The AI only adds the
-     * editorial layer (title, description, times, classification); it extracts the whole recipe
-     * only when the parser found no ingredients or no steps.
+     * Deterministic data stays authoritative for usable ingredients and steps. Ask the AI
+     * to extract the whole recipe when either is missing or an ingredient cannot fit the schema.
      *
      * @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed>
      */
     private function extractWithAi(string $userId, array $recipe, string $sourceText, string $language, ?string $provider, array $taxonomy, int $minTimeout): array {
         $sourceText = mb_substr(trim($sourceText), 0, 120000);
-        $full = ($recipe['ingredients'] ?? []) === [] || ($recipe['steps'] ?? []) === [];
+        $invalidIngredients = false;
+        foreach ((array)($recipe['ingredients'] ?? []) as $ingredient) {
+            if (is_array($ingredient) && mb_strlen((string)($ingredient['name'] ?? '')) > 255) {
+                $invalidIngredients = true;
+                break;
+            }
+        }
+        $full = $invalidIngredients || ($recipe['ingredients'] ?? []) === [] || ($recipe['steps'] ?? []) === [];
         $attempts = 0;
         while (true) {
             try {
@@ -120,11 +126,11 @@ final class ImportManager {
         }
         $ai = $this->normalizer->normalize($ai, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
         $ai = $this->taxonomy->restrictRecipeClassifications($ai, $taxonomy);
-        return $this->mergeEditorial($recipe, $ai, $full);
+        return $this->mergeEditorial($recipe, $ai, $full, $invalidIngredients);
     }
 
     /** @param array<string, mixed> $recipe @param array<string, mixed> $ai @return array<string, mixed> */
-    private function mergeEditorial(array $recipe, array $ai, bool $full): array {
+    private function mergeEditorial(array $recipe, array $ai, bool $full, bool $invalidIngredients): array {
         $title = trim((string)($ai['title'] ?? ''));
         if (!$this->usableTitle($title)) {
             $title = $this->usableTitle((string)($recipe['title'] ?? '')) ? (string)$recipe['title'] : $title;
@@ -156,7 +162,7 @@ final class ImportManager {
         }
         if ($full) {
             foreach (['ingredients', 'steps'] as $field) {
-                if (($recipe[$field] ?? []) === [] && ($ai[$field] ?? []) !== []) {
+                if ((($recipe[$field] ?? []) === [] || ($field === 'ingredients' && $invalidIngredients)) && ($ai[$field] ?? []) !== []) {
                     $recipe[$field] = $ai[$field];
                 }
             }

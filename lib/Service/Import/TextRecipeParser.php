@@ -65,6 +65,12 @@ final class TextRecipeParser {
             }
             foreach ($this->expandToTaste($line) as $single) {
                 $parsed = $this->ingredients->parse($single, count($ingredients));
+                if (mb_strlen((string)$parsed['name']) > 255) {
+                    // Some captions omit the procedure heading and join several
+                    // instructions into one line inside the ingredient section.
+                    $sections['steps'][] = $single;
+                    continue;
+                }
                 $parsed['group'] = $group;
                 $ingredients[] = $parsed;
             }
