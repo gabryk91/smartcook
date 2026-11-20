@@ -64,6 +64,16 @@ $expect(str_contains($importRefinementPrompt, 'single best category'), 'AI impor
 $expect(str_contains($importRefinementPrompt, 'short name of the finished dish'), 'AI import asks for a concise dish title');
 $expect(str_contains($importRefinementPrompt, 'Hungarian chimney cake'), 'AI import asks for a discursive description');
 $expect(str_contains($importRefinementPrompt, 'prepTime, restTime, cookTime'), 'AI import asks for times');
+$fullImportPrompt = (new AiPromptFactory())->recipe('Bastoncini di carote', 'it', ['categories' => [['name' => 'Contorni']]]);
+$expect(str_contains($fullImportPrompt, 'macro summaries'), 'Full AI extraction excludes nutrition summaries from ingredients');
+$expect(str_contains($fullImportPrompt, '"ingredients"'), 'Full AI extraction requests structured ingredients');
+$importManager = (new \ReflectionClass(\OCA\SmartCook\Service\Import\ImportManager::class))->newInstanceWithoutConstructor();
+$mergedImport = (new \ReflectionMethod($importManager, 'mergeExtracted'))->invoke($importManager,
+    ['title' => 'Bastoncini di carote', 'ingredients' => [['name' => 'carote', 'quantity' => '5']], 'steps' => [['text' => 'Cuocere in forno.']]],
+    ['title' => 'Anteprima', 'sourceUrl' => 'https://example.com/recipe', 'ingredients' => [['name' => 'macros per tutta la ricetta']], 'steps' => [['text' => 'Testo estratto.']]]);
+$expectSame('carote', $mergedImport['ingredients'][0]['name'], 'AI ingredients replace a non-empty parser preview');
+$expectSame('Cuocere in forno.', $mergedImport['steps'][0]['text'], 'AI steps replace a non-empty parser preview');
+$expectSame('https://example.com/recipe', $mergedImport['sourceUrl'], 'Import retains source metadata absent from AI output');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');

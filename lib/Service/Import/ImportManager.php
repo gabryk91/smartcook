@@ -94,80 +94,46 @@ final class ImportManager {
         ];
     }
 
-    /**
-     * Deterministic data stays authoritative for usable ingredients and steps. Ask the AI
-     * to extract the whole recipe when either is missing or an ingredient cannot fit the schema.
-     *
-     * @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed>
-     */
+    /** @param array<string, mixed> $recipe @param array<string, mixed> $taxonomy @return array<string, mixed> */
     private function extractWithAi(string $userId, array $recipe, string $sourceText, string $language, ?string $provider, array $taxonomy, int $minTimeout): array {
         $sourceText = mb_substr(trim($sourceText), 0, 120000);
-        $invalidIngredients = false;
-        foreach ((array)($recipe['ingredients'] ?? []) as $ingredient) {
-            if (is_array($ingredient) && mb_strlen((string)($ingredient['name'] ?? '')) > 255) {
-                $invalidIngredients = true;
-                break;
-            }
-        }
-        $full = $invalidIngredients || ($recipe['ingredients'] ?? []) === [] || ($recipe['steps'] ?? []) === [];
+        $preview = array_intersect_key($recipe, array_flip(['title', 'description', 'sourceName', 'sourceUrl', 'cuisine', 'mealType', 'cookingMethod', 'categories', 'tags']));
+        $previewJson = json_encode($preview, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $aiSource = "DETERMINISTIC PREVIEW (tentative; review and correct every field, especially the title and classifications):\n{$previewJson}\n\nORIGINAL SOURCE:\n{$sourceText}";
         $attempts = 0;
         while (true) {
             try {
-                $ai = $full
-                    ? $this->ai->extract($userId, $sourceText, $language, $provider, $taxonomy, $minTimeout)
-                    : $this->ai->refineImport($userId, $recipe, $language, $taxonomy, $provider, $sourceText, $minTimeout);
+                $ai = $this->ai->extract($userId, $aiSource, $language, $provider, $taxonomy, $minTimeout);
+                $ai = $this->normalizer->normalize($ai, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
+                foreach (['ingredients', 'steps'] as $field) {
+                    if (($recipe[$field] ?? []) !== [] && ($ai[$field] ?? []) === []) {
+                        throw new ImportException('AI extraction did not return structured ' . $field);
+                    }
+                }
                 break;
             } catch (ImportException $e) {
-                // Small local models occasionally emit broken JSON; one more try is cheap.
-                if (++$attempts >= 2 || !str_contains($e->getMessage(), 'valid JSON')) {
+                // Small local models occasionally emit incomplete or broken JSON.
+                if (++$attempts >= 2 || (!str_contains($e->getMessage(), 'valid JSON') && !str_contains($e->getMessage(), 'did not return structured'))) {
                     throw $e;
                 }
             }
         }
-        $ai = $this->normalizer->normalize($ai, isset($recipe['sourceUrl']) ? (string)$recipe['sourceUrl'] : null);
         $ai = $this->taxonomy->restrictRecipeClassifications($ai, $taxonomy);
-        return $this->mergeEditorial($recipe, $ai, $full, $invalidIngredients);
+        return $this->mergeExtracted($ai, $recipe);
     }
 
-    /** @param array<string, mixed> $recipe @param array<string, mixed> $ai @return array<string, mixed> */
-    private function mergeEditorial(array $recipe, array $ai, bool $full, bool $invalidIngredients): array {
+    /** @param array<string, mixed> $ai @param array<string, mixed> $fallback @return array<string, mixed> */
+    private function mergeExtracted(array $ai, array $fallback): array {
         $title = trim((string)($ai['title'] ?? ''));
         if (!$this->usableTitle($title)) {
-            $title = $this->usableTitle((string)($recipe['title'] ?? '')) ? (string)$recipe['title'] : $title;
+            $ai['title'] = $fallback['title'] ?? 'Imported recipe';
         }
-        $recipe['title'] = $title !== '' ? $title : (string)($recipe['title'] ?? 'Imported recipe');
-        foreach (['subtitle', 'description', 'cuisine', 'mealType', 'cookingMethod', 'season', 'coverSuggestion', 'yieldText', 'notes'] as $field) {
-            if (($ai[$field] ?? null) !== null && $ai[$field] !== '') {
-                $recipe[$field] = $ai[$field];
+        foreach ($fallback as $field => $value) {
+            if (!array_key_exists($field, $ai) || $ai[$field] === null || $ai[$field] === '' || $ai[$field] === [] || $ai[$field] === 0) {
+                $ai[$field] = $value;
             }
         }
-        foreach (['difficulty', 'calories'] as $field) {
-            if (($ai[$field] ?? null) !== null && $ai[$field] !== '' && $ai[$field] !== 0) {
-                $recipe[$field] = $ai[$field];
-            }
-        }
-        if ((int)($recipe['servings'] ?? 0) <= 1 && (int)($ai['servings'] ?? 0) > 1) {
-            $recipe['servings'] = (int)$ai['servings'];
-        }
-        foreach (['prepTime', 'restTime', 'cookTime'] as $field) {
-            if ((int)($recipe[$field] ?? 0) === 0 && (int)($ai[$field] ?? 0) > 0) {
-                $recipe[$field] = (int)$ai[$field];
-            }
-        }
-        $recipe['totalTime'] = max((int)($recipe['totalTime'] ?? 0), (int)$recipe['prepTime'] + (int)$recipe['restTime'] + (int)$recipe['cookTime']);
-        foreach (['tools', 'tags', 'categories'] as $field) {
-            if (($ai[$field] ?? []) !== []) {
-                $recipe[$field] = $ai[$field];
-            }
-        }
-        if ($full) {
-            foreach (['ingredients', 'steps'] as $field) {
-                if ((($recipe[$field] ?? []) === [] || ($field === 'ingredients' && $invalidIngredients)) && ($ai[$field] ?? []) !== []) {
-                    $recipe[$field] = $ai[$field];
-                }
-            }
-        }
-        return $recipe;
+        return $ai;
     }
 
     /** @param array<string, mixed> $recipe @return array<string, mixed> */
