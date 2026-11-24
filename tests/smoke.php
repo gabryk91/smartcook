@@ -11,6 +11,7 @@ use OCA\SmartCook\Service\Import\FacebookDescriptionExtractor;
 use OCA\SmartCook\Service\Import\JsonLdRecipeExtractor;
 use OCA\SmartCook\Service\Import\RecipeNormalizer;
 use OCA\SmartCook\Service\Import\TextRecipeParser;
+use OCA\SmartCook\Service\Import\YoutubeImporter;
 use OCA\SmartCook\Service\Ocr\NativePdfTextExtractor;
 use OCA\SmartCook\Service\TextNormalizer;
 use OCA\SmartCook\Service\DifficultyNormalizer;
@@ -74,6 +75,13 @@ $mergedImport = (new \ReflectionMethod($importManager, 'mergeExtracted'))->invok
 $expectSame('carote', $mergedImport['ingredients'][0]['name'], 'AI ingredients replace a non-empty parser preview');
 $expectSame('Cuocere in forno.', $mergedImport['steps'][0]['text'], 'AI steps replace a non-empty parser preview');
 $expectSame('https://example.com/recipe', $mergedImport['sourceUrl'], 'Import retains source metadata absent from AI output');
+$youtubeImporter = (new \ReflectionClass(YoutubeImporter::class))->newInstanceWithoutConstructor();
+$youtubeWatchUrl = new \ReflectionMethod($youtubeImporter, 'watchUrl');
+$expectSame('https://www.youtube.com/watch?v=PpXjmGU63lg', $youtubeWatchUrl->invoke($youtubeImporter, 'https://youtube.com/shorts/PpXjmGU63lg?is=SGv_fz4pi6TEhQSu'), 'YouTube Shorts retry uses canonical watch page');
+$youtubeDescription = new \ReflectionMethod($youtubeImporter, 'description');
+$expectSame("Carote\nCuocere in forno", $youtubeDescription->invoke($youtubeImporter, '<script>{"shortDescription" : "Carote\\nCuocere in forno"}</script>'), 'YouTube description accepts spaced JSON fields');
+$expectSame('Ingredienti: carote', $youtubeDescription->invoke($youtubeImporter, '<meta property="og:description" content="Ingredienti: carote">'), 'YouTube description accepts recipe metadata');
+$expectSame('', $youtubeDescription->invoke($youtubeImporter, '<meta property="og:description" content="Watch videos on YouTube">'), 'YouTube ignores generic metadata');
 
 $ingredient = $ingredientParser->parse('2 ½ tazze farina, setacciata');
 $expectSame('farina', $ingredient['name'], 'Ingredient name');
